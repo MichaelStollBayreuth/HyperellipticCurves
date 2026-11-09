@@ -1,0 +1,15 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Solution",
+  "theorem_names": [
+    "challenge_main_affine",
+    "challenge_main_affine_numberField",
+    "challenge_ratPoints_finite_numberField"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

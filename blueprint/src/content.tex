@@ -1,0 +1,190 @@
+\chapter*{Overview}
+
+\subsection*{The result}
+
+Let $f \in \ZZ[x]$ be monic and squarefree of odd degree $2g+1$ with $g \ge 1$, and let
+$C \colon y^2 = f(x)$ be the associated hyperelliptic curve of genus $g$, with its single
+point $\infty$ at infinity. Let $J$ denote its Jacobian, realized below as a class group,
+and let $p$ be an odd prime such that the reduction $\bar f \in \Fp[x]$ is squarefree
+(equivalently, $p \nmid \operatorname{disc} f$). This project formalizes the
+method of Chabauty and Coleman for such curves: if
+\[
+  \operatorname{rk} J(\QQ) \;:=\; \dim_{\QQ} \bigl(J(\QQ) \otimes_{\ZZ} \QQ\bigr) \;\le\; r
+\]
+for a natural number $r < g$, and $p > 2r + 2$, then
+\[
+  \#C(\QQ) \;\le\; \#\bar C(\Fp) + 2r
+\]
+(Theorem~\ref{thm:main}); in particular $C(\QQ)$ is finite
+(Corollary~\ref{cor:finiteness}). The choice $r = g-1$, admissible as soon as
+$\operatorname{rk} J(\QQ) < g$, recovers Coleman's bound
+$\#C(\QQ) \le \#\bar C(\Fp) + 2g-2$ for $p > 2g$; the improvement to $2r$ is Theorem~6.4
+of M.~Stoll, \emph{Independence of rational points on twists of a given curve}, Compositio
+Math.\ 142 (2006), 1201--1214. No finite generation of $J(\QQ)$ is assumed: the rank is
+a cardinal, required to be $\le r$. The main theorems are proved over an abstract complete
+discrete valuation ring of characteristic $0$ with algebraically closed residue field of
+characteristic $\neq 2$, with an arithmetic base field $K_0$ in the role of $\QQ$; the
+classical statement over $\ZZ$ is an instantiation at the Witt vectors $W(\Fpbar)$. That
+ring is not assumed unramified: it carries a uniformizer $\pi$ and a natural number $e$
+with $v(p) \le e$ bounding the absolute ramification index, and the condition on the prime
+is then $p > 2r + e + 1$ --- Corollary~6.7 of \emph{loc.\ cit.}, which is what admits
+ramified primes over a general base field. Over $\QQ$ one has $\pi = p$ and $e = 1$.
+
+\subsection*{The strategy}
+
+The proof follows the classical outline. The $p$-adic points of $C$ decompose into
+\emph{residue disks}, the fibres of the reduction map $C(\Qp) \to \bar C(\Fp)$
+(Lemma~\ref{lem:disk-decomp}); each disk is parametrized by a power series chart
+(Lemma~\ref{lem:disk-param}). A $p$-adic logarithm on the kernel of reduction of the
+Jacobian pairs regular differentials $\omega$ against divisor classes; the pairing
+$\lambda_\omega$ is additive in the class, linear in $\omega$, and on a fixed residue disk
+it is computed by the antiderivative of the power-series expansion of $\omega$
+(Theorem~\ref{thm:glue}). If the rank is at most $r$, a dimension count produces a whole
+\emph{space of annihilating differentials}, of codimension at most $r$ in the regular
+differentials: every $\omega$ in it has $\lambda_\omega = 0$ on the relevant subgroup
+(Theorem~\ref{thm:annihilator}). The rational points in one residue disk then all map to
+zeros of a single $p$-adic power series, whose number is bounded through Strassmann's
+theorem by $1 + \ord_{\bar P}(\bar\omega)$ (Theorem~\ref{thm:disk-bound}). Nothing forces
+the same $\omega$ in every disk: each may use the differential of that space vanishing to
+the smallest order at its own centre, and those minimal orders sum to at most $2r$
+(Corollary~\ref{cor:sum-ord-space}), where one fixed differential would only give the
+degree $2g-2$ of a canonical divisor (Corollary~\ref{cor:sum-ord}).
+
+\subsection*{The Jacobian as a class group}
+
+Mathlib has no algebraic geometry of abelian varieties: no Jacobian variety, no smooth
+projective models, no N\'eron models, and no Riemann--Roch theorem. The project therefore
+works with an entirely ring-theoretic model of the Jacobian. For a field $K$ of
+characteristic $\neq 2$, the affine coordinate ring $\A{K} = K[x][y]/(y^2 - f)$ is a
+Dedekind domain (Theorem~\ref{thm:hypring-dedekind}), and the Jacobian is \emph{defined} as
+its ideal class group,
+\[
+  \J{K} \;:=\; \Cl(\A{K})
+\]
+(Definition~\ref{def:hypjac}). Because $\deg f$ is odd there is exactly one point at
+infinity, and the degree-zero divisor classes of the smooth projective curve correspond
+exactly to the ideal classes of the affine ring, so nothing is lost. The Abel--Jacobi map
+sends a point to the class of its maximal ideal, and every class is represented by a unique
+\emph{reduced Mumford ideal} $(u,\, y - v)$ with $u$ monic, $\deg v < \deg u \le g$ and
+$u \mid v^2 - f$ (Lemmas~\ref{lem:mumford-reduce} and~\ref{lem:mumford-exists}); the group
+law is computed by Cantor's composition-and-reduction algorithm on these representatives.
+All of Chapter~1 works over an arbitrary field, replacing the geometry of the curve by
+commutative algebra of $\A{K}$: norms and traces in the quadratic extension, ideal
+factorizations, and elementary degree and parity arguments.
+
+Three consequences of this model shape the whole development.
+
+\emph{Reduction of classes is constructed by hand.} With no N\'eron model, the reduction
+map $\redJ \colon \J{K} \to \Cl(\A{\bar\kappa})$ on classes is defined by reducing points:
+a class is represented over a finite extension by a divisor supported on rational points,
+each point is reduced through its residue disk, and well-definedness comes from a
+specialization theorem for principal divisors, proved with Weierstrass preparation
+(Theorem~\ref{thm:spec}, Definition~\ref{def:redJ}, Theorem~\ref{thm:redJ-hom}).
+
+\emph{The formal group is built from Cantor's algorithm.} The identity of the Jacobian
+lies on the theta locus, where reduced Mumford representatives degenerate below degree
+$g$, so there is no coordinate chart at the origin. Instead, an auxiliary class $\tau$ in
+general position is constructed (Lemmas~\ref{lem:tau-generic} and~\ref{lem:tau-exists}),
+and the kernel of reduction is coordinatized by the chart $c \mapsto c + \tau$: the
+translated group law
+$F_\tau(X,Y)$, expressing the Mumford data of $\mathrm{ch}(X) + \mathrm{ch}(Y) - \tau$ in
+chart coordinates, is a $g$-dimensional commutative formal group law over the base ring
+(Theorem~\ref{thm:Ftau-assoc}), and the kernel of reduction is isomorphic to the group of
+its points on a polydisk (Theorem~\ref{thm:chart-mem}). Cantor's algorithm enters as a
+family of exact polynomial identities: each composition step carries a B\'ezout identity
+between the participating $u$-polynomials as a hypothesis, and each reduction step an
+inverse of a leading coefficient, so that all constructions are polynomial in the data and
+these certificates, and specialize along arbitrary ring homomorphisms. Identities between
+power series (commutativity, associativity, and the various identifications of charts) are
+proved by evaluating at all points of the polydisk and interpolating
+(Theorem~\ref{thm:interpolation}).
+
+\emph{Coleman integration is replaced by the formal logarithm.} The logarithm of the
+formal group law $F_\tau$ (Chapter~2, Theorem~\ref{thm:log-iso}) provides the homomorphism
+$\Lam$ on the kernel of reduction (Definition~\ref{def:Lam}). Its differential pulls back
+along the curve-to-chart maps to explicit rational differentials $\omega'_1, \dots,
+\omega'_g$ on the curve, which are shown --- by a closed trace-form computation, with no
+Riemann--Roch --- to be a basis of the regular differentials, and whose disk expansions
+integrate $\Lam$ on each residue disk (Theorem~\ref{thm:omega-prime-global}). This is the
+substitute for Coleman's integration theory, and Theorem~\ref{thm:glue} is its summary
+interface: the pairing $\lambda$, its linearity, and the glue identity expressing
+$\lambda_\omega$ on a same-disk difference as a difference of antiderivative values.
+
+\subsection*{Guide to the chapters}
+
+\emph{Chapter 1} develops the class-group model over an arbitrary field: the Dedekind
+property (Theorem~\ref{thm:hypring-dedekind}), Mumford representation with existence and
+uniqueness of reduced representatives (Lemmas~\ref{lem:mumford-reduce},
+\ref{lem:mumford-exists}), and base change (Definition~\ref{def:basechange}).
+
+\emph{Chapter 2} contains the $p$-adic analysis, independent of the curve: evaluation of
+power series on the maximal ideal (Definition~\ref{def:eval}), Weierstrass preparation and
+zero counts (Theorem~\ref{thm:wprep}, Corollary~\ref{cor:wprep-count}), Strassmann's
+theorem (Theorem~\ref{thm:strassmann}), the zero bound for antiderivatives
+(Theorem~\ref{thm:antideriv-zeros}), the interpolation theorem
+(Theorem~\ref{thm:interpolation}), formal group laws with their invariant differentials
+and logarithms (Definitions~\ref{def:fgl}--\ref{def:fgl-log},
+Theorem~\ref{thm:log-iso}), and Hensel's lemma in the smooth-point form
+(Theorem~\ref{thm:hensel}).
+
+\emph{Chapter 3} constructs the residue disks and the reduction of classes: the disk
+parametrizations (Lemma~\ref{lem:disk-param}), integral expansions of differentials with
+the order matching $\ord_{\bar P}(\bar\omega) = \ord_z(\bar w)$
+(Lemmas~\ref{lem:omega-expansion}, \ref{lem:ord-match}), the vanishing budget
+$\sum m_{\bar P} \le 2g-2$ (Corollary~\ref{cor:sum-ord}) and its refinement to a space of
+differentials (Corollary~\ref{cor:sum-ord-space}), the specialization theorem for
+principal divisors (Theorem~\ref{thm:spec}), and the reduction homomorphism $\redJ$
+(Theorem~\ref{thm:redJ-hom}).
+
+\emph{Chapter 4} is the heart: the auxiliary class $\tau$ and its genericity --- proved
+for every genus $g \ge 1$ through the point-by-point fold and its cuspidal degeneration
+(Definition~\ref{def:centre-fold} through Theorem~\ref{thm:fold-witness}) --- the
+translated formal group law $F_\tau$ (Theorem~\ref{thm:Ftau-assoc}), the chart
+isomorphism for the kernel of reduction (Theorem~\ref{thm:chart-mem}), the logarithm
+$\Lam$ (Definition~\ref{def:Lam}), the differentials $\omega'_i$ with the trace-form
+computation of their regularity (Theorem~\ref{thm:omega-prime-global}), the genericity of
+the global configuration (Lemma~\ref{lem:global-generic}), and the interface theorem for
+the pairing $\lambda$ (Theorem~\ref{thm:glue}).
+
+\emph{Chapter 5} concludes: the space of annihilating differentials from the rank
+hypothesis (Theorem~\ref{thm:annihilator}), its integral numerators
+(Lemma~\ref{lem:normalize}),
+the per-disk bound (Theorem~\ref{thm:disk-bound}), and the main theorem with its
+arithmetic instantiations (Theorem~\ref{thm:main}, Corollary~\ref{cor:finiteness}).
+
+\emph{Chapter 6} instantiates the arithmetic base over an arbitrary number field $K$: for
+a prime $\mathfrak p$ of good reduction with ramification index $e$, the ring playing the
+role of the completed maximal unramified extension of $K_{\mathfrak p}$ is constructed as
+a direct factor of $W(\Fpbar) \otimes_{\ZZ} O_K$ (Definition~\ref{def:local-factor},
+Lemma~\ref{lem:factor-dvr}), giving the bound
+$\#C(K) \le \#\bar C(\Fq) + 2r$ for $p > 2r + e + 1$ (Theorem~\ref{thm:main-nf}).
+
+\subsection*{Notation and standing hypotheses}
+
+Throughout: $f \in \ZZ[x]$ is monic and squarefree with $\deg f = 2g+1$, $g \ge 1$ (the
+rank hypothesis of the main theorem forces $g \ge 1$, and no lower genus bound is used
+anywhere); $C \colon y^2 = f(x)$ with its point $\infty$; $p$ is a prime with
+$p \nmid \operatorname{disc}(f)$ and $p > 2r + 2$, where $r < g$ is the bound on the rank
+in the main theorem (so $p$ is odd and $\bar f \in \Fp[x]$ is squarefree of degree
+$2g+1$; the classical condition $p > 2g$ is the case $r = g-1$). Over an arbitrary arithmetic base
+(Theorem~\ref{thm:main-arith}) the condition is $p > 2r + e + 1$, with $e$ bounding the
+absolute ramification index; over $\QQ$, $e = 1$. Fields named $K$ are of characteristic $0$ or of
+characteristic $p$ as indicated; the results of Chapter~1 hold over an arbitrary field of
+characteristic $\ne 2$ unless stated otherwise. $W(\Fq)$ denotes the Witt vectors,
+$\Oq = W(\Fq)$ and $\Qq = \Oq[1/p]$ for $q = p^N$; in the formalization, $\Oq$ is an
+abstract complete discrete valuation ring of characteristic $0$ with algebraically closed
+residue field of characteristic $\neq 2$.
+
+Statements are given in the form and generality in which they are formalized. Remarks
+labelled \emph{Formalization} record, concisely, how a statement or proof is realized in
+Lean; the typewriter-font names in them are the corresponding Lean declarations, and the
+lists attached to each node are machine-checked against the code. Some statements are
+formalized although the main theorems do not depend on them; their Lean declarations are in
+the modules \texttt{HyperellipticCurves.Archive.*}, and a remark says so at each of them.
+
+\input{chapters/00-trunk}
+\input{chapters/01-pkit}
+\input{chapters/02-disks}
+\input{chapters/03-log}
+\input{chapters/04-count}
+\input{chapters/05-numberfield}

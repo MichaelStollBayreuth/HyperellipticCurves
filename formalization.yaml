@@ -1,0 +1,245 @@
+# formalization.yaml (v0.3): repo-root metadata for formalization projects.
+# See https://github.com/mathlib-initiative/formalization.yaml
+
+version: "v0.3"
+
+# project - the formalization itself (not the source).
+project:
+  name: "HyperellipticCurves: the Chabauty–Coleman bound for odd-degree hyperelliptic curves"
+  authors: ["Michael Stoll"]
+  license: "Apache-2.0"
+
+# sources - what was formalized.
+sources:
+  - title: "Independence of rational points on twists of a given curve"
+    authors: ["Michael Stoll"]
+    id: "10.1112/S0010437X06002168"   # Compositio Math. 142 (2006), 1201-1214
+    type: "journal article"
+    license: "© Foundation Compositio Mathematica 2006"
+    author_contacted: "yes"    # the source author is the formalization author
+    prior_work: ""
+  - title: "Effective Chabauty"
+    authors: ["Robert F. Coleman"]
+    id: "10.1215/S0012-7094-85-05240-8"   # Duke Math. J. 52 (1985), 765-770
+    type: "journal article"
+    license: "© Duke University Press"
+    author_contacted: "no"
+    prior_work: ""
+
+# project status
+status:
+  scope: >
+    Formalization of the method of Chabauty and Coleman for hyperelliptic curves
+    C : y² = f(x) with f monic of odd degree 2g + 1, in the refined form of Stoll's Theorem 6.4
+    and Corollary 6.7 (Compositio Math. 142 (2006)): if the rank dim_ℚ (J(K) ⊗ ℚ) of the
+    Jacobian is at most r < g, then #C(K) ≤ #C̄(k) + 2r for every prime of good reduction whose
+    residue characteristic p satisfies p > 2r + e + 1, e being the ramification index. Over ℚ
+    this reads #C(ℚ) ≤ #C̄(𝔽_p) + 2r for p > 2r + 2, and the case r = g - 1 is Coleman's bound
+    #C(ℚ) ≤ #C̄(𝔽_p) + 2g - 2 for p > 2g. The main theorems are proved over an abstract complete
+    discrete valuation ring of characteristic 0 with algebraically closed residue field of
+    characteristic ≠ 2, a uniformizer π and a bound e on the absolute ramification index
+    (HyperellipticCurves/Count/Main.lean), and instantiated over every number field, more
+    generally over the fraction field K of a Dedekind domain A that is finite free over ℤ, at a
+    prime of A at which f is integral with squarefree reduction
+    (HyperellipticCurves/Count/NumberField.lean; the local ring is constructed as a direct
+    factor of W(𝔽̄_p) ⊗ A), and over ℚ (HyperellipticCurves/Count/Arithmetic.lean). Finiteness
+    of C(K) when the rank is smaller than the genus (Chabauty's theorem for these curves)
+    follows. Since Mathlib has no Jacobian varieties, the Jacobian is modelled as the ideal
+    class group of the affine coordinate ring K[x, y]/(y² - f), with reduced Mumford
+    representatives and Cantor's algorithm (HyperellipticCurves/Curve/); the reduction of
+    classes is constructed by reducing points, with a specialization theorem for principal
+    divisors (HyperellipticCurves/RedJ/, HyperellipticCurves/Specialization/); the logarithm on
+    the kernel of reduction comes from a translated formal group law built from Cantor's
+    algorithm, and its differentials are identified with the regular differentials by a
+    trace-form computation (HyperellipticCurves/Log/). The p-adic analysis (Weierstrass
+    preparation, Strassmann's theorem, formal group laws and their logarithms) is in
+    HyperellipticCurves/Series/, residue disks and the vanishing budget of a space of
+    differentials (Stoll's Theorem 6.4) in HyperellipticCurves/Disks/. Supporting material in
+    Mathlib generality is in HyperellipticCurves/ForMathlib/ as upstreaming candidates.
+    Statements that are formalized but not needed for the main theorems are kept in
+    HyperellipticCurves/Archive/. A LaTeX blueprint with a dependency graph and the generated
+    API documentation are published at
+    https://michaelstollbayreuth.github.io/HyperellipticCurves/ .
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+  main_results:
+  - declaration: "ChabautyColeman.chabauty_coleman_odd_hyperelliptic"
+    file: "HyperellipticCurves/Count/Main.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: ""
+    literature_dependencies: []
+  - declaration: "ChabautyColeman.ratPoints_finite_of_rank_le"
+    file: "HyperellipticCurves/Count/Main.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: ""
+    literature_dependencies: []
+  - declaration: "ChabautyColeman.NumberFieldBase.main_affine_numberField"
+    file: "HyperellipticCurves/Count/NumberField.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: "comparator/challenges.json"
+    literature_dependencies: []
+  - declaration: "ChabautyColeman.NumberFieldBase.main_affine_numberField_int"
+    file: "HyperellipticCurves/Count/NumberField.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: ""
+    literature_dependencies: []
+  - declaration: "ChabautyColeman.NumberFieldBase.ratPoints_finite_numberField"
+    file: "HyperellipticCurves/Count/NumberField.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: "comparator/challenges.json"
+    literature_dependencies: []
+  - declaration: "ChabautyColeman.NumberFieldBase.ratPoints_finite_numberField_int"
+    file: "HyperellipticCurves/Count/NumberField.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: ""
+    literature_dependencies: []
+  - declaration: "ChabautyColeman.main_affine_rat_of_rank_le"
+    file: "HyperellipticCurves/Count/Arithmetic.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: "comparator/challenges.json"
+    literature_dependencies: []
+  - declaration: "ChabautyColeman.main_affine_int_of_rank_le"
+    file: "HyperellipticCurves/Count/Arithmetic.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: ""
+    literature_dependencies: []
+  - declaration: "ChabautyColeman.main_affine_int"
+    file: "HyperellipticCurves/Count/Arithmetic.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: ""
+    literature_dependencies: []
+
+# how it was produced.
+automation:
+  methods:
+    - method: "agent"
+      models: ["claude-fable-5", "claude-opus-4.8", "claude-opus-5", "claude-fable-5.1",
+        "claude-opus-5.5"]
+      framework: "Claude Code"
+      tool_setup: >
+        Interactive agent sessions directed by the author, with project-specific style and
+        design conventions (CLAUDE.md/MATHLIB.md) enforced, Magma, PARI/GP and Python for
+        prototyping and for checking mathematics before it was formalized, and sub-agents for
+        parallel audits and sweeps. The mathematics was planned in a blueprint, chapter by
+        chapter, and reviewed by the author before the Lean code was written. Changes were gated
+        by a scripted verification chain: a warning-free build with Mathlib's standard linter set
+        and its omega-to-lia analyzers enabled in the lakefile, a project style lint for the
+        conventions no linter covers (omega, lambda arrows, bare rintro, proofs over 20 lines,
+        ...), a line-length check, Mathlib's environment linters, the blueprint rebuild and
+        declaration check, and a diff of the pretty-printed types of every declaration against
+        the previous commit, so that a commit changed exactly the intended statements. The main
+        results are certified by a comparator harness against Mathlib-only statements.
+      cost:
+        wall_time: "~200 hours of active work (from commit timestamps, gaps over 90 minutes counted as breaks) on 42 days between 2026-07-12 and 2026-11-09, most of it in July and August 2026"
+        spend_usd: "Claude Ultra subscription"
+        hardware: "API-only"
+      prompting_notes: >
+        The development followed the blueprint: the class-group model of the Jacobian, the
+        p-adic power-series kit, residue disks and the reduction of classes, the logarithm, and
+        the count, each planned in the blueprint before it was formalized. The genericity of the
+        auxiliary class τ for every genus, the last open step, was settled (2026-08-15) by the
+        point-by-point fold and its cuspidal degeneration, after several approaches had been
+        explored with symbolic and numerical prototypes in Magma and Python; the certificates of
+        the fold were verified symbolically at small genus before they were formalized. The
+        finished development then went through a structural review and refactor (2026-08-17 to
+        2026-08-20), after which the blueprint was rewritten in the style of a research paper,
+        and through whole-library audits run by parallel sub-agents (2026-08-26, 2026-08-27 and
+        2026-09-02) whose verified findings were applied in themed rounds through the
+        verification chain. On the author's requests the main theorem was then strengthened in
+        steps, each planned with the author: from the bound 2g - 2 to 2r (Stoll's Theorem 6.4)
+        and from unramified to ramified primes with the condition p > 2r + e + 1 (Corollary 6.7)
+        (2026-08-28), to number fields through the local factor of W(𝔽̄_p) ⊗ A (2026-08-30),
+        and to statements about a type of hyperelliptic curves (2026-09-03). The updates to Lean
+        and Mathlib v4.34.0 and v4.35.0 were done with claude-fable-5.1, each followed by a
+        simplification pass toward the new Mathlib. The preparation of the public release
+        (2026-11-09) was done with claude-opus-5.5.
+  spend_usd: "subscription-based usage (no metered API spend)"
+  notes: >
+    Author-directed agent development against a blueprint planned with the author, with
+    continuous human review of the statements and of the mathematics.
+
+# fidelity
+fidelity:
+  divergences: >
+    The curves are the hyperelliptic curves y² = f(x) with f monic of odd degree 2g + 1, where
+    Stoll's Theorem 6.4 and Corollary 6.7 are stated for arbitrary curves. The Jacobian J(K) is
+    the ideal class group of the affine coordinate ring K[x, y]/(y² - f); for odd degree this
+    group is isomorphic to the group of K-rational divisor classes of degree 0 on the smooth
+    projective curve, but that isomorphism is not formalized. The rank is dim_ℚ (J(K) ⊗ ℚ), a
+    cardinal, and finite generation of J(K) (Mordell-Weil) is not assumed. The bound is 2r,
+    not the sharper f_{C/k}(r) of Theorem 6.4, and only the case p > 2r + e + 1 of Corollary
+    6.7 is formalized (not the bound with the correction term Δ), for the group G = J(K) (not
+    for an arbitrary subgroup as in Theorem 6.6). Good reduction is expressed by the integrality
+    of f at the prime and the squarefreeness of its reduction. The statements count affine
+    points, with the point at infinity added on both sides; over ℚ, the p-integrality of f is
+    certified by d f = F with F ∈ ℤ[x] and p ∤ d, and the reduced curve is counted on the model
+    d̄ y² = F̄(x) over ZMod p. The logarithm is not obtained from Coleman integration or from the
+    formal group of the Jacobian variety: it is the logarithm of a formal group law built from
+    Cantor's algorithm at a translate τ of the origin, and the pairing λ is defined on the
+    kernel of reduction J¹ only, which contains every class the count pairs. No lower bound on
+    the genus is assumed: g ≥ 1 follows from r < g, and genus 1 is included.
+
+# review status
+review:
+  status: "author-verified"
+  reviewers: ["Michael Stoll"]
+  notes: >
+    The formalization was directed by the author of the source paper, who chose the formal
+    statements of the main results and reviewed the blueprint chapter by chapter.
+
+# alignment - how source statements map to formal declarations.
+alignment:
+  namespace: "ChabautyColeman"
+  statements:
+    - source: "Stoll 2006, Lemma 6.1 and Proposition 6.3 (the bound per residue disk, with δ(v, n) = 0)"
+      lean: "disk_count_le"
+      module: "HyperellipticCurves.Count.DiskBound"
+      status: "proved"
+      note: "at most 1 + m points in a residue disk on which the integral of ω is constant, for m the index of a unit coefficient of the expansion of ω and p > m + e + 1; the ramification bound enters only through IsLocalRing.IsUniformizer.exists_pow_eq (HyperellipticCurves.ForMathlib.LocalRing)"
+    - source: "Stoll 2006, Theorem 6.4 (N(Λ, C/K) ≤ 2 codim Λ)"
+      lean: "sum_ordSpace_le, exists_ordPoint_eq_ordSpace, ordSpace"
+      module: "HyperellipticCurves.Disks.OrdSpace"
+      status: "proved"
+      note: "for the reduction of an odd-degree hyperelliptic curve, with Λ given by the numerators h of the differentials h dx/y; the bound 2 codim Λ, not the sharper f_{C/k}(codim Λ)"
+    - source: "Stoll 2006, Corollary 6.7, second statement (p > 2r + e + 1)"
+      lean: "NumberFieldBase.main_affine_numberField, NumberFieldBase.main_affine_numberField_int"
+      module: "HyperellipticCurves.Count.NumberField"
+      status: "proved"
+      note: "for C : y² = f(x) with f monic of odd degree over the fraction field of a Dedekind domain finite free over ℤ, at a prime at which f is integral with squarefree reduction; the bound 2r in place of f_{C/k_v}(r); proved from the abstract chabauty_coleman_odd_hyperelliptic (HyperellipticCurves.Count.Main)"
+    - source: "Stoll 2006, Corollary 6.7 over ℚ"
+      lean: "main_affine_rat_of_rank_le, main_affine_int_of_rank_le"
+      module: "HyperellipticCurves.Count.Arithmetic"
+      status: "proved"
+      note: "the case A = ℤ, K = ℚ, where e = 1 and the prime condition reads p > 2r + 2"
+    - source: "Stoll 2006, Corollary 6.7, first statement (with the correction term Δ)"
+      lean: ""
+      module: ""
+      status: "not formalized"
+    - source: "Stoll 2006, Theorem 6.6 for a subgroup G of J(K)"
+      lean: ""
+      module: ""
+      status: "not formalized"
+      note: "only the case G = J(K), through Corollary 6.7"
+    - source: "Coleman 1985, the bound #C(ℚ) ≤ #C̄(𝔽_p) + 2g - 2 for p > 2g"
+      lean: "main_affine_int"
+      module: "HyperellipticCurves.Count.Arithmetic"
+      status: "proved"
+      note: "for odd-degree hyperelliptic curves with f ∈ ℤ[x]: the case r = g - 1 of main_affine_int_of_rank_le, where the prime condition reads p ≥ deg f = 2g + 1"
+    - source: "Finiteness of C(K) when the rank is smaller than the genus (Chabauty)"
+      lean: "NumberFieldBase.ratPoints_finite_numberField, NumberFieldBase.ratPoints_finite_numberField_int"
+      module: "HyperellipticCurves.Count.NumberField"
+      status: "proved"
+      note: "from Corollary 6.7 at a prime of good reduction with large residue characteristic, which exists (NumberFieldBase.exists_prime_squarefree_reduction)"
+
+# acknowledgements
+acknowledgements: ""

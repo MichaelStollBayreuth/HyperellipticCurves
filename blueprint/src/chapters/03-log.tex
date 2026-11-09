@@ -1,0 +1,1564 @@
+\chapter{The abelian logarithm}
+This chapter constructs the analytic core of the method: the auxiliary class $\tau$, the
+translated formal group law $F_\tau$ on the chart at $\tau$, the logarithm $\Lam$ on the
+kernel of reduction, the differentials $\omega'_i$ with their regularity, and the pairing
+$\lambda$ with its integral representation on residue disks. Fix $q = p^N$ as produced by
+Lemma~\ref{lem:tau-exists} and put $\Oq = W(\Fq)$.
+
+\begin{definition}[Regular differentials]
+\label{def:regdiff}
+\lean{ChabautyColeman.RegularDiff}
+\leanok
+$\RegDiff := \bigoplus_{i=0}^{g-1} \Qp\cdot x^i\,dx/y$, a $g$-dimensional $\Qp$-vector
+space with its $\Zp$-lattice $\RegDiff_{\ZZ} := \bigoplus \Zp\, x^i\,dx/y$. (In the
+formalization, differentials are represented by their numerators $h$ with
+$\omega = h\,dx/y$, $\deg h < g$; the packaged submodule is formalized in
+\texttt{HyperellipticCurves.Archive.RegularDiff}, and the main theorems do not depend on it.)
+\end{definition}
+
+\begin{definition}[Good position]
+\label{def:goodpos}
+\lean{ChabautyColeman.GoodPosition, ChabautyColeman.GoodPosition.isCoprime_right,
+  ChabautyColeman.GoodPosition.isCoprime_two_mul_right}
+\leanok
+\uses{lem:mumford-exists}
+A reduced Mumford datum $(u, v)$ over $\Oq$ is in \emph{good position} if $\deg u = g$,
+$\bar u$ is squarefree, and $\gcd(\bar u, \bar f) = 1$; the auxiliary data derived from
+$\tau$ below are required to satisfy the analogous conditions where they are used. Each
+condition is the non-vanishing modulo $p$ of an explicit resultant or discriminant of the
+data. The coprimality conditions involving $\bar v$ --- in particular
+$\gcd(\bar u, 2\bar v) = 1$, the invertibility used by the chart --- are consequences.
+\end{definition}
+
+\begin{lemma}[Abundance of points]
+\label{lem:many-points}
+\lean{ChabautyColeman.residue_curve_points_infinite,
+  ChabautyColeman.infinite_setOf_eval_ne_zero}
+\leanok
+$\bar C(\Fpbar)$ is infinite; more precisely, the set of non-Weierstrass affine points is
+infinite. Hence for any finite set of conditions as in Definition~\ref{def:goodpos} there
+are $g$ distinct non-Weierstrass points avoiding them. (Rationality of the chosen points
+over a finite field, needed for the counting argument, is handled at the arithmetic
+instantiation in Chapter~5.)
+\end{lemma}
+\begin{proof}
+\leanok
+For all but finitely many $\bar a \in \Fpbar$, $\bar f(\bar a)$ is a nonzero square in
+$\Fpbar$, and each such $\bar a$ lifts to a non-Weierstrass point
+$(\bar a, \sqrt{\bar f(\bar a)})$; the conditions exclude only finitely many points.
+\end{proof}
+
+\begin{lemma}[Genericity of the centre]
+\label{lem:tau-generic}
+\lean{ChabautyColeman.HasGoodCenter, ChabautyColeman.hasGoodCenter_of_pos_genus,
+  ChabautyColeman.hasGoodCenter_genus_two,
+  ChabautyColeman.IsFoldCerts, ChabautyColeman.IsFoldAvoid,
+  ChabautyColeman.exists_centerFoldWitness, ChabautyColeman.exists_centerFoldPack,
+  ChabautyColeman.exists_isFoldCerts_isFoldAvoid,
+  ChabautyColeman.cantorCompose_point_eq_disjoint,
+  ChabautyColeman.cantorCompose_point_eq_double,
+  ChabautyColeman.isCoprime_foldChain_of_resultant_ne_zero,
+  ChabautyColeman.curveAvoidNum, ChabautyColeman.eval_curveAvoidNum,
+  ChabautyColeman.not_curveVanishing_curveAvoidNum,
+  ChabautyColeman.not_curveVanishing_curveCondNum_of_squarefree,
+  ChabautyColeman.not_curveVanishing_curveAvoidNum_of_squarefree,
+  ChabautyColeman.not_curveVanishing_X_snd, ChabautyColeman.not_curveVanishing_X_sub_C,
+  ChabautyColeman.exists_curveTuple_ne_zero, ChabautyColeman.curveVanishing_mul,
+  ChabautyColeman.not_curveVanishing_of_aeval_ne_zero}
+\leanok
+\uses{def:goodpos, lem:many-points, def:cantor-map, def:centre-fold, thm:fold-witness,
+  lem:fold-witness-genus-one}
+There exists a tuple of $g$ affine points of the reduced curve over $\Fpbar$ ---
+pairwise distinct $x$-coordinates avoiding a prescribed finite set $T$ of residue
+$x$-values, nonzero $y$-coordinates --- whose interpolated Mumford datum
+$(\bar u, \bar v)$, with $\bar u = \prod_i (X - \bar x_i)$ and $\bar v$ the interpolant
+through the points, is such that the point-by-point fold of
+Definition~\ref{def:centre-fold} computing $\tau + \tau - \tau$ is defined throughout:
+every step condition of the $2g$-step fold is nonzero, and every intermediate state
+avoids the Weierstrass points, $\gcd(U_j, 2V_j) = 1$, the starting datum included. Good
+position of $(\bar u, \bar v)$ is automatic: $\bar u$ is squarefree because the
+$\bar x_i$ are distinct, and coprime to $\bar f$ because the $\bar y_i$ are nonzero. The
+statement holds for every genus $g \ge 1$. For $g \ge 2$ no squarefreeness of $\bar f$
+is needed; for $g = 1$ it is needed: for $\bar f = X^3$ in characteristic $3$ the fold
+conditions vanish identically on the curve
+(cf.\ Lemma~\ref{lem:fold-witness-genus-one}). The avoidance of the prescribed set $T$
+is what the per-disk configuration of Lemma~\ref{lem:global-generic} requires: $\tau$
+must miss the centres of the residue disks being counted.
+\end{lemma}
+\begin{proof}
+\leanok
+\uses{thm:fold-witness, lem:fold-witness-genus-one}
+The fold witness --- Theorem~\ref{thm:fold-witness} for $g \ge 2$ and
+Lemma~\ref{lem:fold-witness-genus-one} for $g = 1$ --- provides a tuple at which the
+$2g$ step conditions, the nonvanishing of the $y$-coordinates, the $T$-avoidance and the
+per-stage Weierstrass avoidance all hold simultaneously: each condition is a nonzero
+polynomial condition on tuples of curve points, and finitely many such conditions have a
+common witness (Lemma~\ref{lem:many-points} and the avoidance principle below; the
+stage coprimalities enter as resultants of the isobaric numerator states of
+Lemma~\ref{lem:fold-universal}, refuted on the cuspidal degeneration). The B\'ezout
+certificates required by the certificate-passing formulation of Cantor's algorithm are
+then constructed over the field: at a disjoint step, coprimality of $U_j$ and
+$X - \bar x_j$ is the step condition $U_j(\bar x_j) \neq 0$; at the doubling step,
+coprimality of $X - \bar x_0$ and $V_0 + \bar y_0$ follows from $2\bar y_0 \neq 0$. With
+these certificates the certified computation coincides with the fold step by step: at a
+disjoint step the composed square root is determined by Chinese-remainder uniqueness,
+and at the doubling step by uniqueness of the square root modulo the composed support.
+\end{proof}
+
+\bigskip
+\noindent\textbf{The witness for all genera: the point-by-point fold and its moment
+certificates.} The following sequence of statements proves the existence of the witness
+tuple for every genus; the entire sequence is formalized, and its main steps were
+additionally verified symbolically at small genus by the scripts in \texttt{prototype/}: the
+fold on the cuspidal curve (\texttt{symfold.m}), the moment characterization of its states
+and the lemmas behind it (\texttt{apic.m}, \texttt{p1lemmas.m}), and the mirror
+(\texttt{revfold.m}); every condition of every genus $\le 6$ has been certified numerically
+from the moment determinants alone (\texttt{detcond.m}).
+
+\begin{definition}[The point-by-point fold]
+\label{def:centre-fold}
+\uses{def:cantor-map, def:goodpos}
+\lean{ChabautyColeman.foldChain, ChabautyColeman.IsFoldState,
+  ChabautyColeman.IsFoldState.step, ChabautyColeman.cuspChain_eq_foldChain,
+  ChabautyColeman.foldGenH, ChabautyColeman.foldH_eq_of_eval_eq,
+  ChabautyColeman.foldH_eq_of_dvd_double, ChabautyColeman.foldXs,
+  ChabautyColeman.foldYs}
+\leanok
+Let $k$ be a field of characteristic $\neq 2$, let $f \in k[X]$ be monic squarefree of
+degree $N = 2g+1$, and let $P_1, \dots, P_g$ be affine non-Weierstrass points of
+$y^2 = f(x)$ with pairwise distinct $x$-coordinates; let $\tau = (u, v)$ be the reduced
+Mumford datum interpolating them. The \emph{fold} computes $\tau + \tau - \tau$ by $2g$
+single-point additions: $D_0 := \tau$ and $D_j := \operatorname{red}(D_{j-1} + P_j)$ for
+$1 \le j \le g$ (\emph{phase 1}), then
+$D_{g+m} := \operatorname{red}(D_{g+m-1} + \iota P_{g+1-m})$ for $1 \le m \le g$
+(\emph{phase 2}: the involuted points are added in \emph{reverse} order, so that
+$[D_{g+m}] = [2\tau] - \sum_{i > g-m}[P_i - \infty] = [D_{g-m}]$ and the fold retraces
+its own phase-1 states backwards; see Lemma~\ref{lem:fold-mirror}). Each addition
+composes to a divisor of degree $g+1$ whose $b$-polynomial has degree $\le g$, and a
+single Cantor reduction returns to degree $g$; since $2\bigl((g+1)-1\bigr) < \deg f$,
+every reduction lies in the unconditional degree regime, so no degree-genericity
+condition arises at any step. The \emph{conditions} of the fold are: at each step, the
+disjointness value $U(x_P)$ of the current $u$-polynomial (at the single doubling step
+$j = 1$ instead $U_0'(x_{P_1})$ and $V_0(x_{P_1}) + y_{P_1}$). Further avoidance
+quantities --- e.g.\ the Weierstrass avoidance $\operatorname{res}(U_j, f) \neq 0$ of an
+intermediate state --- are polynomial in the state coefficients and are treated by the
+same universal method.
+\end{definition}
+
+\begin{lemma}[Mirror symmetry]
+\label{lem:fold-mirror}
+\uses{def:centre-fold, def:cusp-fold, thm:cusp-moment}
+\lean{ChabautyColeman.congruence_of_even_mul, ChabautyColeman.foldNodes,
+  ChabautyColeman.prod_foldNodes_pairing,
+  ChabautyColeman.genNode_zero_atom_ne_zero,
+  ChabautyColeman.genNode_trio_atom_ne_zero,
+  ChabautyColeman.genNode_tripled_atom_ne_zero,
+  ChabautyColeman.genCuspFold, ChabautyColeman.genFoldH,
+  ChabautyColeman.genCuspFold_eval_sq_ne_zero,
+  ChabautyColeman.exists_genCuspFold_witness}
+\leanok
+On the cuspidal model the hyperelliptic involution is $t \mapsto -t$, so phase 2 of the
+fold is the phase-1 recursion continued along the extended node sequence
+$(t_1, \dots, t_g, -t_g, \dots, -t_1)$. Assume the fold conditions hold up to phase-2
+step $m \le g$. Then the state $A_{g+m}$ of the extended chain equals the phase-1 state
+$A_{g-m}$ of the \emph{same} chain: the fold retraces its own states backwards.
+Consequently every phase-2 condition value is the evaluation of a phase-1 state at a
+single node --- the disjointness value of phase-2 step $m+1$ is $U_{g-m}(x_{g-m})$, the
+stage-$(g-m)$ support evaluated at its own last-added node --- and phase 2 needs no
+separate analysis: on the cusp, the full $2g$-step fold is controlled by the phase-1
+theory alone.
+\end{lemma}
+\begin{proof}
+\leanok
+The stage-$(g+m)$ alphabet of the extended chain factors as
+$\prod_{i > g-m}(z^2 - t_i^2)$ times the stage-$(g-m)$ alphabet of the same chain ---
+an \emph{even} polynomial factor with nonzero value at $0$ at generic nodes. The master
+congruence of Theorem~\ref{thm:cusp-moment} descends along such even factors, so
+$A_{g+m}$ satisfies the stage-$(g-m)$ moment congruence, and the value-extraction clause
+of Theorem~\ref{thm:cusp-moment} reads off every phase-2 condition value against the
+phase-1 determinants at the generic nodes (the avoidance value and the two mirror
+values, extending the stage-$(g-m)$ alphabet at $\mp t_{g-m}$); no second chain and no
+state identification is needed. Only at the final stage $2g$ is $A_{2g} = A_0$ read off
+by the uniqueness clause, to get the last avoidance value from $A_0(0) \neq 0$. The
+formal argument is an interleaved induction: conditions up to step $m$ give the
+descended congruence at $m$, which gives the conditions at $m+1$. At the level of the
+curve the identity $D_{g+m} = D_{g-m}$ also follows from the class computation
+$[D_{g+m}] = [2\tau] - \sum_{i > g-m}[P_i - \infty] = [\tau] + \sum_{i \le g-m}
+[P_i - \infty] = [D_{g-m}]$ together with uniqueness of reduced representatives, but the
+formalized route needs only the cuspidal case, where the congruence argument replaces
+the Jacobian.
+\end{proof}
+
+\begin{lemma}[Universal isobaric numerators]
+\label{lem:fold-universal}
+\uses{def:centre-fold}
+\lean{ChabautyColeman.MumfordNum, ChabautyColeman.MumfordNum.step,
+  ChabautyColeman.foldNum, ChabautyColeman.foldHNum, ChabautyColeman.foldCondNum,
+  ChabautyColeman.foldBase, ChabautyColeman.foldNum_succ, ChabautyColeman.den_foldNum,
+  ChabautyColeman.map_foldNum, ChabautyColeman.map_foldHNum,
+  ChabautyColeman.map_foldCondNum, ChabautyColeman.map_foldBase,
+  ChabautyColeman.IsScaledState, ChabautyColeman.IsScaledState.step,
+  ChabautyColeman.isScaledState_foldNum, ChabautyColeman.foldCond,
+  ChabautyColeman.foldCondNum_eq_den_mul, ChabautyColeman.foldStep_dvd_disjoint,
+  ChabautyColeman.foldStep_dvd_double, ChabautyColeman.IsIsobaric,
+  ChabautyColeman.IsIsobaric.divByMonic, ChabautyColeman.IsIsobaricState,
+  ChabautyColeman.IsIsobaricState.step, ChabautyColeman.foldWt,
+  ChabautyColeman.foldCondWt, ChabautyColeman.isIsobaricState_foldNum,
+  ChabautyColeman.isWeightedHomogeneous_foldCondNum,
+  ChabautyColeman.isWeightedHomogeneous_foldHNum,
+  ChabautyColeman.isIsobaricState_foldBase, ChabautyColeman.univWt,
+  ChabautyColeman.univF, ChabautyColeman.univXs, ChabautyColeman.univYs,
+  ChabautyColeman.univBase, ChabautyColeman.univCondNum,
+  ChabautyColeman.isWeightedHomogeneous_univCondNum, ChabautyColeman.cuspSpec,
+  ChabautyColeman.isWeightedHomogeneous_aeval_cuspSpec,
+  ChabautyColeman.cuspNum, ChabautyColeman.isWeightedHomogeneous_cuspNum,
+  ChabautyColeman.cuspNum_eq_foldCondNum}
+\leanok
+Give $X$ and $x_i$ weight $2$, $y_i$ weight $N$, and the coefficient $a_r$ of $f$ weight
+$2(N-r)$. There are \emph{universal} polynomials
+$\mathcal{N}_q \in \mathbb{Z}[x_1, \dots, x_g,\, y_1, \dots, y_g,\, a_0, \dots, a_{N-1}]$,
+isobaric for these weights and indexed by the quantities $q$ of the fold (the
+coefficients of every intermediate state and every condition value), such that over any
+field of characteristic $\neq 2$ in which the fold is defined,
+$q = \mathcal{N}_q(\text{inputs})\big/\bigl(2^{b_q} \prod \mathcal{N}_{q'}^{\,k_{q'}}\bigr)$
+with the product over \emph{earlier} condition quantities $q'$. Under the cuspidal
+specialization $a = 0$, $x_i = t_i^2$, $y_i = t_i^N$, each $\mathcal{N}_q$ becomes a
+homogeneous polynomial $P_q \in \mathbb{Z}[t_1, \dots, t_g]$ of degree
+$\operatorname{wt}(\mathcal{N}_q)$.
+\end{lemma}
+\begin{proof}
+\leanok
+Induction along the fold in cofactor form. Composition divides only by the current
+disjointness value (at the doubling step, by $2 y_{P} U'(x_P)$); the reduction step
+divides by nothing: the cofactor division is by a \emph{monic} polynomial, and the
+normalization is by the leading coefficient $-1$, as $f$ dominates. Clearing the
+denominators inductively produces the $\mathcal{N}_q$, with denominators as stated.
+Every operation is equivariant under the scaling
+$(x, y, a_r) \mapsto (\lambda^2 x, \lambda^N y, \lambda^{2(N-r)} a_r)$ --- the equation
+$y^2 - f(x)$ is isobaric of weight $2N$ --- so the numerators may be chosen isobaric.
+The cuspidal specialization sends an isobaric monomial with exponents $\beta_i$ (on
+$x_i$) and $\gamma_i$ (on $y_i$) to $\pm t^{c}$ with
+$\sum_i c_i = \sum_i (2\beta_i + N\gamma_i)$, which equals the weight when no $a_r$ is
+present; monomials containing some $a_r$ vanish.
+\end{proof}
+
+\begin{definition}[The cuspidal model and the $A$-recursion]
+\label{def:cusp-fold}
+\uses{def:centre-fold}
+\lean{ChabautyColeman.cuspChain, ChabautyColeman.IsCuspState}
+\leanok
+The \emph{cuspidal model} is $y^2 = X^N$ with rational parametrization $x = t^2$,
+$y = t^N$; Cantor's algorithm operates on Mumford pairs verbatim. Let $t_1, \dots, t_g$
+be indeterminates over the prime field ($\operatorname{char} \neq 2$),
+$P_i := (t_i^2,\, t_i^N)$, and run the fold over $\mathbb{Q}(t_1, \dots, t_g)$ resp.\
+$\mathbb{F}_p(t_1, \dots, t_g)$. Along phase 1 define $A_j \in \mathbb{Q}(t)[z]$ by
+$A_0 := \prod_i (z - t_i)$ and, at the step adding $P_{j+1}$ with composed pair
+$(U_c, V_c)$: $A_c := A_j \cdot (z - t_{j+1})$ and $A_{j+1} := (-1)^g\, C_c(-z)$, where
+$C_c := \bigl(z^N - V_c(z^2)\bigr)/A_c(z)$, a polynomial by
+Lemma~\ref{lem:cusp-divisibility}. On the cusp the avoidance condition is
+$U_j(0) \neq 0$, since $\operatorname{res}(U, X^N) = \pm U(0)^N$.
+\end{definition}
+
+\begin{lemma}[$z$-lift of the Mumford condition]
+\label{lem:cusp-divisibility}
+\uses{def:cusp-fold}
+\lean{ChabautyColeman.cuspCompose_dvd, ChabautyColeman.cuspNext_dvd,
+  ChabautyColeman.cuspStep_mumford, ChabautyColeman.IsCuspState.step,
+  ChabautyColeman.isCuspState_cuspChain}
+\leanok
+At every stage of phase 1, $A \mid z^N - V(z^2)$ --- for the reduced states
+$(A_j, V_j)$ and for the composed pairs $(A_c, V_c)$ alike.
+\end{lemma}
+\begin{proof}
+\leanok
+Induction along the fold. Base: $v$ interpolates, so $v(t_i^2) = t_i^N$ and each
+$z - t_i$ divides $z^N - v(z^2)$; the factors are coprime (distinct $t_i$). Composition:
+$V_c = V_j + U_j H$ with $H$ the composition scalar, so
+$z^N - V_c(z^2) = \bigl(z^N - V_j(z^2)\bigr) - U_j(z^2)H$ is divisible by $A_j$
+(inductively, and $A_j(z) \mid U_j(z^2)$ by Lemma~\ref{lem:cusp-reduction}); the new
+factor divides because $V_c(t_{j+1}^2) = t_{j+1}^N$ by the interpolation property of the
+composition, and it is coprime to $A_j$ by the disjointness condition. Reduction:
+$V_{j+1} \equiv -V_c \bmod U_{j+1}$ and $A_{j+1}(z) \mid U_{j+1}(z^2)$, so it suffices
+that $A_{j+1} \mid z^N + V_c(z^2) = -\bigl((-z)^N - V_c((-z)^2)\bigr) =
+-A_c(-z)C_c(-z)$, which holds since $A_{j+1} = \pm C_c(-z)$.
+\end{proof}
+
+\begin{lemma}[Reduction in the $A$-picture]
+\label{lem:cusp-reduction}
+\uses{def:cusp-fold, lem:cusp-divisibility}
+\lean{ChabautyColeman.cuspCofactor_monic, ChabautyColeman.cuspCofactor_natDegree,
+  ChabautyColeman.cuspNext_monic, ChabautyColeman.cuspNext_natDegree,
+  ChabautyColeman.cuspNext_U, ChabautyColeman.cuspCompose_U_comp}
+\leanok
+Every $A_j$ is monic of degree $g$, and $U_j(z^2) = (-1)^g A_j(z) A_j(-z)$.
+\end{lemma}
+\begin{proof}
+\leanok
+Base: $u(z^2) = \prod(z^2 - t_i^2) = A_0(z) \cdot \prod(z + t_i) =
+(-1)^g A_0(z) A_0(-z)$. Step: from $V_c(z^2)^2 - z^{2N} = U_c(z^2)\, w_c(z^2)$ and the
+factorizations $V_c(z^2) - z^N = -A_c(z)C_c(z)$ and $V_c(z^2) + z^N = -A_c(-z)C_c(-z)$,
+together with $U_c(z^2) = (-1)^{g+1} A_c(z) A_c(-z)$ (composition multiplies $U_j$ by
+$X - t_{j+1}^2$), one gets $w_c(z^2) = (-1)^{g+1} C_c(z) C_c(-z)$. The Cantor reduction
+returns $U_{j+1} = w_c/\operatorname{lc}(w_c) = -w_c$ (here $\deg w_c = g$ and
+$\operatorname{lc}(w_c) = -1$ because $f = X^N$ dominates $V_c^2$), so
+$U_{j+1}(z^2) = (-1)^g C_c(z)C_c(-z) = (-1)^g A_{j+1}(z) A_{j+1}(-z)$; and $C_c$ is
+monic of degree $g$ ($z^N - V_c(z^2)$ is monic of degree $N$, $A_c$ monic of degree
+$g+1$), so $A_{j+1} = (-1)^g C_c(-z)$ is monic of degree $g$.
+\end{proof}
+
+\begin{lemma}[Exactness of the reduction step]
+\label{lem:cusp-exact}
+\uses{def:cusp-fold, lem:cusp-reduction}
+\lean{ChabautyColeman.cuspNext_exact}
+\leanok
+$A_{j+1}(z)\,A_c(-z) - A_{j+1}(-z)\,A_c(z) = (-1)^{g+1}\, 2 z^N$, exactly.
+\end{lemma}
+\begin{proof}
+\leanok
+$(-1)^g\bigl(A_{j+1}(z)A_c(-z) - A_{j+1}(-z)A_c(z)\bigr) = C_c(-z)A_c(-z) - C_c(z)A_c(z)
+= \bigl(-z^N - V_c(z^2)\bigr) - \bigl(z^N - V_c(z^2)\bigr) = -2z^N$.
+\end{proof}
+
+\begin{theorem}[The moment characterization]
+\label{thm:cusp-moment}
+\uses{lem:cusp-divisibility, lem:cusp-reduction, lem:cusp-exact}
+\lean{ChabautyColeman.cuspMoment_step, ChabautyColeman.cuspMoment_congruence,
+  ChabautyColeman.cuspMoment_base, ChabautyColeman.coeff_mul_comp_neg_X_eq_zero,
+  ChabautyColeman.momentMatrix, ChabautyColeman.momentRhs,
+  ChabautyColeman.momentMatrix_mulVec, ChabautyColeman.det_smul_eq_cramer_of_mulVec,
+  ChabautyColeman.momentDet, ChabautyColeman.momentDet_linear,
+  ChabautyColeman.moment_system_of_congruence, ChabautyColeman.momentDet_value_atom,
+  ChabautyColeman.eq_of_det_momentMatrix_ne_zero}
+\leanok
+Let $T_j$ be the multiset $\{t_1, \dots, t_g\} \uplus \{t_1, \dots, t_j\}$, $G := g + j$,
+$e_r := e_r(T_j)$, and $d_j(z) := \prod_i (t_i - z)^{\epsilon_i}$ with $\epsilon_i = 2$
+for $i \le j$ and $1$ otherwise. If the avoidance values $A_i(0)$ for $i < j$ are
+nonzero, then:
+\begin{enumerate}
+\item \textup{(master congruence)}\ \
+  $A_j(z)\, d_j(-z) \equiv A_j(-z)\, d_j(z) \pmod{z^{2g+1}}$;
+\item equivalently, writing $A_j = z^g + \sum_{m < g} \alpha_m z^m$: \
+  $\sum_{m=0}^{g} \alpha_m\, e_{G-k+m} = 0$ for $k = 1, 3, \dots, 2g-1$
+  \textup{(the \emph{moment system}; $\alpha_g := 1$)};
+\item if moreover $\det M_j \neq 0$ for the system matrix
+  $M_j := \bigl(e_{G-2i+1+m}\bigr)_{1 \le i \le g,\ 0 \le m \le g-1}$, then $A_j$ is the
+  unique monic degree-$g$ solution, and each condition value of the fold appears as a
+  pattern determinant of a once-extended alphabet. The phase-2 condition values are the
+  mirror values $A_j(\mp t_j)$ of the retraced phase-1 stages
+  (Lemma~\ref{lem:fold-mirror}).
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+\leanok
+(1) Induction. Base ($j = 0$): $d_0 = (-1)^g A_0$, so
+$A_0(z)d_0(-z) = A_0(-z)d_0(z)$ holds \emph{exactly}. Composition multiplies the defect
+by $(z^2 - t_{j+1}^2)$:
+$A_c(z)d_c(-z) - A_c(-z)d_c(z) =
+(z^2 - t_{j+1}^2)\bigl(A_j(z)d_j(-z) - A_j(-z)d_j(z)\bigr)$, where
+$d_c := d_j \cdot (t_{j+1} - z)$. Reduction: by Lemma~\ref{lem:cusp-exact},
+$A_{j+1}(z) \equiv A_{j+1}(-z)\,A_c(z)\,A_c(-z)^{-1} \pmod{z^{2g+1}}$, since the exact
+defect $(-1)^{g+1}2z^N$ vanishes modulo $z^{2g+1}$ ($N = 2g+1$) and $A_c(-z)$ is
+invertible modulo $z^{2g+1}$ precisely when $A_c(0) = -t_{j+1}A_j(0) \neq 0$ --- the
+avoidance hypothesis. Hence the congruence for $A_c$ transfers to $A_{j+1}$.
+(2) $\Gamma(z) := A(z)d(-z) - A(-z)d(z)$ is an odd polynomial, and for odd $k$ its
+$z^k$-coefficient equals $2\sum_m \alpha_m e_{G-k+m}$ (write $d(-z) = \sum_r e_{G-r} z^r$
+and collect the parity signs, which cancel); in characteristic $\neq 2$ the congruence
+modulo $z^{2g+1}$ is thus exactly the system.
+(3) Uniqueness is Cramer's rule; the value formulas follow from
+$U_j(z^2) = (-1)^g A_j(z)A_j(-z)$ (Lemma~\ref{lem:cusp-reduction}) evaluated at
+$z = t_{j+1}$, $t_j$, $0$.
+\end{proof}
+
+\begin{remark}[The Schur-polynomial interpretation of the atoms]
+\label{rem:schur-atoms}
+The determinant values certified in Theorem~\ref{thm:cusp-witness} by the
+leading-coefficient induction admit an explicit Schur-polynomial theory. It is
+\emph{deliberately left informal} --- the formalized route certifies the determinants
+directly and does not use the Schur form --- and is included here as an independent
+verification, checked symbolically in Magma, and as the structural explanation of the
+$\pm 2^a$ integer contents observed in all numerical data.
+
+\emph{(1) Cramer data are Schur polynomials.}
+Let $\Lambda(j) := (g^{\,j+1}, g-1, g-2, \dots, 1)$. Then, for $0 \le m \le g$, the
+$m$-th Cramer determinant satisfies
+$\mathrm{NA}_m = (-1)^{g-m}\, s_{\Lambda(j)/(m)}(T_j)$ (a skew Schur polynomial, $(m)$
+the one-row partition); in particular
+$\det M_j = \pm\, s_{(g^j,\, g-1, \dots, 1)}(T_j)$ --- at $j = 0$ the classical
+$s_{\delta}(t_1, \dots, t_g) = \prod_{i < l}(t_i + t_l)$ --- and by the one-variable
+branching rule $\mathrm{NA}_j(-w) = \pm\, s_{\Lambda(j)}\bigl(T_j \cup \{w\}\bigr)$.
+Consequently every fold condition is, up to sign and the factor $\det M_j^{2}$, a
+product of two values of the single Schur polynomial $s_{\Lambda(j)}$ at multiset
+alphabets: $s_{\Lambda(j)}(T_j \cup \{t\})\, \cdot\, s_{\Lambda(j)}(T_j \cup \{-t\})$
+with $t = t_{j+1}$ (step) resp.\ $t = t_j$ (mirror), and $s_{\Lambda(j)}(T_j)^2$
+(avoidance). The values at the all-positive alphabets are monomial-positive.
+\emph{Why:} the matrix $M_j$ and its column-replaced Cramer variants are minors of the
+Toeplitz array $(e_{r-c}(T_j))_{r,c}$; by the dual Jacobi--Trudi identity for skew
+shapes, any such minor is $\pm$ a skew Schur polynomial, and matching the index pattern
+$e_{G-2i+1+m}$ against $e_{\lambda'_i - \mu'_s - i + s}$ gives
+$\lambda' = (G, G-1, \dots, G-g+1)$, i.e.\ $\lambda = \Lambda(j)$, and $\mu' = (1^m)$,
+i.e.\ $\mu = (m)$; the sign $(-1)^{g-m}$ is the column transposition moving the
+replaced column to its place. For $m = g$ the skew shape drops the full first row,
+leaving the straight $(g^j, g-1, \dots, 1)$. The branching rule
+$s_{\Lambda}(X \cup \{w\}) = \sum_{r \ge 0} s_{\Lambda/(r)}(X)\, w^r$ (one extra
+variable picks up a horizontal strip, necessarily a single row) gives the stated form of
+$\mathrm{NA}_j(-w)$; monomial-positivity of (skew) Schur polynomials is
+Lindstr\"om--Gessel--Viennot.
+
+\emph{(2) Nested-extreme factorization.}
+Let $\Lambda$ be a partition, $\ell(\Lambda) \le n$. Partition the $n$ slots of
+$s_\Lambda(x_1, \dots, x_n)$ into $k$ groups of sizes $m_1, \dots, m_k$ carrying
+distinct values $v_1 > \dots > v_k$ (a priority order), and let $S(v_1, \dots, v_k)$ be
+the resulting polynomial. Define $D_r := \deg_{v_r}$ and the iterated leading
+coefficients along the priority order. Then, with $M_r := m_1 + \dots + m_r$ and the
+\emph{slices} $\sigma_r := (\Lambda_{M_{r-1}+1}, \dots, \Lambda_{M_r})$:
+$D_r = |\sigma_r|$, and the final iterated leading coefficient equals
+$\prod_r N_r$ with $N_r := s_{\sigma_r}(1^{m_r}) \ge 1$, the number of semistandard
+Young tableaux of the straight shape $\sigma_r$ with $m_r$ letters. Equivalently: the
+monomial $v_1^{D_1} \cdots v_k^{D_k}$ is the lexicographically largest monomial of $S$
+and has coefficient $\prod_r N_r$.
+\emph{Why:} by symmetry assign group $r$ the entry range $\{M_{r-1}+1, \dots, M_r\}$;
+the $v_1$-degree of a tableau's monomial is its number of entries $\le m_1$. In a
+semistandard tableau the entry in row $i$ is $\ge i$, so entries $\le m_1$ lie in rows
+$\le m_1$ and form a Young subdiagram $\mu \subseteq \Lambda$ (left-closed by
+row-weakness, up-closed by column-strictness); thus
+$|\mu| \le \Lambda_1 + \dots + \Lambda_{m_1}$ with equality iff $\mu$ is the full top
+$m_1$ rows, and the bound is attained. A tableau attaining it is exactly a pair: an
+arbitrary tableau of the straight shape $\sigma_1$ with $m_1$ letters ($N_1$ choices),
+and an arbitrary filling of the lower rows with the larger entries; the lower part, with
+entries shifted down by $m_1$, is an arbitrary tableau of the straight shape
+$(\Lambda_{m_1+1}, \dots)$ on the remaining letters. Induction on $k$ finishes;
+$N_r \ge 1$ since $\ell(\sigma_r) \le m_r$.
+
+\emph{(3) Slice values.}
+By Weyl's dimension formula, $s_{(a)}(1) = 1$, $s_{(a,b)}(1,1) = a - b + 1$ and
+\[ s_{(a,b,c)}(1,1,1) = \tfrac12\,(a-b+1)(b-c+1)(a-c+2)\,. \]
+Since consecutive rows of $\Lambda(j)$ differ by $0$ or $1$: every $2$-slice contributes $1$ or $2$; a
+$3$-slice contributes $1$ on $(a,a,a)$, $8$ on $(a, a{-}1, a{-}2)$, and $3$ on the
+boundary patterns $(a,a,a{-}1)$, $(a,a{-}1,a{-}1)$ --- the source of the
+characteristic-$3$ fingerprint observed in the numerical data.
+
+\emph{(4) Certificates for the positive atoms.}
+Each of the values $s_{\Lambda(j)}(T_j)$, $s_{\Lambda(j)}(T_j \cup \{t_{j+1}\})$,
+$s_{\Lambda(j)}(T_j \cup \{t_j\})$ ($j \ge 1$, $g \ge 2$) contains an explicit monomial
+with coefficient a power of $2$; consequently each is nonzero over every field of
+characteristic $\neq 2$, and has $2$-power integer content. Specifically: for the first
+two alphabets (doubles and singles only) \emph{every} priority order works, with
+$2$-exponent the number of difference-$1$ two-row slices; for the tripled alphabet,
+place the triple first if $j \ge 2$ (slice $(g,g,g) \mapsto 1$) and after one single if
+$j = 1$ (slice $(g, g{-}1, g{-}2) \mapsto 8$). This is (2) combined with (3).
+
+\emph{(5) Signed group values.}
+(a) $s_\mu(t, -t) = 0$ unless $\ell(\mu) \le 2$ and $\mu_1 \equiv \mu_2 \bmod 2$, in
+which case it equals $(-1)^{\mu_2} t^{|\mu|}$; in particular
+$s_{(g,g)}(t,-t) = (-1)^g t^{2g}$.
+(b) $s_\mu(t, t, -t) = t^{|\mu|} s_\mu(1,1,-1)$, and
+$s_{(a,a,a)}(1,1,-1) = s_{(a,a,a-1)}(1,1,-1) = (-1)^a$.
+(For (a), $s_{(\mu_1,\mu_2)}(x,y) = (xy)^{\mu_2} h_{\mu_1-\mu_2}(x,y)$ and
+$h_d(t,-t) = t^d$ for even $d$, $0$ for odd $d$. For (b),
+$s_{(a,a,a)} = (xyz)^a \mapsto (-1)^a$;
+$s_{(a,a,a-1)} = (xyz)^{a-1} e_2 \mapsto (-1)^{a-1}\cdot(1 - 1 - 1) = (-1)^a$. Note the
+contrast with the \emph{unsigned} $s_{(a,a,a-1)}(1,1,1) = 3$: the signed specialization
+rescues exactly the boundary pattern.)
+
+\emph{(6) Certificates for the negated atoms.}
+For $j \ge 1$, $g \ge 2$ and $\Lambda = \Lambda(j)$:
+in $s_{\Lambda}(T_j \cup \{-t_{j+1}\})$ the $t_{j+1}$-degree is exactly $2g$, with
+leading coefficient $(-1)^g\, s_{\Lambda''}\bigl(T_j \smallsetminus \{t_{j+1}\}\bigr)$,
+$\Lambda''$ the shape with the top two rows removed; in
+$s_{\Lambda}(T_j \cup \{-t_j\})$ the $t_j$-degree is exactly $3g$ ($j \ge 2$) resp.\
+$3g - 1$ ($j = 1$), with leading coefficient $(-1)^g\, s_{\Lambda'''}(\text{rest})$,
+$\Lambda'''$ the shape with the top three rows removed. Continuing with (2) on the
+remaining alphabet, each negated atom contains an explicit monomial with coefficient
+$\pm 2^a$, hence is nonzero over every field of characteristic $\neq 2$ with $2$-power
+content. \emph{Why:} give the signed group --- the pair $\{t, -t\}$ (step case) resp.\
+the trio $\{t, t, -t\}$ (mirror case) --- top priority and expand by the coproduct
+$s_\Lambda(Y \uplus X) = \sum_\mu s_\mu(Y)\, s_{\Lambda/\mu}(X)$, so the $t$-degree
+comes only from $s_\mu(Y)$. In the pair case
+$|\mu| \le \Lambda_1 + \Lambda_2 = 2g$ with equality only for $\mu = (g,g)$, which
+passes the parity condition of (5)(a) with value $(-1)^g$; in the trio case
+$|\mu| \le \Lambda_1 + \Lambda_2 + \Lambda_3$ with equality only for the full top three
+rows, with value $(-1)^g$ by (5)(b). In each case $\mu$ consists of full equal-length
+top rows, so $\Lambda/\mu$ is the straight shape with those rows removed, its
+consecutive-difference pattern is again $0/1$, and no larger $|\mu|$ contributes.
+
+The statements of (1)--(6) were verified symbolically for small $g$ (scripts
+\texttt{schurid.m}, \texttt{p2shapes.m}, \texttt{branch.m}, \texttt{p34atoms.m},
+\texttt{c3check.m} in \texttt{prototype/}). The formalized counterparts of (4) and (6)
+are the leading-coefficient cascades cited with Theorem~\ref{thm:cusp-witness}; the
+degree and leading-coefficient statements of (6) are exactly the coefficient identities
+of the peeled node there.
+\end{remark}
+
+\begin{theorem}[The cuspidal witness, all $g$]
+\label{thm:cusp-witness}
+\lean{ChabautyColeman.cusp_alphabet_comp_neg,
+  ChabautyColeman.momentDet_mul, ChabautyColeman.peelPattern,
+  ChabautyColeman.peelStage_single, ChabautyColeman.peelStage_double,
+  ChabautyColeman.peelStage_id, ChabautyColeman.peelStage_triple_id,
+  ChabautyColeman.peelStage_lead,
+  ChabautyColeman.coeff_momentDet_of_stage, ChabautyColeman.degree_prod_coeff_lt,
+  ChabautyColeman.coeff_momentDet_single, ChabautyColeman.coeff_momentDet_double,
+  ChabautyColeman.coeff_momentDet_id, ChabautyColeman.coeff_momentDet_triple_id,
+  ChabautyColeman.coeff_momentDet_lead, ChabautyColeman.peelHom,
+  ChabautyColeman.momentDet_ne_zero_of_map,
+  ChabautyColeman.momentDet_singles_ne_zero, ChabautyColeman.momentDet_doubles_ne_zero,
+  ChabautyColeman.momentDet_X_peelPattern_one,
+  ChabautyColeman.eval_ne_zero_of_momentDet_ne_zero,
+  ChabautyColeman.momentDet_generic_doubles_ne_zero,
+  ChabautyColeman.momentDet_generic_doubles_mul_X_ne_zero,
+  ChabautyColeman.momentDet_generic_pair_ne_zero,
+  ChabautyColeman.momentDet_generic_trio_ne_zero,
+  ChabautyColeman.momentDet_generic_tripled_ne_zero,
+  ChabautyColeman.momentDet_generic_trio_id_ne_zero,
+  ChabautyColeman.momentDet_generic_tripled_one_ne_zero,
+  ChabautyColeman.cuspGenH, ChabautyColeman.cuspChain_cond_of_atoms,
+  ChabautyColeman.isCuspState_cuspChain_of_atoms,
+  ChabautyColeman.cuspChain_congruence_of_atoms,
+  ChabautyColeman.cuspChain_eval_ne_zero_of_atoms,
+  ChabautyColeman.cuspStep_cond_base, ChabautyColeman.exists_cuspStep_H,
+  ChabautyColeman.genNode, ChabautyColeman.genCuspChain,
+  ChabautyColeman.genNode_trio_atom_ne_zero,
+  ChabautyColeman.genNode_tripled_atom_ne_zero,
+  ChabautyColeman.exists_genCuspChain_witness, ChabautyColeman.genFoldH,
+  ChabautyColeman.genCuspFold, ChabautyColeman.exists_genCuspFold_witness,
+  ChabautyColeman.genCuspFold_eval_sq_ne_zero,
+  ChabautyColeman.isScaledState_foldBase_gen, ChabautyColeman.genFoldH_eq_foldGenH,
+  ChabautyColeman.foldCondNum_cusp_ne_zero, ChabautyColeman.cuspNum_ne_zero}
+\leanok
+\uses{thm:cusp-moment, lem:fold-mirror}
+For every $g \ge 2$ and every field $k$ of characteristic $\neq 2$: at the generic
+nodes $t_1, \dots, t_g$ the full $2g$-step cuspidal fold is defined, with every
+composition, disjointness and avoidance condition of both phases nonzero in
+$k(t_1, \dots, t_g)$, and the moment determinants $\det M_j$ are nonzero for all
+$j \le g$. Consequently the cleared condition numerators $P_q$ ($q < 2g$) of the
+numerator fold at the cuspidal inputs are nonzero polynomials over $k$ --- the
+nonvanishing hypothesis that Lemma~\ref{lem:cusp-descent} consumes.
+\end{theorem}
+\begin{proof}
+\leanok
+The values to be certified --- the determinants $\det M_j$, the avoidance values
+$\mathrm{NA}_j(0)$, the step values $\mathrm{NA}_j(\mp t)$ and the mirror values
+$\mathrm{NA}_j(\mp t_j)$ at the last-added node --- are nonzero at the generic nodes by
+an exact leading-coefficient induction, one node at a time. Read the pattern determinant
+in the polynomial ring in the peeled node $u$ over the remaining generic nodes. For each
+of the five factor shapes occurring in the alphabets (a linear factor, its square, a
+signed pair, a trio, and a tripled factor), the identity of the corresponding peel stage
+states that the top $u$-coefficient of the determinant is a fixed scalar --- $1$, $2$,
+$\pm 1$ or $8$ --- times the determinant of the remaining alphabet at the next pattern,
+and no other term of the expansion reaches that degree. Nonvanishing therefore follows
+by induction on the number of nodes over the integral domain of generic nodes; the
+extension atoms peel their distinguished node first. No valuation-theoretic input
+enters. The chain induction built on Theorem~\ref{thm:cusp-moment} then discharges
+every phase-1 condition from these determinant values, and the mirror
+(Lemma~\ref{lem:fold-mirror}) extends the induction through phase 2 along the retraced
+phase-1 alphabets. Identifying the resulting scalars with the generic scalars of the
+numerator fold and clearing denominators converts each condition into its numerator
+$P_q$.
+
+The Schur-side certificates of Remark~\ref{rem:schur-atoms} give an independent
+verification; the numerical computation of every condition for $g \le 6$ from the moment determinants
+(script \texttt{detcond.m}) agrees with the exact fold wherever both are available.
+\end{proof}
+
+\begin{lemma}[Descent from the cusp]
+\label{lem:cusp-descent}
+\uses{lem:fold-universal, thm:cusp-witness}
+\lean{ChabautyColeman.descRate, ChabautyColeman.digits_eq_of_sum_eq,
+  MvPolynomial.IsWeightedHomogeneous.aeval,
+  ChabautyColeman.orderTop_aeval_descRate_le, ChabautyColeman.le_orderTop_mul_sub_one,
+  ChabautyColeman.le_orderTop_prod_sub_one, ChabautyColeman.aeval_family_ne_zero,
+  ChabautyColeman.exists_infinityPoint}
+\leanok
+Fix a field $K$ of characteristic $\neq 2$. Let $\mathcal{D} \ge 1$ bound the
+$t$-degrees of the finitely many cuspidal numerators $P_q$ of
+Lemma~\ref{lem:fold-universal}, choose a base $B > \mathcal{D}$, set
+$M := \mathcal{D}B^{\,g+1}$, and use the \emph{common rates}
+$\tilde n_i := M + B^{\,i+1}$ for every fold quantity $q$. If $P_q \neq 0$, then the
+value of the universal numerator $\mathcal{N}_q$ at the family of points escaping to
+infinity with rates $\tilde n_i$ is a \emph{nonzero} element of $K(\!(s)\!)$: its
+valuation is that of the valuation-minimal monomial of
+$P_q(t)\rvert_{t_i = s^{-\tilde n_i}}$, which lies in the window
+$[\,-dM - \mathcal{D}B^{\,g},\, -dM\,]$ for $d = \operatorname{wt}(\mathcal{N}_q)$.
+\end{lemma}
+\begin{proof}
+\leanok
+\emph{(a) Separation and the window.} $P_q$ is homogeneous of some degree
+$d \le \mathcal{D}$, so a monomial $t^c$ of $P_q$ specializes to valuation
+$-\sum_i c_i \tilde n_i = -dM - \sum_i c_i B^{\,i+1}$: the $M$-part is common to
+\emph{all} monomials (homogeneity), and since $0 \le c_i \le d \le \mathcal{D} < B$ the
+digits $c_i$ make $c \mapsto \sum_i c_i B^{\,i+1}$ injective. Hence distinct monomials
+land on distinct valuations, all inside the window
+$[\,-dM - \mathcal{D}B^{\,g},\, -dM\,]$, and
+$v^\ast := v\bigl(P_q(s^{-\tilde n})\bigr)$ is attained by a unique monomial; in
+particular $P_q(s^{-\tilde n}) \neq 0$.
+
+\emph{(b) The correction budget.} At the family, $y_i = t_i^N (1 + \eta_i)$ with
+$v(\eta_i) \ge 2\tilde n_i \ge 2M$ (a Hensel square root), and $x_i = t_i^2$ exactly.
+Evaluate $\mathcal{N}_q$ monomial by monomial. The deviation of an $a$-free monomial
+$\mu$ from its cuspidal contribution has valuation
+$\ge v(\mu(\text{cusp})) + 2M \ge (-dM - \mathcal{D}B^{\,g}) + 2M > -dM \ge v^\ast$,
+using that \emph{every} $a$-free monomial of the isobaric $\mathcal{N}_q$ --- whether
+or not it survives the collection into $P_q$ --- has $t$-degree exactly $d$ and hence
+lies in the window of (a). A monomial containing some $a_r$ has $(x,y)$-weight at most
+$d - 2$, so its value has valuation
+$\ge -(d-2)(M + B^g) \ge -dM + 2M - \mathcal{D}B^{\,g} > -dM \ge v^\ast$. Hence
+$v\bigl(\mathcal{N}_q(\text{family}) - P_q(s^{-\tilde n})\bigr) > v^\ast$, so
+$\mathcal{N}_q(\text{family})$ has valuation exactly $v^\ast$; in particular it is
+nonzero.
+\end{proof}
+
+\begin{theorem}[The fold witness for genus $\ge 2$]
+\label{thm:fold-witness}
+\lean{ChabautyColeman.exists_foldWitness, ChabautyColeman.curveCondNum,
+  ChabautyColeman.curveSpec, ChabautyColeman.not_curveVanishing_curveCondNum,
+  ChabautyColeman.eval_curveCondNum, ChabautyColeman.foldXs, ChabautyColeman.foldYs,
+  ChabautyColeman.isScaledState_foldBase, ChabautyColeman.foldCond_ne_zero}
+\leanok
+\uses{lem:fold-universal, thm:cusp-witness, lem:cusp-descent}
+Let $g \ge 2$ and let $K$ be algebraically closed of characteristic $\neq 2$, $f$ monic
+of degree $N = 2g+1$. Every universal fold numerator $\mathcal{N}_q$ is a nonzero
+polynomial function on $g$-tuples of affine curve points; consequently there is a
+\emph{single} tuple $P_1, \dots, P_g$ over $K$, with pairwise distinct $x$-coordinates,
+at which all $\mathcal{N}_q$ are simultaneously nonzero --- so the point-by-point fold
+$\tau + \tau - \tau$ at this tuple is defined throughout and every disjointness and
+doubling condition of both phases is nonzero, for every genus $\ge 2$. (Genus $1$,
+where the cuspidal specialization degenerates in characteristic $3$, is
+Lemma~\ref{lem:fold-witness-genus-one}.)
+\end{theorem}
+\begin{proof}
+\leanok
+Each $\mathcal{N}_q$ is nonzero on the variety of point tuples: the family of points
+escaping to infinity with the common rates of Lemma~\ref{lem:cusp-descent} is a
+$K(\!(s)\!)$-point at which $\mathcal{N}_q$ takes a nonzero value --- a pure polynomial
+evaluation, requiring no other condition to hold, hence no circularity. A common
+witness tuple then exists because finitely many nonzero polynomial conditions on $C^g$
+have a common witness (a product of the conditions is refuted by one witness per
+factor); the pairwise distinctness of the $x$-coordinates joins as $g(g-1)$ further
+conditions $x_i - x_j$, each refuted at a two-point tuple. At the common tuple the fold
+quantities are the ratios of Lemma~\ref{lem:fold-universal} with nonvanishing
+numerators and denominators, inductively along the fold. Phase 2 needs no separate
+argument: its conditions belong to the same uniform family of numerators, their
+cuspidal nonvanishing having been established through the mirror inside
+Theorem~\ref{thm:cusp-witness}. Further polynomial avoidance conditions --- the
+Weierstrass avoidance $\operatorname{res}(U_j, f) \neq 0$ of the intermediate states,
+or $y_i \neq 0$ --- join the same argument by enlarging the finite set of conditions,
+their cuspidal nonvanishing being recorded there as well (on the cusp
+$\operatorname{res}(U_j, X^N) = \pm U_j(0)^N$ and $U_j(0) = \pm A_j(0)^2 \neq 0$).
+\end{proof}
+
+\begin{lemma}[The genus-one fold witness]
+\label{lem:fold-witness-genus-one}
+\lean{ChabautyColeman.exists_genusOnePoint,
+  ChabautyColeman.GenusOne.tangent_factorization,
+  ChabautyColeman.GenusOne.foldChain_one, ChabautyColeman.GenusOne.foldChain_two,
+  ChabautyColeman.GenusOne.foldGenH_zero_eq, ChabautyColeman.GenusOne.foldGenH_one_eq,
+  ChabautyColeman.GenusOne.psi_eval_eq, ChabautyColeman.GenusOne.avoid_eval_eq,
+  ChabautyColeman.GenusOne.psi_ne_zero, ChabautyColeman.GenusOne.avoid_ne_zero}
+\leanok
+\uses{lem:fold-universal}
+Let $g = 1$ and let $K$ be algebraically closed of characteristic $\neq 2$, $f$ monic
+cubic and \emph{squarefree}. Some affine curve point $(x_0, y_0)$ has $y_0 \neq 0$,
+nonzero step-condition numerators at both fold steps, and nonzero stage resultants at
+all three fold stages --- the genus-one instance of Theorem~\ref{thm:fold-witness}.
+
+The cuspidal argument does not cover this case: on the cusp the interior condition
+value at $g = 1$ is $3t^2/4$, identically zero in characteristic $3$ (the additive
+group of the cusp is all $3$-torsion there, so $x(2P) = x(P)$ throughout), and for
+$f = X^3$ the conditions genuinely vanish at every curve point --- squarefreeness is
+sharp.
+\end{lemma}
+\begin{proof}
+\leanok
+A direct tangent--chord computation of the fold
+(Lemma~\ref{lem:fold-universal} supplies the transfer to the numerator conditions).
+With $\lambda = f'(x_0)/(2y_0)$, $x_2 = \lambda^2 - a - 2x_0$ and
+$y_2 = -y_0 - \lambda(x_2 - x_0)$, the single cubic factorization
+\[ (y_0 + \lambda(X - x_0))^2 - f \;=\; -(X - x_0)^2 (X - x_2) \]
+governs both steps: the chord through $2P$ and $-P$ is the \emph{negated} tangent line,
+so the second step needs no new identity, and the chain visits $(X - x_2, y_2)$ and
+returns to $(X - x_0, y_0)$ --- $\tau + \tau - \tau = \tau$ on the nose. The condition
+values are, up to powers of $2y_0$, the values at $x_0$ of $\psi_3 = 2ff'' - f'^2$ (the
+$3$-division polynomial: $\psi_3(x_0) = 4y_0^2\,(x_0 - x_2)$) and of
+$f'\psi_3 - 8f^2$ (the numerator of $y(2P)$: $8y_0^3\,y_2$); the stage resultants are
+the $y$-values $y_0, y_2, y_0$ of the states, again up to denominators. Both
+polynomials are nonzero for squarefree $f$ in \emph{every} characteristic, by
+separability: if either vanished, $f \mid f'^2$, hence $f \mid f'$ by coprimality,
+hence $f' = 0$ by degrees --- contradicting the coprimality of $f$ and $f' = 0$ for the
+nonunit $f$. The witness point takes $x_0$ outside the finitely many roots of
+$f \cdot \psi_3 \cdot (f'\psi_3 - 8f^2)$ and $y_0 = \sqrt{f(x_0)}$.
+\end{proof}
+
+\begin{lemma}[The auxiliary class $\tau$]
+\label{lem:tau-exists}
+\lean{ChabautyColeman.TauData, ChabautyColeman.TauData.exists_of_hasGoodCenter,
+  ChabautyColeman.exists_interpolating_datum,
+  ChabautyColeman.exists_ftauUY_root, ChabautyColeman.exists_isFoldCerts_lift,
+  ChabautyColeman.exists_isFoldCerts_ftau, ChabautyColeman.isFtauFoldAvoid_of_center,
+  ChabautyColeman.isFoldAvoid_of_map, ChabautyColeman.exists_bezout_lift_map,
+  ChabautyColeman.TauData.exists_genus_two}
+\leanok
+\uses{lem:tau-generic, lem:many-points, lem:disk-param, lem:mumford-exists}
+There exist $q$ and a class $\tau \in \J{\Qq}$ whose reduced datum $(u_\tau, v_\tau)$
+lifts the witness datum of Lemma~\ref{lem:tau-generic} and satisfies
+Definition~\ref{def:goodpos}, together with all the data the constructions below
+require: an integral Mumford datum with its cofactor identity and a B\'ezout identity
+$c_1 u_\tau + c_2 (2 v_\tau) = 1$ over $\Oq$; the $g$ points splitting it,
+$u_\tau = \prod_i (X - a_i)$ with pairwise unit differences $a_i - a_j$ and
+$v_\tau(a_i) = b_i$; the \emph{moving points} of the fold --- the Hensel roots of the
+perturbed $u$-polynomial over $\Oq[[X;Y]]$, with constant coefficients the $a_i$ ---
+and valid B\'ezout data for the fold computation of $F_\tau$ over $\Oq[[X;Y]]$,
+avoiding the Weierstrass points at every stage. The residue-level genericity of
+Lemma~\ref{lem:tau-generic} travels with the datum: the lifts have prescribed residues,
+and the avoidance conditions descend along the residue map. The avoidance of the
+prescribed finite set $T$ of residue $x$-values --- $\bar u_\tau(x) \neq 0$ for
+$x \in T$ --- also comes with the datum; the per-disk construction of
+Lemma~\ref{lem:global-generic} consumes it.
+\end{lemma}
+\begin{proof}
+\leanok
+The witness tuple of Lemma~\ref{lem:tau-generic} lifts point by point, by Hensel's
+lemma, to disk centres with prescribed residues (Lemma~\ref{lem:disk-param}); $u_\tau$
+is the product of the lifted linear factors, and $v_\tau$ is interpolated through the
+lifted points by the Chinese remainder theorem --- the lifted $x$-coordinates differ by
+units, so the linear factors are pairwise comaximal --- with $\bar v_\tau$ recovered
+exactly by uniqueness of interpolation in degree $< g$. The B\'ezout identity over
+$\Oq$ lifts by Nakayama's lemma from the stage-$0$ avoidance of the witness. The moving
+points exist by Hensel's lemma along the ideal generated by the variables: the
+$\tau$-roots are simple roots of $u_\tau$, their derivative values being unit products
+of the pairwise differences. The B\'ezout data for the fold lift step by step, again by
+Nakayama with prescribed residues against the already-lifted states, and the
+Weierstrass avoidance descends from the residue configuration, the residue map
+reflecting coprimality of monic polynomials.
+\end{proof}
+
+\begin{definition}[Cantor addition as a rational map]
+\label{def:cantor-map}
+\lean{ChabautyColeman.cantorV, ChabautyColeman.cantorV_sq_sub,
+  ChabautyColeman.y_sub_algebraMap_cantorV, ChabautyColeman.cantorCompose,
+  ChabautyColeman.cantorReduce}
+\leanok
+\uses{lem:mumford-exists}
+The pair of tuples of rational functions
+$\mathrm{Add} = (\mathrm{Add}_u, \mathrm{Add}_v)$ in the coordinates of two Mumford
+data of degree $g$, obtained by transcribing Cantor's composition and reduction
+symbolically; its domain of definition contains the locus where the finitely many
+leading coefficients and resultants appearing in the algorithm are invertible. The
+inverse is $\ominus(u, v) := (u, -v)$ (Lemma~\ref{lem:aj-inverse}). The composition is
+the coprime branch of Cantor's algorithm with the three-term B\'ezout relation
+$s_1 u_1 + s_2 u_2 + s_3(v_1 + v_2) = 1$: unlike the extended Euclidean algorithm,
+which is not a rational map near the diagonal, this branch uniformly covers
+composition, the near-diagonal case, and doubling.
+\end{definition}
+
+\begin{lemma}[Correctness of the rational map]
+\label{lem:cantor-correct}
+\lean{ChabautyColeman.mumfordIdeal_mul_of_bezout,
+  ChabautyColeman.mk0_mumfordIdeal_mul_of_bezout,
+  ChabautyColeman.mk0_mumfordIdeal_eq_mk0_cofactor_datum,
+  ChabautyColeman.exists_bezout_lift}
+\leanok
+\uses{def:cantor-map, lem:mumford-exists}
+At every point of its domain over any field, $\mathrm{Add}$ evaluates to the reduced
+datum of the product class. More precisely, in the certificate-passing form used
+throughout: given a B\'ezout identity $s_1 u_1 + s_2 u_2 + s_3(v_1+v_2) = 1$, the
+product of the two Mumford ideals \emph{equals} the Mumford ideal of the composed datum
+$(u_1 u_2,\ V)$ with $V = s_1 u_1 v_2 + s_2 u_2 v_1 + s_3(v_1 v_2 + f)$, so the
+composition computes the product class; and given an inverse of the leading coefficient
+of the cofactor $w$ of $v^2 - f = uw$, the normalized reduced datum
+$(c\,w,\ (-v) \bmod c\,w)$ is monic, is again a Mumford datum, and represents the same
+class (Lemma~\ref{lem:mumford-reduce}). Over a local ring, a B\'ezout identity for the
+residues lifts by Nakayama's lemma, since the Mumford $u$-polynomials are monic
+(monicity is essential: $1 - \pi X$ over a discrete valuation ring has invertible
+residue but is not invertible).
+\end{lemma}
+\begin{proof}
+\leanok
+The composed ideal identity is proved directly from the certificate:
+$V \equiv v_i \bmod u_i$ and $V^2 \equiv f \bmod u_1 u_2$ with explicit cofactors, and
+$y - V$ is an explicit combination of the four product generators; the reduction step
+reduces to Lemma~\ref{lem:mumford-reduce} after normalizing by the leading-coefficient
+inverse.
+\end{proof}
+
+\begin{definition}[The chart at $\tau$]
+\label{def:chart}
+\lean{ChabautyColeman.chartU, ChabautyColeman.chartV, ChabautyColeman.exists_chartV}
+\leanok
+\uses{lem:tau-exists, thm:hensel}
+Coordinates near $\tau$: the $g$ coefficients $X = (X_1,\dots,X_g)$ of $u - u_\tau$.
+There is $V(X) \in \Oq[[X]][x]$ of $x$-degree $< g$ with $V(0) = v_\tau$ and
+$V(X)^2 \equiv f \bmod (u_\tau + X)$; the chart point of $X$ is the Mumford datum
+$(u_\tau + X,\ V(X))$, i.e.\ the ideal $(u_\tau + X,\ y - V(X))$. \emph{Formalization.}
+$V$ is constructed as a single quadratic Hensel root (Theorem~\ref{thm:hensel}) of
+$T^2 = f$ in the quotient by $(u_\tau + X)$, a finite free algebra over the power
+series ring, which is Henselian for the $(X)$-adic ideal; no topology on $\Oq$ is
+needed. The inputs are the cofactor identity $v_\tau^2 - f = u_\tau w$ and the B\'ezout
+identity $c_1 u_\tau + c_2 (2 v_\tau) = 1$ carried by the datum of
+Lemma~\ref{lem:tau-exists}.
+\end{definition}
+
+\begin{definition}[The translated group law $F_\tau$]
+\label{def:Ftau}
+\lean{ChabautyColeman.FtauFold, ChabautyColeman.ftauFoldPipe,
+  ChabautyColeman.FoldCertData, ChabautyColeman.IsFoldCerts,
+  ChabautyColeman.IsFtauFoldCerts, ChabautyColeman.ftauFoldPipe_fst_eq,
+  ChabautyColeman.ftauFoldXs, ChabautyColeman.ftauFoldYs,
+  ChabautyColeman.ftauUY_eq_prod}
+\leanok
+\uses{def:chart, def:cantor-map, lem:tau-exists}
+$F_\tau(X,Y)$ is defined as the chart coordinates of
+$\mathrm{ch}(X) + \mathrm{ch}(Y) - \tau$, expanded as a formal power series at $(0,0)$:
+in the $\tau$-translated identification $c(X) := \mathrm{ch}(X) - \tau$ this is the
+group law, satisfying $\mathrm{ch}(F_\tau(X,Y)) = \mathrm{ch}(X) + \mathrm{ch}(Y) -
+\tau$. \emph{Formalization.} The computation is realized as the point-by-point fold of
+Definition~\ref{def:centre-fold} over $\Oq[[X;Y]]$: starting from the $X$-side chart
+datum, fold in, one point per step, first the $g$ moving points of the $Y$-side chart
+--- the Hensel roots of the $Y$-side chart polynomial, which factor it completely ---
+and then the $g$ involuted $\tau$-points $(a_i, -b_i)$; each step is one Cantor
+composition at a B\'ezout triple followed by the unconditional reduction with leading
+coefficient $-1$. The B\'ezout data are a parameter of the definition, one triple per
+step; given their validity, the output is a Mumford datum whose $u$-part is exactly the
+chart polynomial at $F_\tau(X,Y)$. Existence of valid data over $\Oq[[X;Y]]$ is part of
+Lemma~\ref{lem:tau-exists}.
+\end{definition}
+
+\begin{lemma}[Integrality, unit laws, commutativity]
+\label{lem:Ftau-basic}
+\lean{ChabautyColeman.setYZero_FtauFold, ChabautyColeman.setXZero_FtauFold,
+  ChabautyColeman.rename_swap_FtauFold, ChabautyColeman.constantCoeff_FtauFold,
+  ChabautyColeman.fold_pipeline_eq_self, ChabautyColeman.mk0_foldPipe,
+  ChabautyColeman.prod_mk0_foldXs_foldYs, ChabautyColeman.mk0_mumfordIdeal_mul_neg}
+\leanok
+\uses{def:Ftau, lem:cantor-correct}
+$F_\tau \in \Oq[[X;Y]]^g$ (the denominators of Definition~\ref{def:cantor-map} are
+units at the centre by Definition~\ref{def:goodpos}); $F_\tau(X,0) = X$,
+$F_\tau(0,Y) = Y$, $F_\tau(X,Y) = F_\tau(Y,X)$; and for all
+$\mathbf x, \mathbf y \in (\mathfrak m')^g$, $\mathfrak m'$ the maximal ideal of a
+complete discrete valuation ring $\Oq'$ over $\Oq$,
+$\mathrm{ch}(F_\tau(\mathbf x,\mathbf y))$ represents the class
+$\mathrm{ch}(\mathbf x) + \mathrm{ch}(\mathbf y) - \tau$: $F_\tau$ computes the sum in
+the $\tau$-translated identification.
+\end{lemma}
+\begin{proof}
+\leanok
+Integrality holds by construction, and the vanishing constant term expresses that the
+value of the fold at the centre is the $\tau$-datum itself. For the unit law
+$F_\tau(X,0) = X$: at $Y = 0$ the moving points degenerate onto the $\tau$-points, so
+the fold computes $[\mathrm{ch}(X)] + [\tau] - [\tau] = [\mathrm{ch}(X)]$ --- the
+mirrored point block cancels and reduced representatives are unique
+(Lemma~\ref{lem:cantor-correct}, Lemma~\ref{lem:mumford-exists}); the identity of
+power series follows by evaluating at all points and interpolating
+(Theorem~\ref{thm:interpolation}; interpolation over $\Oq$-points suffices).
+Commutativity is proved the same way: the swapped computations have the same class,
+hence the same reduced output. The last clause is the pointwise class computation of
+the fold, transported to evaluation points.
+\end{proof}
+
+\begin{theorem}[Associativity]
+\label{thm:Ftau-assoc}
+\lean{ChabautyColeman.FtauFold_assoc, ChabautyColeman.eval_FtauFold_eq_of_mk0_eq,
+  ChabautyColeman.fold_pipeline_eq_of_mk0_eq, ChabautyColeman.mk0_chart_eval_fold,
+  ChabautyColeman.chartClass, ChabautyColeman.eval_ftauFoldPipe_eq,
+  ChabautyColeman.ftauFoldPipe_constantCoeff_eq, ChabautyColeman.constantCoeff_FtauFold,
+  ChabautyColeman.eq_of_dvd_sq_sub_of_bezout}
+\leanok
+\uses{lem:Ftau-basic, thm:interpolation, lem:cantor-correct}
+$F_\tau(F_\tau(X,Y),Z) = F_\tau(X,F_\tau(Y,Z))$; hence $F_\tau$ is a $g$-dimensional
+commutative formal group law over $\Oq$ in the sense of Definition~\ref{def:fgl}.
+\end{theorem}
+\begin{proof}
+\leanok
+Both sides are power series over $\Oq$ agreeing at every point of the polydisk, because
+at points both compute the associative class-group sum
+$\mathrm{ch}(x)+\mathrm{ch}(y)+\mathrm{ch}(z)-2\tau$; conclude by
+Theorem~\ref{thm:interpolation}. The pointwise statement rests on: the chart at the
+evaluated coordinates $F_\tau(\mathbf x, \mathbf y)$ represents
+$\mathrm{ch}(\mathbf x) + \mathrm{ch}(\mathbf y) - \tau$ (the evaluated fold output is
+the chart datum at the evaluated coordinates --- the $u$-parts agree by the shape of
+the result, the $v$-parts by uniqueness of square roots with a B\'ezout certificate);
+and computations with class-equal inputs have equal reduced outputs, by uniqueness of
+reduced representatives.
+\end{proof}
+
+\begin{lemma}[Reduction commutes with reduced representatives at good position]
+\label{lem:reduce-commutes}
+\lean{ChabautyColeman.red_reducedRep_eq, ChabautyColeman.red_reducedRep_points,
+  ChabautyColeman.prod_pointIdeal_eq_reduced,
+  ChabautyColeman.eq_of_mumfordIdeal_eq_prod_pointIdeal, ChabautyColeman.redres_sq_curve}
+\leanok
+\uses{thm:redJ-hom, lem:mumford-exists, def:goodpos}
+Let $c \in \J{\Qq}$ be such that $\redJ(c)$ has a reduced datum
+$(\bar u_0, \bar v_0)$ over $\Fq$ with $\bar u_0$ squarefree of full degree $g$. Then
+the reduced datum $(u, v)$ of $c$ has coefficients in $\Oq$, $\deg u = g$, and
+$(\bar u, \bar v) = (\bar u_0, \bar v_0)$.
+\end{lemma}
+\begin{proof}
+\leanok
+Compute $\redJ(c)$ from the points of the reduced representative of $c$
+(Definition~\ref{def:redJ}): the split Mumford representative over the splitting field
+$L$ of $u$ factors into point ideals, and the factorization determines the datum by the
+norm identity $\mathfrak a\,\iota(\mathfrak a) = (u)$. Reduce it to the residue curve
+and match against $(\bar u_0, \bar v_0)$ by semi-reduction and uniqueness of reduced
+representatives (Lemma~\ref{lem:mumford-exists} over $\Fq$): since $\bar u_0$ has full
+degree $g$ and is squarefree, no cancellation and no contribution from the disk at
+infinity can occur, forcing every point of the representative to be integral with
+multiplicity one and distinct reductions. Integrality of $(u, v)$ follows: $u$ has
+integral roots, and $v$ is the interpolant through the integral points, the
+$x$-differences being units.
+\end{proof}
+
+\begin{theorem}[Chart parametrization of the kernel of reduction]
+\label{thm:chart-mem}
+\lean{ChabautyColeman.J1_equiv_polydisk, ChabautyColeman.polydiskToKer,
+  ChabautyColeman.polydiskToKer_bijective, ChabautyColeman.polydiskToKer_eval_FtauFold,
+  ChabautyColeman.exists_chartClass_eq, ChabautyColeman.chartClass_injective,
+  ChabautyColeman.redJ_chartClass, ChabautyColeman.redJ_tauClass,
+  ChabautyColeman.redJ_mk0_mumford, ChabautyColeman.mumfordIdeal_eq_prod_pointIdeal}
+\leanok
+\uses{thm:redJ-hom, lem:reduce-commutes, thm:hensel, def:chart, lem:Ftau-basic}
+The map $c \mapsto{}$chart coordinates of $c + \tau$ is a group isomorphism
+$J^1(\Qq) \xrightarrow{\ \sim\ } \big((p\Oq)^g,\ +_{F_\tau}\big)$.
+\end{theorem}
+\begin{proof}
+\leanok
+For $c \in J^1$: $\redJ(c+\tau) = \redJ(\tau)$, and the reduction of the class of an
+integral datum with squarefree reduced $u$-polynomial is the class of the reduced datum
+(split $u$ over $L$ with integral roots --- squarefree $\bar u$ lifts to separability
+--- factor the Mumford ideal into point ideals on both levels, and match the
+reductions). So $\redJ(c+\tau) = [(\bar u_\tau, \bar v_\tau)]$, and
+Lemma~\ref{lem:reduce-commutes} shows the reduced representative of $c + \tau$ is
+integral with reduction $(\bar u_\tau, \bar v_\tau)$. Its $u$-part is the chart
+polynomial at explicit coordinates $z \in (p\Oq)^g$ (the displacement coefficients),
+and its $v$-part is the chart square root, by uniqueness of square roots with a
+B\'ezout certificate at the common residue datum. Conversely every chart class reduces
+to $\redJ(\tau)$, so chart classes translated by $-\tau$ lie in $J^1$; injectivity is
+uniqueness of reduced Mumford representatives (Lemma~\ref{lem:mumford-exists}); the
+group compatibility is the pointwise class computation of
+Theorem~\ref{thm:Ftau-assoc} together with $[(u,-v)] = [(u,v)]^{-1}$.
+\end{proof}
+
+\begin{definition}[The logarithm on the kernel of reduction]
+\label{def:Lam}
+\lean{ChabautyColeman.Lam, ChabautyColeman.Lam_injective, ChabautyColeman.Lam_add,
+  ChabautyColeman.ftauFoldFGL, ChabautyColeman.kerScaledCoords,
+  ChabautyColeman.FormalGroupLaw.scaledLog}
+\leanok
+\uses{thm:Ftau-assoc, thm:log-iso, thm:chart-mem}
+$\Lam := \log_{F_\tau} \circ\ (\text{chart coordinates of } \cdot + \tau)\colon
+J^1(\Qq) \to \Qq^{\,g}$, a group homomorphism by Theorems~\ref{thm:chart-mem}
+and~\ref{thm:log-iso}. ($\Lam$ is moreover injective; for $e = 1$ this is formalized in
+\texttt{HyperellipticCurves.Archive.LogInjective}, and the main theorems do not depend on it.)
+\emph{Formalization.} $\Lam$ is defined in the $\pi$-scaled coordinates of
+Theorem~\ref{thm:log-iso}: its value is the total evaluation of the integral $\pi$-scaled
+logarithm at $\mathbf y$, where $\pi\mathbf y$ is the chart coordinate vector of
+$c + \tau$; additivity combines the group compatibility of
+Theorem~\ref{thm:chart-mem} with Theorem~\ref{thm:log-iso}.
+\end{definition}
+
+\begin{lemma}[Rationality of the invariant differential]
+\label{lem:delta-rational}
+\lean{ChabautyColeman.invariantDiffFold_rational, ChabautyColeman.DatumFamRing,
+  ChabautyColeman.ftauFamSpec,
+  ChabautyColeman.traceDiff_prod, ChabautyColeman.traceDiff_foldPipe,
+  ChabautyColeman.sum_traceMat_ftauFoldPipe,
+  ChabautyColeman.sum_traceMat_mul_setYZero_pderiv_FtauFold,
+  ChabautyColeman.traceMat_map_setYZero_eq_C,
+  ChabautyColeman.det_traceMatrix_ne_zero,
+  Polynomial.exists_bezout_of_isUnit_resultant,
+  ChabautyColeman.ftauFoldPipe_eq_of_certs, ChabautyColeman.FtauFold_eq_of_certs}
+\leanok
+\uses{def:Ftau, def:fgl-log}
+$M(X) = (\partial F_\tau/\partial Y)(X,0)$ is the power-series expansion of a matrix of
+\emph{rational} functions of the full Mumford datum, invertible at $0$; hence
+$\delta = M^{-1}dX$ is a $g$-tuple of rational $1$-forms on the chart. (Rationality
+holds in the coordinates of the full datum; the chart square root is transcendental in
+the chart coordinates alone.)
+\end{lemma}
+\begin{proof}
+\leanok
+$F_\tau$ is the expansion of a composite of rational maps
+(Definitions~\ref{def:cantor-map} and~\ref{def:Ftau}); differentiation preserves
+rationality, and $M(0) = I$. \emph{Formalization.} Each entry of $M$ is exhibited as
+the specialization, at the chart data with $Y = 0$, of a universal element of a
+three-block coefficient ring localized away from an explicit list of denominators, so
+that the entries re-specialize along any family of Mumford data. The route is through
+the trace form of Theorem~\ref{thm:omega-prime-global}: the invariance identity of the
+fold specializes at $Y = 0$ to $T(X)\cdot M(X) = T_2$ with $T$ the trace matrix of the
+$X$-side chart and $T_2$ constant, so $M = T^{-1}T_2$ is determined by the starting
+data alone, and all four denominators (three block resultants and the determinant of
+the trace matrix) specialize to units unconditionally.
+\end{proof}
+
+\begin{definition}[Curve-to-chart maps]
+\label{def:phiD}
+\leanok
+\lean{ChabautyColeman.pairV, ChabautyColeman.pair_dvd, ChabautyColeman.diskY_sq,
+  ChabautyColeman.movingPair_dvd, ChabautyColeman.exists_isPipelineCerts_of_center,
+  ChabautyColeman.exists_isPipelineCerts_powerSeries, ChabautyColeman.chartCoords,
+  ChabautyColeman.phiPipeline, ChabautyColeman.phiZeta,
+  ChabautyColeman.phiPipeline_map_constantCoeff, ChabautyColeman.constantCoeff_phiZeta}
+\uses{def:cantor-map, def:chart, lem:tau-exists, lem:aj-inverse}
+For an auxiliary point $Q$ in good position relative to $\tau$, the rational map
+$\phi_Q \colon C \dashrightarrow \text{chart}$ sends $P$ to the chart coordinates of
+$[P + \iota Q - 2\infty] + \tau$; it is regular at all $P$ avoiding an explicit proper
+closed locus. On a residue disk with parameter $z$ and centre $P_0$, the map is
+realized as a three-term Cantor computation over $\Oq[[z]]$ on the data of the moving
+pair $[P_z + \iota Q]$, the $\tau$-datum, and the constant pair $[Q + \iota P_0]$; its
+chart coordinates form the coordinate series $\zeta(z)$. At $z = 0$ the computation
+returns the $\tau$-datum exactly --- the two pair classes cancel and reduced
+representatives are unique --- so $\zeta(0) = 0$. As everywhere, the B\'ezout data of
+the steps are parameters; their existence reduces to residue-level genericity
+(Lemma~\ref{lem:global-generic}) by Nakayama lifting. The computation is ordered so
+that all support overlaps are of doubling type: cancelling overlaps (a point meeting
+its involute) are genuinely singular for the certificate-based composition, which is
+what shapes the good-position locus.
+\end{definition}
+
+\begin{lemma}[Expansion injectivity]
+\label{lem:exp-inj}
+\lean{ChabautyColeman.funcExpansionGeneric_eq_zero_iff,
+  ChabautyColeman.funcExpansionGeneric_injective}
+\leanok
+\uses{lem:disk-param}
+A rational differential on $C$ over $\Qq$ whose full expansion at one point of
+$C(\Qq)$ vanishes is zero; two rational differentials with equal expansions at one
+point are equal.
+\end{lemma}
+\begin{proof}
+\leanok
+Stated for functions $P + Q\,y$ ($P, Q \in \Qq[x]$) at an affine non-Weierstrass point,
+to which rational functions and differentials reduce by clearing denominators: the
+expansion times its conjugate expansion is the Taylor series of the norm polynomial
+$P^2 - fQ^2$, which is nonzero for $(P,Q) \neq (0,0)$ by the degree-parity count.
+\emph{Formalization.} The main development compares series through uniqueness of
+reduced representatives instead; this lemma is formalized in
+\texttt{HyperellipticCurves.Archive.ExpInj}, and the main theorems do not depend on it.
+\end{proof}
+
+\begin{theorem}[The differentials $\omega'_i$]
+\label{thm:omega-prime-global}
+\lean{ChabautyColeman.omegaPrime, ChabautyColeman.pderiv_subst_log,
+  ChabautyColeman.cantorReduce_fst, ChabautyColeman.map_reduceCert,
+  ChabautyColeman.exists_reduceCert_map, ChabautyColeman.natDegree_cantorReduce_of_fullDeg,
+  ChabautyColeman.isCoprime_two_mul_of_map, ChabautyColeman.isCoprime_cantorStage₂_of_map,
+  ChabautyColeman.isCoprime_cantorPipeline_of_map, ChabautyColeman.isCoprime_phiStage₂_of_residue,
+  ChabautyColeman.isCoprime_phiPipeline_of_residue, ChabautyColeman.isCoprime_wStage₂_of_residue,
+  ChabautyColeman.isCoprime_wPipeline_of_residue,
+  ChabautyColeman.subst_log_eq_antideriv, ChabautyColeman.mk0_phiPipeline_eval,
+  ChabautyColeman.phiPipeline_eq_of_aux,
+  ChabautyColeman.cantorPipeline_eq_cantorPipeline_of_mk0_eq,
+  ChabautyColeman.mk0_pair_mul_mk0_pair_chain,
+  ChabautyColeman.FractionTopology.valuedFractionRing,
+  ChabautyColeman.FractionTopology.continuous_algebraMap,
+  ChabautyColeman.FractionTopology.isTopologicallyNilpotent_algebraMap,
+  ChabautyColeman.hasSum_algebraMap_evalT_scaledLog, ChabautyColeman.hasSum_algebraMap_Lam,
+  ChabautyColeman.redJ_diskPointDiff_eq_one, ChabautyColeman.aj_eq_mk0_mumfordIdeal,
+  ChabautyColeman.FractionTopology.isUniformInducing_algebraMap,
+  ChabautyColeman.FractionTopology.instCompleteSpace,
+  ChabautyColeman.phiPipeline_monic_dvd_degree_lt,
+  ChabautyColeman.map_evalRingHom_eq_add_chartCoords,
+  ChabautyColeman.map_evalRingHom_eq_chartV_map,
+  ChabautyColeman.chartClass_eq_diskPointDiff_mul_tauClass,
+  ChabautyColeman.J1_equiv_polydisk_diskPointDiff, ChabautyColeman.summable_logSubstFamily,
+  ChabautyColeman.hasSum_coeff_subst_log, ChabautyColeman.hasSum_Lam_antiderivOmegaPrime,
+  ChabautyColeman.HypField.deriv, ChabautyColeman.globPipeline, ChabautyColeman.globZeta,
+  ChabautyColeman.globOmega, ChabautyColeman.globExpand,
+  ChabautyColeman.map_globExpand_globPipeline, ChabautyColeman.globExpand_globZeta,
+  ChabautyColeman.globExpand_deriv, ChabautyColeman.globExpand_globOmega,
+  ChabautyColeman.regularDiffBasis, ChabautyColeman.map_chartU_eq_of_chartCoords,
+  ChabautyColeman.map_chartV_eq_of_chartCoords, ChabautyColeman.map_chartU_eq_phiPipeline_fst,
+  ChabautyColeman.map_chartV_eq_phiPipeline_snd, ChabautyColeman.globExpand_comp_datumFamSpec,
+  ChabautyColeman.isUnit_datumFamSpec_glob, ChabautyColeman.exists_globN,
+  ChabautyColeman.HypRing.exists_toHypField_mul_eq,
+  ChabautyColeman.HypRing.exists_toHypField_mul_eq_finite,
+  ChabautyColeman.toHypField_eq_of_bezout, ChabautyColeman.HypField.deriv_toHypField_C,
+  Polynomial.topCoeffMod, Polynomial.topCoeffMod_eq_zero_of_natDegree_lt,
+  Polynomial.topCoeffMod_mul_monic, Polynomial.topCoeffMod_neg,
+  Polynomial.topCoeffMod_congr, Derivation.dotDer, Derivation.coeff_dotDer,
+  Derivation.dotDer_eq_zero_of_coeff, ChabautyColeman.traceDiff,
+  ChabautyColeman.traceDiff_eq_zero_of_dotDer_eq_zero, ChabautyColeman.dvd_sub_of_bezout,
+  ChabautyColeman.traceDiff_mul, ChabautyColeman.traceDiff_reduce,
+  ChabautyColeman.sub_mul_topCoeffMod_pair, ChabautyColeman.traceDiff_pair,
+  Derivation.natDegree_dotDer_le, Polynomial.natDegree_sq_sub_of_odd,
+  ChabautyColeman.traceDiff_congr, ChabautyColeman.exists_bezout_of_dvd_sub,
+  ChabautyColeman.isCoprime_two_mul_of_dvd_add,
+  ChabautyColeman.traceDiff_reduce_of_natDegree_lt, Derivation.dvd_dotDer_of_dvd_sub,
+  ChabautyColeman.traceDiff_reduce_of_dvd_dotDer_of_natDegree_lt,
+  ChabautyColeman.traceDiff_reduce_of_dvd_dotDer,
+  ChabautyColeman.traceDiff_cantorReduce_of_dvd_dotDer,
+  ChabautyColeman.traceDiff_cantorPipeline_of_dvd_dotDer, ChabautyColeman.map_residue_eq,
+  ChabautyColeman.traceMat_wPipeline, ChabautyColeman.wU₁_map_seriesResidue,
+  ChabautyColeman.wV₁_map_seriesResidue, ChabautyColeman.isPipelineAvoid_w_of_residue,
+  ChabautyColeman.cantorCompose_eq_of_isCoprime, ChabautyColeman.isCoprime_wU₁_map,
+  ChabautyColeman.two_mul_X_mul_traceDiff_wPipeline_map,
+  ChabautyColeman.eq_aeval_mul_of_two_mul_eq,
+  ChabautyColeman.X_mul_omegaPrime_eq_aeval_tracePoly_mul_derivative,
+  ChabautyColeman.map_omegaExpansionWeierstrass_eq_sum_smul_omegaPrime_tracePoly,
+  ChabautyColeman.aeval_ne_zero_of_coeff_zero_ne_zero, ChabautyColeman.aeval_inv_eq_zero_iff,
+  ChabautyColeman.invAevalFracHom, ChabautyColeman.sq_inv_pow_mul_X,
+  ChabautyColeman.inftyExpand, ChabautyColeman.traceDiff_single, ChabautyColeman.IsAddCerts,
+  ChabautyColeman.cantorStage₂_monic_dvd_degree_lt, ChabautyColeman.traceDiff_cantorStage₂,
+  ChabautyColeman.IsAddCerts.map, ChabautyColeman.mk0_cantorStage₂,
+  ChabautyColeman.map_infSeries_eq, ChabautyColeman.traceMat_infU,
+  ChabautyColeman.kzDeriv_aeval, ChabautyColeman.kzDeriv_inv,
+  ChabautyColeman.two_mul_y_mul_traceDiff_infU_map, ChabautyColeman.infSeries_mul_omegaPrime_kz,
+  ChabautyColeman.map_omegaExpansionInf_eq_sum_smul_omegaPrime_tracePoly,
+  ChabautyColeman.HypField.derivation, ChabautyColeman.HypField.deriv_smul,
+  ChabautyColeman.HypField.deriv_algebraMap_baseField, MvPowerSeries.pderiv,
+  RatFunc.derivative_C, RatFunc.derivative_smul, ChabautyColeman.dvd_cantorCompose_sub_left,
+  ChabautyColeman.dvd_cantorCompose_sub_right, ChabautyColeman.isCoprime_cantorCompose,
+  ChabautyColeman.traceDiff_cantorCompose, ChabautyColeman.dvd_cantorReduce_add,
+  ChabautyColeman.traceDiff_cantorReduce, ChabautyColeman.traceDiff_cantorPipeline,
+  ChabautyColeman.HypField.deriv_x, Polynomial.topCoeffMod_sum,
+  Polynomial.topCoeffMod_C_mul, Derivation.dotDer_C_mul_X_pow, ChabautyColeman.traceMat,
+  ChabautyColeman.traceDiff_eq_sum, ChabautyColeman.chartU_map_rename_eq,
+  ChabautyColeman.pderiv_coeff_map_C_eq_zero, ChabautyColeman.traceDiff_chartU_map_rename,
+  ChabautyColeman.traceDiff_ftauUX_eq_zero, ChabautyColeman.traceDiff_ftauUY,
+  ChabautyColeman.IsFoldCerts.isFoldState, ChabautyColeman.traceDiff_prod,
+  ChabautyColeman.traceDiff_foldPipe, ChabautyColeman.sum_traceMat_ftauFoldPipe,
+  ChabautyColeman.ftauUY_eq_prod, Polynomial.topCoeffMod_map, ChabautyColeman.traceMat_map,
+  ChabautyColeman.ftauFoldPipe_map_setYZero,
+  ChabautyColeman.sum_traceMat_mul_setYZero_pderiv_FtauFold,
+  Polynomial.exists_topCoeffMod_ne_zero, ChabautyColeman.traceMatrix,
+  ChabautyColeman.traceMatrix_comm, ChabautyColeman.sum_mul_traceMatrix,
+  ChabautyColeman.eq_zero_of_sum_mul_traceMatrix, ChabautyColeman.det_traceMatrix_ne_zero,
+  ChabautyColeman.dvd_sub_of_bezout_of_bezout, ChabautyColeman.traceMat_congr,
+  ChabautyColeman.traceMat_map_setYZero_eq_C,
+  ChabautyColeman.sum_traceMat_mul_setYZero_pderiv_FtauFold_eq_C,
+  ChabautyColeman.traceMat_phiPipeline, ChabautyColeman.globExpand_traceMat,
+  ChabautyColeman.eq_mul_of_mul_eq,
+  ChabautyColeman.constantCoeff_setYZero, ChabautyColeman.residue_eq_of_constantCoeff_sub_mem',
+  ChabautyColeman.map_residue_eq', ChabautyColeman.bezout_ftauFoldPipe_map_setYZero,
+  MvPowerSeries.substRingHom, MvPowerSeries.substRingHom_apply, MvPowerSeries.substRingHom_X,
+  MvPowerSeries.substRingHom_comp_C, MvPowerSeries.constantCoeff_substRingHom,
+  MvPowerSeries.map_substRingHom, MvPowerSeries.hasSubst_map_of_constantCoeff_zero,
+  ChabautyColeman.map_substRingHom_diffMatrix, ChabautyColeman.ftauFoldFGL_diffMatrix_eq,
+  ChabautyColeman.isCoprime_X_sub_C_of_isUnit_eval, ChabautyColeman.isCoprime_pairV,
+  ChabautyColeman.ker_constantCoeff_le_jacobson, ChabautyColeman.isCoprime_chartU,
+  ChabautyColeman.isCoprime_chartU_map_rename, ChabautyColeman.isCoprime_cantorPipeline,
+  ChabautyColeman.HypField.algebraMap_polynomial_injective, ChabautyColeman.HypField.y_ne_zero,
+  ChabautyColeman.isCoprime_two_mul_map, ChabautyColeman.isUnit_two_mul_map,
+  ChabautyColeman.isCoprime_pair_const, ChabautyColeman.isCoprime_phiU₁,
+  ChabautyColeman.isCoprime_phiU₃, ChabautyColeman.isCoprime_neg_map_C,
+  ChabautyColeman.isCoprime_ftauFoldPipe, ChabautyColeman.isCoprime_phiPipeline,
+  ChabautyColeman.HypRing.toHypField_apply,
+  ChabautyColeman.omegaPrime_taylor, ChabautyColeman.isCoprime_of_map,
+  ChabautyColeman.ReflectsCoprime, ChabautyColeman.reflectsCoprime_of_ker_le_jacobson,
+  ChabautyColeman.reflectsCoprime_of_field, ChabautyColeman.cantorStage₁_map,
+  ChabautyColeman.cantorStage₂_map, ChabautyColeman.cantorStage₃_map,
+  ChabautyColeman.mvSeriesResidue, ChabautyColeman.mvSeriesResidue_surjective,
+  ChabautyColeman.isUnit_of_mvSeriesResidue_ne_zero,
+  ChabautyColeman.ker_mvSeriesResidue_le_jacobson, ChabautyColeman.ftauFoldXs_map,
+  ChabautyColeman.ftauFoldYs_map, ChabautyColeman.isFoldAvoid_of_map,
+  ChabautyColeman.seriesResidue_apply, ChabautyColeman.seriesResidue_C,
+  ChabautyColeman.seriesResidue_X, ChabautyColeman.seriesResidue_C_add_X,
+  ChabautyColeman.map_C_map_seriesResidue, ChabautyColeman.phiU₁_map_seriesResidue,
+  ChabautyColeman.phiV₁_map_seriesResidue, ChabautyColeman.cantorCompose_eq_of_bezout,
+  ChabautyColeman.globExpand_algebraMap_base_comp,
+  ChabautyColeman.map_globExpand_map_algebraMap, ChabautyColeman.globExpand_x_eq_diskX,
+  ChabautyColeman.globExpand_y_eq_diskY, ChabautyColeman.globExpand_globSlope_eq,
+  ChabautyColeman.map_globExpand_globU₁, ChabautyColeman.map_globExpand_globV₁,
+  ChabautyColeman.map_globExpand_globU₃, ChabautyColeman.map_globExpand_globV₃,
+  ChabautyColeman.IsPipelineAvoid, ChabautyColeman.IsFtauFoldAvoid,
+  ChabautyColeman.isFtauFoldAvoid_of_center, ChabautyColeman.isPipelineAvoid_phi_of_residue,
+  ChabautyColeman.tracePoly, ChabautyColeman.degree_tracePoly_lt,
+  ChabautyColeman.two_smul_tracePoly, ChabautyColeman.sum_smul_tracePoly,
+  ChabautyColeman.sum_smul_tracePoly_ne_zero, Derivation.leibniz_mul, IsFractionRing.deriv,
+  IsFractionRing.derivation, ChabautyColeman.kzDerivation, ChabautyColeman.kzHom,
+  ChabautyColeman.IsPipelineAvoid.map, ChabautyColeman.two_mul_y_mul_traceDiff_phiPipeline_map,
+  ChabautyColeman.kzOmega, ChabautyColeman.two_mul_kzOmega_eq_sum,
+  ChabautyColeman.two_mul_omegaPrime_kz_eq_sum,
+  ChabautyColeman.yseries_mul_omegaPrime_eq_taylor_tracePoly_kz,
+  ChabautyColeman.map_omegaExpansionGeneric_eq_sum_smul_omegaPrime,
+  ChabautyColeman.aeval_eq_zero_iff_of_aeval_eq_X_sq, ChabautyColeman.aevalFracHom,
+  ChabautyColeman.weierstrassExpand, ChabautyColeman.weierstrassExpand_toHypField,
+  ChabautyColeman.aeval_map_weierstrassSeries,
+  ChabautyColeman.map_weierstrassExpand_globPipeline,
+  ChabautyColeman.weierstrassExpand_globZeta, ChabautyColeman.derivative_aeval,
+  ChabautyColeman.kzDeriv_weierstrassExpand, ChabautyColeman.weierstrassExpand_globOmega,
+  ChabautyColeman.X_mul_omegaPrime_eq_aeval_mul_derivative,
+  PowerSeries.map_derivative,
+  ChabautyColeman.map_omegaExpansionWeierstrass_eq_sum_smul_omegaPrime}
+\uses{lem:delta-rational, def:phiD, thm:chart-mem, def:Lam, lem:omega-expansion}
+\leanok
+Define $\omega'_i := \phi_Q^*\,\delta_i$, rational differentials on $C_{\Qq}$. Then:
+\begin{enumerate}
+\item[(a)] $\omega'_i$ is independent of the auxiliary point $Q$;
+\item[(b)] for every residue disk $D$ with parameter $z$ and all $P_0, P \in D(\Qq)$,
+the value $\Lam_i([P]-[P_0])$ --- defined, since same-disk differences lie in $J^1$ ---
+is the integral of the expansion of $\omega'_i$ on $D$ from $z(P_0)$ to $z(P)$;
+\item[(c)] each $\omega'_i$ is regular, and $(\omega'_1,\dots,\omega'_g)$ is a basis of
+$\RegDiff \otimes \Qq$. Explicitly,
+\[
+  2\,\omega'_l \;=\; \Bigl(\sum_i (A^{-1})_{li}\,x^i\Bigr)\,\frac{dx}{y},
+\]
+where $A$ is the invertible \emph{trace matrix} of the $\tau$-datum defined in the
+proof --- a Hankel matrix depending on $(u_\tau, c_2)$ alone.
+\end{enumerate}
+The counting argument consumes clause (b), the regularity and explicit form in (c), and
+the linear independence of the numerators; clause (a) and the statement that the
+$\omega'_i$ span all of $\RegDiff$ are formalized in
+\texttt{HyperellipticCurves.Archive.AuxIndep} and
+\texttt{HyperellipticCurves.Archive.RegularDiff}, and the main theorems do not depend on them.
+\end{theorem}
+\begin{proof}
+\leanok
+\emph{(a)} Two computations of $\phi_Q$ through different auxiliary points produce the
+same Mumford datum over $\Oq[[z]]$: the two auxiliary pair classes cancel, and reduced
+representatives of a class over $\operatorname{Frac}(\Oq[[z]])$ are unique. Hence
+$\zeta$, and with it $\omega'$, does not depend on $Q$.
+
+\emph{(b)} There are three components. \emph{Formal:} by the chain rule and
+$d\Lam = \delta$ (Lemma~\ref{lem:fgl-log-diff}), the composite $\Lam_i(\zeta(z))$ is
+the antiderivative of $\omega'_i = \sum_j (M^{-1})_{ij}(\zeta(z))\,\zeta_j'(z)$
+vanishing at $0$. \emph{Geometric:} the chart coordinates of the same-disk difference
+$[P_{z_0}]-[P_0]$, translated by $\tau$, are exactly $\zeta(z_0)$ --- the evaluated
+disk computation is the chart datum at $\zeta(z_0)$, its class is
+$([P_{z_0}]+[\iota P_0]) + \tau$, and the difference lies in $J^1$ since both points
+reduce to the same residue point. \emph{Analytic:} the value of $\Lam$ is a convergent
+sum over $\Qq$ (equipped with its valuation topology, for which it is complete), and
+the double series obtained by substituting $\zeta(z)$ into the scaled logarithm is
+summable, so it may be summed in either order: summing one way gives the value
+$\Lam_i(c)$ at the endpoint, summing the other way gives the coefficients of the
+antiderivative of $\omega'_i$. Together these prove (b) for a difference against the
+disk centre; the general two-point form follows by additivity of $\Lam$.
+
+\emph{(c)} This is proved by a closed computation of the pullback --- the \emph{trace
+form} --- with no Riemann--Roch and no case analysis at infinity. For a Mumford datum
+$(U,V)$ over a ring with a derivation $D$ acting on coefficients (write $\dot U$ for
+the coefficientwise derivative, so $\deg \dot U < \deg U$ as $U$ is monic), set
+\[
+  \Theta_k(U,V) \;:=\; -\lambda_U\bigl(X^{k-1}\,\dot U\,s\bigr), \qquad
+  s := (2V)^{-1} \bmod U, \qquad
+  \lambda_u(h) := \mathrm{coeff}_{\deg u - 1}(h \bmod u).
+\]
+Classically $\Theta_k = \sum_i x_i^{k-1}D(x_i)/(2y_i)$, summed over the points of the
+divisor --- the pullback of $x^{k-1}dx/(2y)$ --- but the coefficient description
+requires neither the trace form nor separability, and the only inverse it uses,
+$(2V)^{-1} \bmod U$, is the B\'ezout cofactor $c_2$ that every step of the computation
+carries. Two elementary properties of $\lambda$ --- $\lambda_u(h) = 0$ for
+$\deg h \le \deg u - 2$ (the elementary form of Euler's identity
+$\mathrm{Tr}(h/u') = 0$), and $\lambda_{uw}(qw) = \lambda_u(q)$ for monic $u, w$, with
+no coprimality required (in particular $w = u$ is allowed) --- yield four facts:
+\begin{itemize}
+\item[(T1)] $\Theta$ is \emph{additive} under Cantor composition, including the
+doubling case, where the Chinese remainder theorem fails but the localization property
+of $\lambda$ does not;
+\item[(T2)] $\Theta$ is \emph{unchanged} by Cantor reduction: with
+$R = V^2 - f = U\widetilde U$ one has $\dot R = 2V\dot V$ ($f$ has constant
+coefficients), and the two contributions combine into
+$\lambda_R(X^{k-1}\dot V) = 0$ by the vanishing property. The degree count is tight and
+uses the odd degree of $f$: $2\deg V = 2g+1$ is impossible by parity, and $k \le g$ is
+exactly the right range;
+\item[(T3)] on a moving pair $\{P, \iota Q\}$, $\Theta_k = x^{k-1}D(x)/(2y)$ directly;
+\item[(T4)] data with constant coefficients have $\dot U = 0$, hence $\Theta_k = 0$.
+\end{itemize}
+Applying (T1)--(T4) along the disk computation of $\phi_Q$ --- one moving block against
+two constant ones --- gives, at the generic point,
+\[
+  y \cdot \Theta_k(U_\zeta, V_\zeta) \;=\; x^{k-1}/2, \qquad k = 1,\dots,g,
+\]
+a polynomial of degree $k-1 < g$: regularity, outright. Writing
+$C_{kj} := -\lambda_{U}(X^{k+j}s)$, a Hankel matrix with only $2g-1$ distinct entries,
+one has $\Theta_{k+1} = \sum_j C_{kj}D(\zeta_j)$. Applying (T1), (T2), (T4) in the
+formal setting with the derivations $\partial/\partial Y_k$ turns additivity into the
+invariance identity $\sum_j C_{ij}(F(X,Y))\,\partial F_j/\partial Y_k = C_{ik}(Y)$, and
+setting $Y = 0$ gives $C(X)\,M(X) = C(0)$, i.e.\ $C = A\,M^{-1}$ with $A := C(0)$
+\emph{constant}. The matrix $A$ is invertible: it is the Gram matrix, in the monomial
+basis of $\Oq[X]/(u_\tau)$, of the residue pairing $(h,q) \mapsto -\lambda_{u_\tau}(hqs)$,
+which is nondegenerate whenever $s$ is invertible modulo $u_\tau$ --- guaranteed by the
+B\'ezout identity of the $\tau$-datum. Combining, $2\,\varphi_l = \sum_i
+(A^{-1})_{li}\,x^i$ for the numerators $\varphi_l$ of the $\omega'_l$: each is a
+polynomial of degree $< g$, and, $A$ being invertible, the $\omega'_l$ form a basis.
+
+The identity of (c) is established on each residue disk directly over
+$\operatorname{Frac}(K[[z]])$ with the derivation $d/dz$; on a generic disk it reads
+$b\,\eta\,\omega'_i = \operatorname{taylor}_a\bigl(\tfrac12\sum_j (A^{-1})_{ij}
+x^j\bigr)$, which is the identification consumed by the per-disk count
+(Theorem~\ref{thm:disk-bound}). The analogous identities hold on the Weierstrass and
+infinity disks; at a Weierstrass centre the second reduction step passes through a
+divisor containing a Weierstrass point, and is crossed by a refinement of (T2) --- if
+the constant part $B$ of $U = uB$ has $B \mid \dot V$, which holds automatically when
+the second block is constant, then $\Theta$ of the reduced datum equals $\Theta$ of the
+moving part alone; the orders of $V^2 - f$ and $U$ at the Weierstrass point cancel, so
+the reduced data stay Weierstrass-free. At the infinity disk the configuration
+$[P_z - \infty] + \tau$ has only two blocks and needs no auxiliary point at all. The
+genericity used in this argument --- $\Theta$ must be defined along the computation,
+i.e.\ every intermediate divisor must avoid the Weierstrass points --- is exactly the
+condition catalogue of Lemma~\ref{lem:global-generic}.
+\end{proof}
+
+\begin{remark}[Why a direct holomorphy proof fails]
+One might try to prove clause (c) by verifying the holomorphy of $\omega'_i$ place by
+place, using denominator-clearing data for two auxiliary configurations together with a
+B\'ezout relation between the two denominators. Such data do not exist: by clause (a),
+varying the auxiliary point does not move what is being cleared --- the two configurations
+compute the same chart coordinates, so the two denominators are denominators of one and the
+same function; a B\'ezout relation between them would force the chart coordinates to be
+integral over $\Qq[x]$, hence, being also regular at infinity, \emph{constant}, which
+happens only in the degenerate case $\zeta \equiv 0$. (Exact computation over the
+function field confirms this: for $y^2 = x^5-x+1$, $\tau = [(0,1)]+[(1,1)]-2\infty$,
+centre $(-1,1)$, the chart coordinates have denominator $(x^2-x+3)^2$ --- the same for
+every auxiliary point.) The trace-form computation in the proof above replaces the
+holomorphy verification: it \emph{exhibits} the regular numerator instead of deducing
+its existence.
+\end{remark}
+
+\begin{remark}[Formalization]
+The trace-form differential $\Theta$ is formalized over an arbitrary commutative ring
+with a derivation acting on polynomial coefficients (\texttt{HyperellipticCurves.Curve.TraceDiff});
+(T2) is proved for domains, where $\deg(V^2 - f) = \max(2\deg V, \deg f)$ --- over a
+general ring a nilpotent leading coefficient of $V$ can collapse the degree, and the
+identity fails. $\Theta$ does not depend on the choice of B\'ezout cofactor, so each
+step of a computation may carry its own certificate and only existence propagates.
+Every reduction in the development is a \emph{single} Cantor step: the fold has no
+reduction chains, and in the three-block disk computation the outer blocks are pairs,
+so each composition has degree $g+2$ and one reduction returns to degree $g$ for every
+genus; the B\'ezout data of a computation therefore consist of two composition triples
+and two leading-coefficient inverses. The per-disk identities of clause (c) are proved
+over $\operatorname{Frac}(K[[z]])$ with the derivation $d/dz$ on all three chart types
+(\texttt{HyperellipticCurves.Log.Trace.TraceKz}, \texttt{TraceKzWeierstrass},
+\texttt{TraceKzInf}). What separates a chart's trace identity from $\omega'$ --- transport
+of the differential matrix along the substitution, inversion of the constant trace matrix,
+and the solve --- does not depend on the chart, and is carried out once
+(\texttt{two\_mul\_omegaPrime\_kz\_eq\_sum}), the three capstones supplying only their
+chart datum and their numerators. The required Weierstrass-avoidance conditions descend to
+residue-level conditions on the reduced configuration, since the residue map reflects
+coprimality of monic polynomials (Nakayama). Clause (b) rests on the convergence
+infrastructure of \texttt{HyperellipticCurves.Series.FractionTopology} (the valuation
+topology on $\Qq$ and its completeness, proved via the complete open subring $\Oq$ and
+uniformly separated cosets) and the summable double family of
+\texttt{HyperellipticCurves.Log.Analytic.ColemanIntegral}.
+\end{remark}
+
+\begin{lemma}[Genericity of the global configuration]
+\label{lem:global-generic}
+\lean{ChabautyColeman.IsPipelineAvoid, ChabautyColeman.isCoprime_two_mul_iff,
+  ChabautyColeman.reduceCanon, ChabautyColeman.ReduceGeneric, ChabautyColeman.reduceGeneric_iff,
+  ChabautyColeman.ReduceGeneric.reduceCert, ChabautyColeman.ReduceGeneric.fullDeg,
+  ChabautyColeman.ReduceGeneric.reduceCanon_natDegree, ChabautyColeman.ReduceCoprimeCanon,
+  ChabautyColeman.reduceCoprimeCanon_iff, ChabautyColeman.genericDeg_pair_compose,
+  ChabautyColeman.pipelineCanonData, ChabautyColeman.isPipelineCenterCerts_pipelineCanonData,
+  ChabautyColeman.isPipelineAvoid_pipelineCanonData,
+  ChabautyColeman.isPipelineCenterCerts_of_pair_blocks,
+  ChabautyColeman.cantorCompose_snd_eq_add_mul, ChabautyColeman.cantorPipeline_eq_middle,
+  ChabautyColeman.isPipelineAvoid_of_pair_blocks, ChabautyColeman.curveVanishing_mul,
+  ChabautyColeman.exists_curveTuple_ne_zero, ChabautyColeman.pencilW_spec,
+  ChabautyColeman.pencilTangB_ne_zero, ChabautyColeman.finite_setOf_pencil_multiple_root,
+  ChabautyColeman.exists_pencil_param, ChabautyColeman.reduceGeneric_pencil_three,
+  ChabautyColeman.exists_isPipelineCerts_disk, ChabautyColeman.exists_lift_curve_point,
+  ChabautyColeman.pairV_neg, ChabautyColeman.exists_auxiliary_point,
+  ChabautyColeman.exists_isPipelineCerts_phi, ChabautyColeman.exists_auxiliary_point_phi,
+  ChabautyColeman.eval_pencilW₀_ne_zero_of_deriv,
+  ChabautyColeman.pencilPar_ne_zero_of_nonsingular,
+  ChabautyColeman.isCoprime_cantorCofactor_pencil,
+  ChabautyColeman.movingPair_dvd_weierstrass,
+  ChabautyColeman.exists_auxiliary_point_phi_weierstrass, ChabautyColeman.wPipeline,
+  ChabautyColeman.wZeta, ChabautyColeman.wPipeline_map_constantCoeff,
+  ChabautyColeman.mk0_wPipeline_eval, ChabautyColeman.redJ_diskPointDiff_eq_one_weierstrass,
+  ChabautyColeman.chartClass_eq_diskPointDiff_mul_tauClass_weierstrass,
+  ChabautyColeman.J1_equiv_polydisk_diskPointDiff_weierstrass,
+  ChabautyColeman.hasSum_Lam_antiderivOmegaPrime_weierstrass, ChabautyColeman.diskDiffClassW,
+  ChabautyColeman.lambda_glue_weierstrass,
+  ChabautyColeman.weierstrassRoot_eq_eval_weierstrassSeries,
+  ChabautyColeman.encard_le_of_lambda_eq_zero_weierstrass,
+  ChabautyColeman.encard_inter_residueDisk_le_weierstrass,
+  ChabautyColeman.encard_inter_residueDisk_le_ordPoint_weierstrass, ChabautyColeman.infC,
+  ChabautyColeman.infV, ChabautyColeman.infU, ChabautyColeman.infZeta,
+  ChabautyColeman.aeval_reflect_infV, ChabautyColeman.aeval_reflect_infV_sq_sub,
+  ChabautyColeman.infV_sq_sub_factor, ChabautyColeman.infU_monic,
+  ChabautyColeman.map_constantCoeff_infU, ChabautyColeman.constantCoeff_infZeta,
+  ChabautyColeman.exists_infVred, ChabautyColeman.infRoot_eq_eval_infSeries,
+  ChabautyColeman.mk0_mumfordIdeal_of_scaled_factor, ChabautyColeman.mk0_infU_eval,
+  ChabautyColeman.redJ_diskPointDiff_eq_one_inf, ChabautyColeman.map_constantCoeff_infVred,
+  ChabautyColeman.chartClass_eq_diskPointDiff_mul_tauClass_inf,
+  ChabautyColeman.J1_equiv_polydisk_diskPointDiff_inf, ChabautyColeman.diskDiffClassInf,
+  ChabautyColeman.hasSum_Lam_antiderivOmegaPrime_inf,
+  ChabautyColeman.hasSum_lambdaOne_diskDiffClass_inf,
+  ChabautyColeman.mapBase_aj_eq_diskDiffClassInf, ChabautyColeman.lambda_glue_inf,
+  ChabautyColeman.encard_le_of_lambda_eq_zero_inf,
+  ChabautyColeman.encard_inter_residueDisk_le_inf,
+  ChabautyColeman.encard_inter_residueDisk_le_ordPoint_inf}
+\uses{thm:omega-prime-global, lem:tau-exists, lem:tau-generic, lem:many-points}
+\leanok
+The genericity hypotheses of Theorem~\ref{thm:omega-prime-global}(c) are satisfiable at
+every residue disk: for every nonsingular disk centre there are an auxiliary curve point
+$Q = (x_Q, y_Q)$ with its slope datum, and the class $\tau$ of
+Lemma~\ref{lem:tau-exists}, such that
+\begin{enumerate}
+\item $y_Q$ is a unit --- the auxiliary point does not reduce to a Weierstrass point;
+\item every intermediate state of the fold computation of $F_\tau$ avoids the
+Weierstrass points (this is carried by the datum of Lemma~\ref{lem:tau-exists}, so no
+separate condition remains);
+\item the reduced per-disk configuration
+$[\bar P_0 + \iota\bar Q] + \bar\tau + [\bar Q + \iota \bar P_0]$ avoids the
+Weierstrass points at both of its reduced intermediate data.
+\end{enumerate}
+Like Lemma~\ref{lem:tau-generic}, this is a purely residue-level genericity statement
+followed by a Hensel lift.
+\end{lemma}
+\begin{proof}
+\leanok
+Condition (2) is Lemma~\ref{lem:tau-generic}, lifted with the datum of
+Lemma~\ref{lem:tau-exists}; a single witness configuration discharges both. For a
+Mumford datum, $u$ is coprime to $2v$ exactly when it is coprime to $\bar f$, so every
+avoidance condition is a condition against the \emph{fixed} curve --- the intermediate
+divisor misses the Weierstrass points --- not against the evolving square root.
+
+For conditions (1) and (3), the key observation is that the candidate composed square
+roots of the per-disk configuration form an affine \emph{pencil}: with
+$N = u_\tau\,(X - a)$ and $V_0$ the interpolant with $V_0 \equiv v_\tau \bmod u_\tau$
+and $V_0(a) = b$, they are $V_t = V_0 + t\,N$, and $V_t^2 - f = N\,W_t$ with $W_t$
+quadratic in $t$. The auxiliary point is read off the parameter: for any root $x_Q$ of
+$W_t$, the pair $(x_Q, -V_t(x_Q))$ is a curve point. Each genericity condition then
+becomes ``avoid finitely many $t$'':
+\begin{itemize}
+\item the degree condition of the first reduction step is $t \neq 0$;
+\item transversality at the centre, the condition $u_\tau(x_Q) \neq 0$, and the
+coprimality of the reduced intermediate datum with $\bar f$ are each \emph{affine} in
+$t$ with nonvanishing coefficient --- respectively $2b$ (at a Weierstrass centre
+$b = 0$, and instead the constant term $W_0(a) = -f'(a)/u_\tau(a)$ is nonzero, by
+differentiating the pencil identity), $2v_\tau(r)$ at the roots $r$ of $u_\tau$, and
+$N(r)$ at the roots $r$ of $\bar f$, all nonzero because $\bar\tau$ is in good
+position;
+\item the simple-root condition on $W_t$ is finite by elimination: a multiple root $x$
+of $W_t$ off the support of $N$ puts the curve point $(x, V_t(x))$ on the line
+$A\,y + B = 0$ with $A = 2(V_0'N - V_0N')$ and $B = 2fN' - f'N$, so $x$ is a root of
+$A^2f - B^2$; that polynomial is nonzero by degree parity (odd against even), and
+$B \neq 0$ because its top coefficient is the integer $2(g+1) - (2g+1) = 1$, nonzero in
+\emph{every} characteristic --- no separability of $u_\tau$ and no discriminant is
+needed.
+\end{itemize}
+The third composition produces $-V_t$ on the nose, so its degree condition coincides
+with the first; and the full configuration returns its middle datum --- the two pair
+blocks are inverse classes --- so the final avoidance condition reduces to the good
+position of $\bar\tau$. A good parameter therefore exists over the algebraically closed
+residue field, uniformly at every nonsingular centre ($b \neq 0$, or $a$ a simple root
+of $\bar f$); at a Weierstrass centre the reduced intermediate data remain
+Weierstrass-free because the orders of $V^2 - f$ and of the $u$-part at the centre
+cancel. Finally, the residue-level witness lifts by Hensel's lemma: the centre and the
+auxiliary point lift as smooth points, the B\'ezout data lift by Nakayama, and all
+conditions are open.
+\end{proof}
+
+\begin{remark}[Formalization]
+The per-disk statement is
+\texttt{exists\_isPipelineCerts\_disk} (residue level, all clauses at a nonsingular
+centre) and \texttt{exists\_auxiliary\_point} /
+\texttt{exists\_auxiliary\_point\_phi} (Hensel-lifted, with the certified computation
+over $\Oq[[z]]$), with the Weierstrass-centre forms
+\texttt{exists\_auxiliary\_point\_weierstrass} /
+\texttt{exists\_auxiliary\_point\_phi\_weierstrass}. The infinity disk needs no
+genericity at all: its centre is $\infty$ itself, so the class to expand is
+$[P_z - \infty] + \tau$ --- no auxiliary point and no pair blocks; the computation is
+one composition and one reduction in closed form, carried in scaled integral
+coordinates because the moving point has non-integral coordinates, and the disk
+identities (the chart class, the kernel membership, the value of the pairing, and the
+per-disk bound of Theorem~\ref{thm:disk-bound}) are established on it directly. On the
+Weierstrass and infinity disks the identification of the two disk parametrizations in
+use is part of the statement chain. All conditions are produced for every genus
+$\ge 1$.
+\end{remark}
+
+\begin{definition}[The pairing $\lambda$ on $J^1(\Qp)$, normalized]
+\label{def:lambda1}
+\leanok
+\lean{ChabautyColeman.lambdaOne, ChabautyColeman.lambdaOne_mul,
+  ChabautyColeman.lambdaOne_add_left, ChabautyColeman.lambdaOne_smul_left}
+\uses{thm:omega-prime-global, lem:global-generic, def:Lam, def:regdiff}
+Write $\omega = \sum_i c_i(\omega)\,\omega'_i$ in the basis of
+Theorem~\ref{thm:omega-prime-global}, and set
+$\lambda_\omega := \sum_i c_i(\omega)\,\Lam_i$ on $J^1(\Qq)$, restricted to $J^1(\Qp)$.
+The pairing is linear in $\omega$ and additive in the class. \emph{Formalization:}
+$\lambda$ is implemented in $\omega'$-coordinates --- for a coefficient vector $c$ the
+functional $\sum_i c_i\,\Lam_i$ on the kernel of reduction; the identification
+$c = c(\omega)$ is the explicit trace-form coordinate identity of
+Theorem~\ref{thm:omega-prime-global}(c).
+\end{definition}
+
+\begin{lemma}[Rationality of values]
+\label{lem:values-rational}
+\leanok
+\lean{ChabautyColeman.lambdaOne_rational_values,
+  ChabautyColeman.FractionTopology.continuous_ringEquiv,
+  ChabautyColeman.FractionTopology.valuation_ringEquiv}
+\uses{def:lambda1, thm:omega-prime-global}
+For $\omega \in \RegDiff$ (over $\Qp$) and $c \in J^1(\Qp)$:
+$\lambda_\omega(c) \in \Qp$.
+\end{lemma}
+\begin{proof}
+\leanok
+$\lambda_\omega$ is characterized Galois-equivariantly by
+Theorem~\ref{thm:omega-prime-global}(b) at $\Qp$-rational disks together with
+additivity ($\tau$ drops out), so Frobenius-fixed inputs give fixed outputs. The
+analytic content is that a continuous field automorphism transports the convergent
+characterization of the disk values: any field automorphism of $\Qq$ over $\Qp$ is an
+isometry of the valued field, hence continuous, and uniqueness of limits transports the
+values along the induced permutation of the disks. \emph{Formalization.} The
+annihilator argument of Chapter~5 runs with values in $\Qq$ directly, so the main theorems
+do not depend on this lemma; it is formalized in
+\texttt{HyperellipticCurves.Archive.RationalValues}.
+\end{proof}
+
+\begin{definition}[The pairing $\lambda$ on $J^1(K_0)$]
+\label{def:lambda}
+\lean{ChabautyColeman.lambda, ChabautyColeman.J1,
+  ChabautyColeman.lambda_mul, ChabautyColeman.lambda_add_left,
+  ChabautyColeman.lambda_smul_left, ChabautyColeman.lambdaOne_inv,
+  ChabautyColeman.mem_J1_iff, ChabautyColeman.mem_J1_of_mapBase_eq,
+  ChabautyColeman.mem_J1_of_mapBase_eq_div}
+\leanok
+\uses{def:lambda1, thm:redJ-hom, lem:values-rational}
+Let $J^1(K_0) := \ker\big(\J{K_0} \to \J{K} \to \J{\Fpbar}\big)$ be the group of
+classes over the arithmetic base field whose base change reduces trivially, and let
+$\lambda_\omega$ on $J^1(K_0)$ be the value of Definition~\ref{def:lambda1} at the base
+change of the class. It is additive in the class and linear in $\omega$.
+\end{definition}
+
+\begin{remark}[Formalization]
+The pairing $\lambda$ is defined on $J^1$ only, and this suffices: every class the
+counting argument pairs is a same-disk difference of rational points, which lies in
+$J^1$, and the rank of $J^1$ is bounded by the rank of $\J{K_0}$ by flatness of $\QQ$
+over $\ZZ$ (Theorem~\ref{thm:annihilator}). So there is no need to extend $\lambda$ to
+all of $\J{\Qp}$ by $\lambda(c) := \tfrac1N \lambda(Nc)$, with $N$ the index of $J^1$
+(Theorem~\ref{thm:J1-index}), and the finite-index and Frobenius apparatus of
+Theorem~\ref{thm:J1-index} does not enter the proof.
+\end{remark}
+
+\begin{theorem}[Interface theorem: linearity and the glue identity]
+\label{thm:glue}
+\lean{ChabautyColeman.lambda_mul, ChabautyColeman.lambda_add_left,
+  ChabautyColeman.lambda_smul_left, ChabautyColeman.diskDiffClass,
+  ChabautyColeman.hasSum_lambdaOne_diskDiffClass, ChabautyColeman.lambda_glue,
+  ChabautyColeman.mapBase_aj_div_eq_diskDiffClass, ChabautyColeman.mapBase_aj,
+  ChabautyColeman.HypJac.congr_aj}
+\leanok
+\uses{def:lambda, thm:omega-prime-global, def:disk-antider}
+$\lambda \colon \RegDiff \to \operatorname{Hom}(J^1(\Qp), \Qp)$ is $\Qp$-linear, and
+for every residue disk $D$ with parameter $z$ and all $P, P_0 \in C(\Qp) \cap D$ (the
+same-disk difference lies in $J^1(\Qp)$, since $\redJ$ kills it):
+\[ \lambda_\omega\big(\aj(P) - \aj(P_0)\big) \;=\; G^{\omega}_D(z(P)) - G^{\omega}_D(z(P_0)). \]
+\end{theorem}
+\begin{proof}
+\leanok
+Linearity comes with Definitions~\ref{def:lambda1} and~\ref{def:lambda}. For the glue
+identity: same-disk differences lie in $J^1(\Qp)$ (Theorem~\ref{thm:redJ-hom}); apply
+Theorem~\ref{thm:omega-prime-global}(b) with the basis expansion of $\omega$; the two
+antiderivatives agree up to a constant that cancels in the difference. That the base
+change of the difference of the two Abel--Jacobi classes is the same-disk difference
+used in Theorem~\ref{thm:omega-prime-global}(b) rests on the naturality of the
+Abel--Jacobi map in the base field, composed with base change along the extension.
+\end{proof}
+
+\begin{remark}[Genus-two shortcut]
+\label{rem:g2-cert}
+\uses{def:lambda}
+For $g = 2$ the constructions of Definitions~\ref{def:Ftau}--\ref{def:lambda} could be
+replaced by the explicit Grant--Flynn formal group and local parameters, imported as
+polynomial-identity certificates; this would instantiate Theorem~\ref{thm:glue}
+independently of Theorems~\ref{thm:Ftau-assoc} and~\ref{thm:omega-prime-global}. The
+route is not needed. The script \texttt{prototype/g2\_formal\_group.py} carries out its
+first steps in exact arithmetic --- Cantor composition, the chart series, and $F_\tau$ for
+$y^2 = x^5 - x + 1$ at $p = 11$ --- and verifies integrality, the unit laws,
+commutativity, associativity and $M(0) = I$ up to total degree~$5$.
+\end{remark}

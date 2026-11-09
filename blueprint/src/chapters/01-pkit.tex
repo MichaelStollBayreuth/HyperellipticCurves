@@ -1,0 +1,570 @@
+\chapter{$p$-adic analysis and formal group laws}
+Throughout this chapter, $O$ is a complete discrete valuation ring with fraction field of
+characteristic $0$, residue characteristic $p$, maximal ideal $\mathfrak m = (\pi)$ and
+normalized valuation $v$. A natural number $e$ with $v(p) \le e$ bounds the absolute
+ramification index; the unramified case is $e = 1$, where $\pi = p$. Nothing in this chapter
+mentions the curve.
+
+\begin{definition}[Evaluation of power series]
+\label{def:eval}
+\lean{ChabautyColeman.PSeries.eval, ChabautyColeman.PSeries.hasSum_eval,
+  ChabautyColeman.PSeries.hasEval_of_mem, PadicInt.isAdic}
+\leanok
+For $h = \sum a_k z^k \in O[[z]]$ and $z_0 \in \mathfrak m$, set
+$h(z_0) := \sum a_k z_0^k$; the series converges since $v(a_k z_0^k) \to \infty$.
+\emph{Formalization:} a thin layer over Mathlib's power-series evaluation; the standing
+setting is a complete Hausdorff uniform ring $O$, local with the $\mathfrak m$-adic
+topology, so that elements of $\mathfrak m$ are topologically nilpotent. The
+identification of the metric topology of $\ZZ_p$ with the $p\ZZ_p$-adic one makes
+$O = \ZZ_p$ an instance.
+\end{definition}
+
+\begin{lemma}[Evaluation calculus]
+\label{lem:eval-hom}
+\lean{ChabautyColeman.PSeries.evalRingHom, ChabautyColeman.PSeries.comp,
+  ChabautyColeman.PSeries.eval_comp, ChabautyColeman.PSeries.constantCoeff_comp,
+  ChabautyColeman.PSeries.eval_deriv, ChabautyColeman.PSeries.summable_of_mem_pow}
+\leanok
+\uses{def:eval}
+The map $h \mapsto h(z_0)$ is a ring homomorphism; evaluation commutes with composition
+$h \circ k$ for $k(0) \in \mathfrak m$; and the formal derivative controls first
+differences: $h(z_0 + w) = h(z_0) + h'(z_0)\,w + r\,w^2$ for some $r \in O$ and all
+$z_0, w \in \mathfrak m$. (That a power series vanishing identically on $\mathfrak m$ is
+$0$ when the residue field is infinite is the one-variable case of
+Theorem~\ref{thm:interpolation}.)
+\end{lemma}
+\begin{proof}
+\leanok
+The ring-homomorphism and composition statements follow from continuity of evaluation
+(the composition is defined by evaluating $h$ at the point $k$ of $O[[z]]$ for the
+product topology). For the Taylor statement, peel the first two terms off the binomial
+expansion of $(z_0 + w)^n$ termwise; the remainder series has terms in
+$\mathfrak m^{n-2}$, hence converges.
+\end{proof}
+
+\begin{theorem}[Weierstrass preparation]
+\label{thm:wprep}
+\lean{PowerSeries.exists_isWeierstrassFactorization,
+  PowerSeries.IsWeierstrassFactorization.elim,
+  ChabautyColeman.PSeries.instIsAdicComplete}
+\leanok
+\uses{def:eval}
+If $h \in O[[z]]$ has $\bar h \ne 0$ with $m := \ord(\bar h) < \infty$, then $h = u W$
+with $u \in O[[z]]^\times$ and $W \in O[z]$ monic of degree $m$ with
+$W \equiv z^m \pmod{\mathfrak m}$, and this factorization is unique.
+\end{theorem}
+\begin{proof}
+\leanok
+This is in Mathlib for local rings that are adically complete with respect to the
+maximal ideal (distinguished polynomials are by definition monic with lower coefficients
+in $\mathfrak m$, and their degree is $\ord(\bar h)$). What remains is that the standing
+topological hypotheses imply $\mathfrak m$-adic completeness.
+\end{proof}
+
+\begin{corollary}[Zeros in the open unit disk]
+\label{cor:wprep-count}
+\lean{ChabautyColeman.PSeries.zeros_le_ord, ChabautyColeman.PSeries.finite_setOf_eval_eq_zero,
+  ChabautyColeman.PSeries.setOf_eval_eq_zero_eq, ChabautyColeman.PSeries.isUnit_eval_of_isUnit}
+\leanok
+\uses{thm:wprep, lem:eval-hom}
+For $O$ a domain, such an $h$ has at most $m$ distinct zeros in $\mathfrak m$; the zeros
+are exactly the roots of $W$, all of which lie in $\mathfrak m$. Since the statement
+applies to every $O$ satisfying the standing hypotheses, it applies in particular to
+every complete extension $O'/O$. (A refinement counting zeros with multiplicity is
+possible, but only the count of distinct zeros is used: rational points inject into
+zeros.)
+\end{corollary}
+\begin{proof}
+\leanok
+Values of a power series on $\mathfrak m$ are congruent to the constant coefficient
+modulo $\mathfrak m$ (write $h - h(0) = z\,g$ and evaluate), so units of $O[[z]]$ do
+not vanish on $\mathfrak m$: $h$ and $W$ have the same zeros there. Roots of a
+distinguished polynomial lie in $\mathfrak m$ ($z^m \in \mathfrak m$ at a root, and
+$\mathfrak m$ is prime), and a monic polynomial of degree $m$ over a domain has at most
+$m$ roots; $\deg W = m$ by comparison with the reduction.
+\end{proof}
+
+\begin{theorem}[Strassmann]
+\label{thm:strassmann}
+\lean{ChabautyColeman.PSeries.strassmann, ChabautyColeman.PSeries.strassmann_finite,
+  ChabautyColeman.PSeries.evalT, ChabautyColeman.PSeries.recenter,
+  ChabautyColeman.PSeries.evalT_add_eq, ChabautyColeman.PSeries.map_recenter}
+\leanok
+\uses{thm:wprep, cor:wprep-count, lem:eval-hom}
+Let $O$ be a domain and $h = \sum a_k z^k \in O[[z]]$ with $a_k \to 0$ (so that $h$
+converges on all of $O$), $a_N$ a unit, and $a_k \in \mathfrak m$ for all $k > N$. Then
+$h$ has at most $N$ zeros in $O$. (The decay hypothesis $a_k \to 0$ is necessary for
+convergence outside $\mathfrak m$; finiteness of the number of unit coefficients alone
+does not suffice.)
+\end{theorem}
+\begin{proof}
+\leanok
+Instead of preparation at radius $1$, which would require the Tate algebra, decompose
+the zero set by residue classes: the reduction $\bar h$ is a polynomial $q$ of degree
+$N$; zeros of $h$ lie over roots of $q$; over a root $\bar c$ with lift $c$, the zeros
+of $h$ are the zeros on $\mathfrak m$ of the recentred series $h(c + z)$ (defined
+coefficientwise by convergent series; the identity between $h(c+w)$ and the recentring
+evaluated at $w$ is an exchange of summation). The reduction of $h(c + z)$ is the
+Taylor shift $q(\bar c + z)$, whose vanishing order is the multiplicity of $q$ at
+$\bar c$, so Corollary~\ref{cor:wprep-count} bounds the zeros in the class by that
+multiplicity, and $\sum_{\bar c} \mathrm{mult}_{\bar c}(q) \le \deg q = N$.
+\end{proof}
+
+\begin{lemma}[An index-valuation inequality]
+\label{lem:padic-index}
+\lean{Nat.add_mul_padicValNat_lt, Nat.mul_padicValNat_le}
+\leanok
+Let $p > m + e + 1$ and $k + 1 > m + 1$. Then $(k+1) - e\,v_p(k+1) > m + 1$. (No primality
+of $p$ is needed; in Lean the inequality is stated without natural subtraction, as
+$m + 1 + e\,v_p(k+1) < k+1$.)
+\end{lemma}
+\begin{proof}
+\leanok
+Let $j := v_p(k+1)$. For $j = 0$ this is the hypothesis $k + 1 > m + 1$. For $j \ge 1$,
+$k + 1 \ge p^j \ge (m+e+2)^j \ge (m+e+2)\,j \ge m + 2 + e\,j$, the middle step because
+$c\,j \le c^j$ for $c \ge 2$ and the last because $(m+2)(j-1) \ge 0$.
+\end{proof}
+
+\begin{theorem}[Zeros of antiderivatives]
+\label{thm:antideriv-zeros}
+\lean{ChabautyColeman.PSeries.antideriv_zeros_le,
+  ChabautyColeman.PSeries.antideriv_zeros_finite,
+  ChabautyColeman.PSeries.pow_dvd_coeff_antideriv,
+  IsLocalRing.IsUniformizer.exists_pow_eq,
+  Nat.tendsto_sub_mul_padicValNat_atTop}
+\leanok
+\uses{thm:strassmann, lem:padic-index}
+Let $\mathfrak m = (\pi)$ with $v(p) \le e$, let
+$w = \sum_{k\ge0} b_k z^k \in O[[z]]$ with $b_m$ a unit, and let
+$G(z) = c + \sum_k \tfrac{b_k}{k+1} z^{k+1}$ be an antiderivative, $c \in O$. If
+$p > m + e + 1$, then $G$ has at most $m + 1$ zeros in $\mathfrak m$. ($m$ need not be
+the exact reduction order of $w$: any index with unit coefficient works, and
+$m = \ord(\bar w)$ gives the sharpest bound. For $v(c) < 0$ the statement is trivial, so
+requiring $c \in O$ loses nothing.)
+\end{theorem}
+\begin{proof}
+\leanok
+\uses{lem:padic-index, thm:strassmann}
+Work with the substituted series $H(u) := G(\pi u)$, which has coefficients in $O$ and is
+characterized division-free by $(k+1)\,\mathrm{coeff}_{k+1}(H) = \pi^{k+1} b_k$; the claim
+becomes a bound on its zeros in all of $O$. Integrality is the divisibility
+$(k+1) \mid \pi^{k+1}$, which holds because $v(k+1) = v(p)\,v_p(k+1) \le e\,v_p(k+1)$ and
+$(e+2)\,v_p(n) \le (e+2)^{v_p(n)} \le p^{v_p(n)} \le n$ for $p \ge e+2$. The coefficient of
+$H$ at index $k+1$ has valuation $v(b_k) + (k+1) - v(k+1)$, hence at least
+$v(b_k) + (k+1) - e\,v_p(k+1)$: it equals $m+1$ at index $m+1$ (using $m + 1 < p$, so
+integers prime to $p$ are units in $O$), exceeds $m+1$ for every index $> m+1$ by
+Lemma~\ref{lem:padic-index}, and the coefficients tend to $0$ (by the same estimate, since
+$(e+2)\,v_p(k+1) \le k+1$). Dividing by $\pi^{s}$ with $s$ the minimal valuation ($\le m+1$)
+gives a series with unit content and top unit index $\le m+1$; Strassmann's theorem
+bounds its zeros in $O$ by $m+1$.
+\end{proof}
+
+\begin{definition}[Multivariate evaluation]
+\label{def:mv-eval}
+\lean{ChabautyColeman.MvPSeries.eval, ChabautyColeman.MvPSeries.hasEval_of_mem,
+  ChabautyColeman.MvPSeries.evalRingHom, ChabautyColeman.MvPSeries.hasSum_eval,
+  MvPowerSeries.continuous_subst', ChabautyColeman.MvPSeries.eval_subst,
+  ChabautyColeman.MvPSeries.hasEval_eval}
+\leanok
+\uses{def:eval}
+For $h \in O[[z_1,\dots,z_n]]$ and $\mathbf z_0 \in \mathfrak m^n$, the value
+$h(\mathbf z_0)$ is defined by the same estimates. Evaluation is a ring homomorphism and
+is compatible with formal substitution: substitution is continuous for the product
+topologies (each coefficient of a substitution is a fixed finite linear combination of
+the input coefficients), so evaluating a substitution equals evaluating at the evaluated
+family, which is itself a legitimate evaluation point.
+\end{definition}
+
+\begin{definition}[Evaluation of series with decaying coefficients]
+\label{def:mv-evalT}
+\lean{ChabautyColeman.MvPSeries.evalT, ChabautyColeman.MvPSeries.hasSum_evalT,
+  ChabautyColeman.MvPSeries.evalT_eq_eval, ChabautyColeman.MvPSeries.evalT_add,
+  ChabautyColeman.MvPSeries.tendsto_coeff_zero_of_mem_pow,
+  Finsupp.tendsto_degree_cofinite}
+\leanok
+\uses{def:mv-eval}
+For $h \in O[[z_1,\dots,z_n]]$ whose coefficients tend to $0$ (along the cofinite filter
+on multi-indices) and \emph{any} family $\mathbf z \in O^n$ --- not restricted to
+$\mathfrak m^n$ --- the sum $h(\mathbf z) = \sum_d (\mathrm{coeff}_d h)\,\mathbf z^d$
+converges, since each term lies in a power of $\mathfrak m$ determined by
+$\mathrm{coeff}_d h$, the point family being bounded. This total evaluation is additive
+in $h$ and agrees with the evaluation of Definition~\ref{def:mv-eval} wherever the
+latter converges. A convenient sufficient condition for the decay hypothesis:
+$\mathrm{coeff}_d h \in \mathfrak m^{e(d)}$ with $e(d) \to \infty$ cofinitely, which
+holds once $e$ grows with the total degree, since only finitely many multi-indices have
+bounded degree. This is the $n$-variable analogue of the coefficient-decay evaluation
+behind Strassmann's theorem; it is what evaluates the logarithm on~$\mathfrak m^n$ after
+scaling by~$\pi$.
+\end{definition}
+
+\begin{theorem}[Interpolation]
+\label{thm:interpolation}
+\lean{ChabautyColeman.MvPSeries.eq_zero_of_forall_eval_zero,
+  ChabautyColeman.PSeries.eq_zero_of_forall_eval_zero}
+\leanok
+\uses{def:mv-eval, cor:wprep-count}
+Let $O$ be a domain of the standing setting with $\mathfrak m = (\pi)$ principal,
+$\pi \ne 0$, and $O$ infinite. If $h \in O[[z_1,\dots,z_n]]$ vanishes at every point of
+$\mathfrak m^n$, then $h = 0$. No condition on the residue field is needed; in
+particular the statement applies directly over $\ZZ_p$.
+\end{theorem}
+\begin{proof}
+\leanok
+One variable: if the reduction of $h$ were nonzero, the zero set of $h$ in $\mathfrak m$
+would be finite (Corollary~\ref{cor:wprep-count}), but it is all of the infinite set
+$\mathfrak m$; hence $\pi$ divides all coefficients, and iterating, all coefficients lie
+in $\bigcap_s \mathfrak m^s = 0$. Several variables, by induction on $n$: fixing all but
+one variable, the coefficient slices collapse into a one-variable series computing the
+evaluation (an exchange of summation), and the one-variable case applies
+coefficientwise.
+\end{proof}
+
+\begin{definition}[Formal group law]
+\label{def:fgl}
+\lean{ChabautyColeman.FormalGroupLaw, ChabautyColeman.FormalGroupLaw.Points}
+\leanok
+\uses{def:mv-eval}
+An $n$-dimensional commutative formal group law over $O$ is a tuple
+$F \in O[[X;Y]]^n$ with $F(X,0)=X$, $F(0,Y)=Y$, $F(X,Y)=F(Y,X)$ and
+$F(F(X,Y),Z)=F(X,F(Y,Z))$, as formal substitution identities. It makes $\mathfrak m^n$ a
+commutative \emph{monoid} via Definition~\ref{def:mv-eval}: each monoid axiom is the
+corresponding formal axiom evaluated, using that evaluation of a substitution is
+evaluation at the evaluated family, and that values of series without constant term stay
+in $\mathfrak m$. (Inverses, which would make this monoid a group, are never needed: the
+group laws below parametrize residue polydisks of a group and inherit inverses from it.)
+\end{definition}
+
+\begin{remark}[Formalization]
+The monoid of points (\texttt{ChabautyColeman.FormalGroupLaw.Points}) is formalized in
+\texttt{HyperellipticCurves.Archive.FormalGroupPoints}; the main theorems do not depend on it,
+since the main development works with the evaluated identities directly, in the $\pi$-scaled
+form of Theorem~\ref{thm:log-iso}.
+\end{remark}
+
+\begin{lemma}[Formal partial derivatives]
+\label{lem:pderiv}
+\lean{MvPowerSeries.pderiv, MvPowerSeries.pderiv_subst, MvPowerSeries.continuous_subst'}
+\leanok
+Formal partial derivatives of multivariate power series satisfy the Leibniz rule and the
+chain rule for formal substitution.
+\end{lemma}
+\begin{proof}
+\leanok
+The Leibniz rule holds by construction. For the chain rule, both sides are continuous for the
+product topologies (with discrete coefficients) and agree on the dense subring of polynomials,
+where the identity follows by induction from the polynomial chain rule.
+\end{proof}
+
+\begin{remark}[Formalization]
+The partial derivative itself is Mathlib's \texttt{MvPowerSeries.pderiv}, which is a derivation,
+so the Leibniz rule is \texttt{Derivation.leibniz} and needs no separate statement; the project
+adds the chain rule for substitution and the continuity of substitution over an arbitrary
+topological coefficient ring.
+\end{remark}
+
+\begin{definition}[Differential matrix]
+\label{def:fgl-diff}
+\lean{ChabautyColeman.FormalGroupLaw.diffMatrix,
+  ChabautyColeman.FormalGroupLaw.diffMatrix_map_constantCoeff,
+  ChabautyColeman.FormalGroupLaw.isUnit_diffMatrix}
+\leanok
+\uses{def:fgl, lem:pderiv}
+$M(X) := (\partial F/\partial Y)(X,0) \in \mathrm{GL}_n(O[[X]])$: applying the chain
+rule to $F(0,Y) = Y$ gives $M(0) = I$, so $\det M$ has unit constant term and $M$ is
+invertible over the local ring $O[[X]]$.
+\end{definition}
+
+\begin{definition}[Base change of a formal group law]
+\label{def:fgl-basechange}
+\lean{ChabautyColeman.FormalGroupLaw.map,
+  ChabautyColeman.FormalGroupLaw.diffMatrix_map,
+  ChabautyColeman.FormalGroupLaw.diffMatrixInv_map}
+\leanok
+\uses{def:fgl, def:fgl-diff}
+For a ring homomorphism $f \colon O \to O'$, applying $f$ to the coefficients of each
+$F_i$ gives a formal group law $f_*\Phi$ over $O'$. The differential matrix and its
+inverse commute with base change: $M(f_*\Phi) = f_*(M(\Phi))$ and
+$M(f_*\Phi)^{-1} = f_*(M(\Phi)^{-1})$. In particular, since $M(\Phi)^{-1}$ has entries
+in $O[[X]]$ already over $O$, the entries of the invariant differential $M^{-1}$ of the
+base change to $\mathrm{Frac}\,O$ are integral; only the logarithm below acquires
+denominators.
+\end{definition}
+
+\begin{definition}[Invariant differential and logarithm]
+\label{def:fgl-log}
+\lean{ChabautyColeman.FormalGroupLaw.log, ChabautyColeman.eulerAntideriv,
+  ChabautyColeman.FormalGroupLaw.coeff_single_log,
+  ChabautyColeman.FormalGroupLaw.diffMatrixInv_map_constantCoeff}
+\leanok
+\uses{def:fgl, def:fgl-diff}
+The invariant differential is $\delta := M(X)^{-1}dX$. Over a field of coefficients, the
+logarithm $\Lam$ is \emph{defined} as the radial (Euler) antiderivative of
+$\sum_j (M^{-1})_{ij} X_j$: divide the degree-$k$ homogeneous part by $k$. Then
+$\Lam \in X + (\deg \ge 2)$ and $\Lam(0) = 0$, the normalization holding because
+$M^{-1}(0) = I$. That $d\Lam = \delta$ --- for which $\Lam$ is then the unique solution
+with $\Lam(0) = 0$, and which requires the closedness of $\delta$ --- is
+Lemma~\ref{lem:fgl-log-diff}.
+\end{definition}
+
+\begin{lemma}[Matrix invariance identity]
+\label{lem:fgl-invariance-matrix}
+\lean{ChabautyColeman.FormalGroupLaw.diffMatrix_subst_F}
+\leanok
+\uses{def:fgl-diff, lem:pderiv}
+$M(F(X,Y)) = (D_Y F)(X,Y)\cdot M(Y)$ as matrices over $O[[X,Y]]$, where
+$(D_Y F)_{ij} = \partial F_i/\partial Y_j$ and $M(Y)$ is the differential matrix in the
+variables of the second block.
+\end{lemma}
+\begin{proof}
+\leanok
+Differentiate the associativity law $F(F(X,Y),C) = F(X,F(Y,C))$ with respect to $C_k$
+and set $C = 0$. By the chain rule (Lemma~\ref{lem:pderiv}), the left side becomes
+$M(F(X,Y))_{ik}$ and the right side $\sum_j \partial_{Y_j}F_i(X,Y)\cdot M(Y)_{jk}$,
+using $F(Y,0) = Y$ to collapse the inner substitutions.
+\end{proof}
+
+\begin{lemma}[Closedness of the invariant differential]
+\label{lem:fgl-invariance-closed}
+\lean{ChabautyColeman.FormalGroupLaw.pderiv_diffMatrixInv_symm}
+\leanok
+\uses{def:fgl-diff, lem:fgl-invariance-matrix, lem:pderiv}
+The invariant differential $\delta_i = \sum_a (M^{-1})_{ia}\,dX_a$ is closed:
+$\partial_l (M^{-1})_{ik} = \partial_k (M^{-1})_{il}$. Commutativity of $F$ is
+essential.
+\end{lemma}
+\begin{proof}
+\leanok
+Inverting the matrix identity of Lemma~\ref{lem:fgl-invariance-matrix} gives
+$N(F(X,Y))\,(D_Y F)(X,Y) = N(Y)$ for $N = M^{-1}$. Differentiate with respect to $Y_l$
+and antisymmetrize in $(k,l)$: the second-derivative terms cancel since partial
+derivatives commute, leaving, with $A_{iab} = \partial_b N_{ia} - \partial_a N_{ib}$,
+\[ A_{ikl}(Y) = \sum_{a,b} A_{iab}(F(X,Y))\,\partial_{Y_k}F_a\,\partial_{Y_l}F_b. \]
+Setting $Y = 0$ (so $F(X,0) = X$ and $\partial_{Y_k}F_a(X,0) = M_{ak}$) shows
+$M^{\mathsf T} A_i M = A_i(0)$ is the \emph{constant} matrix of linear coefficients.
+From $M^{-1}M = 1$ and $M(0) = M^{-1}(0) = 1$, the linear coefficients of $M^{-1}$ and
+$M$ are opposite, and those of $M$ are the mixed second derivatives
+$\partial_{X_l}\partial_{Y_k} F_i(0)$, symmetric in $(k,l)$ by commutativity of $F$
+(applied as a renaming of variables). Hence $A_i(0) = 0$, and multiplying by the
+inverses of $M^{\mathsf T}$ and $M$ gives $A_i = 0$.
+\end{proof}
+
+\begin{lemma}[Differential of the logarithm]
+\label{lem:fgl-log-diff}
+\lean{ChabautyColeman.FormalGroupLaw.pderiv_log}
+\leanok
+\uses{def:fgl-log, lem:fgl-invariance-closed, lem:pderiv}
+$d\Lam = \delta$, i.e.\ $\partial_k \Lam_i = (M^{-1})_{ik}$, in characteristic zero.
+\end{lemma}
+\begin{proof}
+\leanok
+For a closed form, the radial antiderivative is a primitive: with the Euler operator
+$E = \sum_j X_j\partial_j$, which acts on the degree-$n$ part as multiplication by $n$,
+one has $E\Lam_i = \sum_j (M^{-1})_{ij}X_j$ by construction, and applying $\partial_k$
+gives $(E+1)(\partial_k\Lam_i) = \partial_k\sum_j (M^{-1})_{ij}X_j
+= (E+1)\bigl((M^{-1})_{ik}\bigr)$, the last equality by closedness
+(Lemma~\ref{lem:fgl-invariance-closed}). Since $E + 1$ multiplies the degree-$n$ part by
+$n + 1 \ne 0$, it is injective on coefficients in characteristic zero.
+\end{proof}
+
+\begin{lemma}[Invariance and additivity]
+\label{lem:fgl-invariance}
+\lean{ChabautyColeman.FormalGroupLaw.diffMatrixInv_subst_F,
+  ChabautyColeman.FormalGroupLaw.log_subst_F}
+\leanok
+\uses{def:fgl-log, lem:fgl-invariance-matrix, lem:fgl-log-diff}
+$\delta(F(X,Y))\cdot d_Y F(X,Y) = \delta(Y)$ as formal identities; consequently
+$\Lam(F(X,Y)) = \Lam(X) + \Lam(Y)$.
+\end{lemma}
+\begin{proof}
+\leanok
+Inverting the matrix identity of Lemma~\ref{lem:fgl-invariance-matrix} gives
+$M(F(X,Y))^{-1}\,(D_Y F)(X,Y) = M(Y)^{-1}$, which is the first identity. For
+additivity, consider $G := \Lam(F(X,Y)) - \Lam(X) - \Lam(Y)$. Its $Y$-partials vanish:
+by the chain rule and $d\Lam = \delta$ (Lemma~\ref{lem:fgl-log-diff}), both
+$\partial_{Y_k}\Lam(F(X,Y))$ and $\partial_{Y_k}\Lam(Y)$ equal the $Y$-substituted
+entry $(M^{-1})_{ik}(Y)$ by the first identity, while $\Lam(X)$ has no $Y$-dependence.
+The $X$-partials vanish by the same computation reflected through commutativity of $F$
+(under the block swap, the first identity turns into its $X$-block counterpart
+$M(F(X,Y))^{-1}\,(D_X F)(X,Y) = M(X)^{-1}$). Finally $G$ has zero constant term, and in
+characteristic zero a series with vanishing constant term and vanishing first partials
+is zero.
+\end{proof}
+
+\begin{lemma}[Integral coefficients of the logarithm]
+\label{lem:log-coeff-integral}
+\lean{ChabautyColeman.FormalGroupLaw.coeff_log_map}
+\leanok
+\uses{def:fgl-log, def:fgl-basechange}
+For $\Phi$ over $O$ and any homomorphism $f \colon O \to K$ into a field, the
+coefficient of the logarithm of the base change $f_*\Phi$ at multi-index $d$ is
+$(\deg d)^{-1}\, f(c_d)$, where $c_d \in O$ is the corresponding coefficient of the
+integral row $\sum_j (M^{-1})_{ij} X_j$ of the invariant differential. Thus the
+numerator is integral and the only denominator is the total degree $\deg d$.
+\end{lemma}
+\begin{proof}
+\leanok
+The differential matrix and its inverse commute with base change
+(Definition~\ref{def:fgl-basechange}), so the row $\sum_j (M^{-1})_{ij} X_j$ of
+$f_*\Phi$ is $f$ applied coefficientwise to that of $\Phi$; the Euler antiderivative
+then divides the degree-$d$ part by $\deg d$.
+\end{proof}
+
+\begin{lemma}[$p$-power denominators of the logarithm]
+\label{lem:log-coeff-padic}
+\lean{ChabautyColeman.FormalGroupLaw.coeff_log_map_padic}
+\leanok
+\uses{lem:log-coeff-integral}
+Over a local ring $O$ of residue characteristic $p$ (so that every integer prime to $p$
+is a unit), the degree-$d$ coefficient of the logarithm of $f_*\Phi$ becomes integral
+after multiplication by $f(p)^{v_p(\deg d)}$: the denominator is a pure power of $p$,
+with exponent $v_p(\deg d)$.
+\end{lemma}
+\begin{proof}
+\leanok
+By Lemma~\ref{lem:log-coeff-integral} the denominator is $\deg d$; writing
+$\deg d = p^{v_p(\deg d)}\cdot m$ with $p \nmid m$, the prime-to-$p$ factor $m$ is a
+unit in $O$, so only the $p$-power part survives as a denominator.
+\end{proof}
+
+\begin{lemma}[Integrality of the scaled logarithm]
+\label{lem:log-scale-integral}
+\lean{ChabautyColeman.FormalGroupLaw.coeff_log_map_scale}
+\leanok
+\uses{lem:log-coeff-padic}
+Assume $p > e + 1$. Scaling the variables by the uniformizer $\pi$ makes the logarithm
+integral: the degree-$d$ coefficient of $\Lam(\pi U)$ is $f(c)$ for some
+$c \in \mathfrak m^{\deg d - e\,v_p(\deg d)}$. So $\Lam(\pi U) \in O[[U]]$, and since
+$\deg d - e\,v_p(\deg d) \to \infty$ the coefficients tend to $0$, which drives the
+convergence of $\Lam$ on $\mathfrak m^n$.
+\end{lemma}
+\begin{proof}
+\leanok
+Multiply the $p$-power denominator bound of Lemma~\ref{lem:log-coeff-padic} by
+$\pi^{\deg d}$ and split the denominator off the numerator: writing $v := v_p(\deg d)$, we
+have $e\,v \le \deg d$ because $(e+2)\,v \le (e+2)^v \le p^v \le \deg d$, so
+$\pi^{\deg d} = p^{v}\,c'$ with $c' \in \mathfrak m^{\deg d - e v}$ --- the ramification
+bound is spent exactly here.
+\end{proof}
+
+\begin{lemma}[Convergence of the logarithm on $\mathfrak m^n$]
+\label{lem:log-converge}
+\lean{ChabautyColeman.FormalGroupLaw.exists_integral_scaled_log}
+\leanok
+\uses{lem:log-scale-integral, def:mv-evalT}
+Over a local ring $O$ of residue characteristic $p$ with $p > e + 1$: after scaling the
+variables by the uniformizer $\pi$, the logarithm of $f_*\Phi$ descends to an integral
+power series $H \in O[[U]]$ --- its base change is the $\pi$-scaled logarithm,
+$f(\mathrm{coeff}_d H) = f(\pi)^{\deg d}\,\mathrm{coeff}_d \Lam$ --- whose coefficients
+tend to $0$. Hence $\Lam$ converges on $\mathfrak m^n$, its value at
+$\mathbf x = \pi\mathbf y$ being $f$ of the total evaluation of $H$ at $\mathbf y$, with
+$v(\Lam(\mathbf x)) \ge 1$.
+\end{lemma}
+\begin{proof}
+\leanok
+By Lemma~\ref{lem:log-scale-integral} the degree-$d$ coefficient of $\Lam(\pi U)$ is
+$f(c_d)$ for some $c_d \in \mathfrak m^{\deg d - e\,v_p(\deg d)}$; take $H$ with these
+integral coefficients. Since $\deg d - e\,v_p(\deg d) \to \infty$ (the $p$-adic valuation
+is sublinear and only finitely many multi-indices have bounded degree), the coefficients
+tend to~$0$ and $H$ converges by Definition~\ref{def:mv-evalT}.
+\end{proof}
+
+\begin{lemma}[The formal exponential]
+\label{lem:fgl-exp}
+\lean{ChabautyColeman.FormalGroupLaw.exp, ChabautyColeman.FormalGroupLaw.log_comp_exp,
+  ChabautyColeman.FormalGroupLaw.exp_comp_log}
+\leanok
+\uses{def:fgl-log, def:fgl}
+The formal exponential $\mathrm{Exp}$ is the compositional inverse of $\Lam$:
+$\Lam \circ \mathrm{Exp} = \mathrm{Exp} \circ \Lam = X$ as formal power series. Since
+$\Lam \in X + (\deg \ge 2)$ has identity linear part, this inverse exists and is unique.
+\end{lemma}
+\begin{proof}
+\leanok
+The compositional inverse of a formal self-map with zero constant term and identity
+linear part exists (by the fixed-point iteration $E^{k+1} = X - (\Lam - X)(E^k)$, which
+stabilizes one coefficient degree per step because $\Lam - X$ has order $\ge 2$), is
+two-sided, and is unique. Apply this to $\Lam$, whose linear part is the identity
+because $M^{-1}(0) = I$.
+\end{proof}
+
+\begin{lemma}[Convergence of the exponential for odd $p$]
+\label{lem:exp-converge}
+\lean{ChabautyColeman.FormalGroupLaw.exp_converges, ChabautyColeman.FormalGroupLaw.exp_bounded,
+  ChabautyColeman.Dexp}
+\leanok
+\uses{lem:fgl-exp, lem:log-converge}
+The inverse series $\mathrm{Exp}$ of $\Lam$ converges on~$(pO)^n$, by the classical
+estimate $v_p(k!) = (k - s(k))/(p-1)$, where $s(k)$ is the sum of the base-$p$ digits
+of~$k$, and $p \ge 3$: the degree-$d$ coefficient of $\mathrm{Exp}$ becomes integral after
+multiplication by $p^{\lfloor (\deg d - 1)/(p-1) \rfloor}$, and $\mathrm{Exp}(pU)$
+descends to an integral power series with coefficients tending to~$0$, as for the
+logarithm in Lemma~\ref{lem:log-converge}.
+\end{lemma}
+\begin{proof}
+\leanok
+The coefficient bound is proved by strong induction on $\deg d$ through the recursion
+$\mathrm{Exp} = X - (\Lam - X)\circ\mathrm{Exp}$: the product slack from
+$\prod_i \mathrm{Exp}_i^{m_i}$ cancels the logarithm's $1/\deg m$ denominator, and
+$(p-1)\,v_p(m) \le m - 1$ closes the estimate. Convergence needs $p \ge 3$ via
+$\deg d - (\deg d - 1)/(p-1) \to \infty$.
+\end{proof}
+
+\begin{remark}[Formalization]
+The exponential (Lemmas~\ref{lem:fgl-exp} and~\ref{lem:exp-converge}) serves only the
+injectivity of the logarithm. All three are formalized, in
+\texttt{HyperellipticCurves.Archive.FormalGroupExp},
+\texttt{HyperellipticCurves.Archive.ExpConverge} and
+\texttt{HyperellipticCurves.Archive.LogInjective}; the main theorems do not depend on them.
+\end{remark}
+
+\begin{theorem}[The logarithm as a homomorphism]
+\label{thm:log-iso}
+\lean{ChabautyColeman.FormalGroupLaw.log_addHom, ChabautyColeman.FormalGroupLaw.scaledF,
+  ChabautyColeman.FormalGroupLaw.scaledLog,
+  ChabautyColeman.FormalGroupLaw.subst_scaledF_descent,
+  ChabautyColeman.MvPSeries.evalT_subst}
+\leanok
+\uses{lem:fgl-invariance, lem:log-converge, def:mv-eval}
+For $p > e + 1$, $\Lam \colon \mathcal G(F)(\mathfrak m) \to (\mathrm{Frac}\,O)^n$ is a
+group homomorphism. ($\Lam$ is moreover injective --- indeed, in the unramified case, a
+bijection onto $(pO)^n$ via $\mathrm{Exp}$ --- but this is never used.)
+\end{theorem}
+\begin{proof}
+\leanok
+Descend the formal additivity $\Lam(F(\mathbf X,\mathbf Y)) = \Lam(\mathbf X) +
+\Lam(\mathbf Y)$ (Lemma~\ref{lem:fgl-invariance}) to the $\pi$-scaled integral forms and
+evaluate. \emph{Formalization.} The value of $\Lam$ is realized as the total evaluation
+(Definition~\ref{def:mv-evalT}) of the $\pi$-scaled logarithm $H$ (\texttt{scaledLog}), and
+the $\pi$-scaled group sum $F(\pi\mathbf X, \pi\mathbf Y)/\pi$ (\texttt{scaledF}, integral
+with decaying coefficients for any scaling factor in $\mathfrak m$) is turned into addition
+(\texttt{log\_addHom}): the additivity identity descends along the $\pi$-rescaling
+substitution --- injectivity of the coefficient map and associativity of substitution --- to
+$H\circ F_\pi = H(\mathbf X) + H(\mathbf Y)$ for the scaled group law $F_\pi$
+(\texttt{subst\_scaledF\_descent}), and total evaluation commutes with substitution
+(\texttt{evalT\_subst}).
+\end{proof}
+
+\begin{theorem}[Hensel's lemma, smooth-point form]
+\label{thm:hensel}
+\lean{ChabautyColeman.exists_smooth_root, ChabautyColeman.hensel_unique,
+  ChabautyColeman.exists_weierstrass_root, ChabautyColeman.instHenselianLocalRing}
+\leanok
+Let $g \in O[X]$ (not necessarily monic) with $g(a_0) \in \mathfrak m$ and
+$g'(a_0) \in O^\times$. Then $g$ has a unique root $x \equiv a_0 \pmod{\mathfrak m}$. In
+particular, for $f$ with $f(\omega) = 0$, $f'(\omega) \in O^\times$ and any
+$y \in \mathfrak m$, there is a unique $x \equiv \omega$ with $f(x) = y^2$ --- the
+implicit-function step of the disk charts. This is the full Hensel content the proof
+consumes: every chart root is a single one-variable Hensel root, over $O$ or over the
+$z$-adically complete base $O[[z]]$.
+\end{theorem}
+\begin{proof}
+\leanok
+Newton iteration $x \mapsto x - c\, g(x)$ with $c\,g'(a_0) = 1$, contracting in the
+$\mathfrak m$-adic metric: the residual after $k$ steps lies in $\mathfrak m^{k+1}$, the
+increments telescope to a limit by nonarchimedean summability, and the limit is a root
+by Hausdorffness. Uniqueness: the difference of two roots is killed by a unit times
+itself modulo $\mathfrak m$. \emph{Formalization.} For monic polynomials this is
+Mathlib's Henselian-ring property, derived from adic completeness
+(\texttt{instHenselianLocalRing}); a multivariate smooth-point form is formalized in
+\texttt{HyperellipticCurves.Archive.HenselSmooth}, and the main theorems do not depend on it.
+\end{proof}

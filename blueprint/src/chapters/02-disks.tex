@@ -1,0 +1,411 @@
+\chapter{Residue disks and the reduction of classes}
+In this chapter $O$ is $\Zp$ or $\Oq = W(\Fq)$ unless stated otherwise; $K' :=
+\mathrm{Frac}(O)$, with residue field $\kappa$. Recall the standing hypotheses:
+$p \nmid \operatorname{disc} f$ and $p$ odd.
+
+\begin{lemma}[Two kinds of points]
+\label{lem:two-charts}
+\lean{ChabautyColeman.point_int_or_inf}
+\leanok
+Every $P \in C(K')$ (affine or $\infty$) is exactly one of the following: of
+\emph{finite type}, i.e.\ $P = (x_0, y_0)$ with $x_0, y_0 \in O$; or of \emph{infinite
+type}, i.e.\ $v(x_0) = -2s < 0$, $v(y_0) = -(2g+1)s$, and
+$t(P) := x_0^g/y_0 \in \mathfrak m$ (with $t(\infty) := 0$).
+\end{lemma}
+\begin{proof}
+\leanok
+If $v(x_0) < 0$ then $v(f(x_0)) = (2g+1)\,v(x_0)$ ($f$ is monic, so the leading term
+dominates), hence $2v(y_0) = (2g+1)v(x_0)$ and
+$2\,v(t(P)) = -v(x_0) > 0$, giving $t(P) \in \mathfrak m$ directly. If $v(x_0)\ge 0$
+then $v(y_0^2) = v(f(x_0)) \ge 0$, so $y_0 \in O$.
+\end{proof}
+
+\begin{definition}[Reduction and residue disks]
+\label{def:disk}
+\lean{ChabautyColeman.redPoint, ChabautyColeman.ResidueDisk}
+\leanok
+\uses{lem:two-charts}
+$\red(P) := (\bar x_0, \bar y_0) \in \bar C(\kappa)$ for points of finite type and
+$\red(P) := \bar\infty$ for points of infinite type; the \emph{residue disk} of
+$\bar P \in \bar C(\kappa)$ is $D_{\bar P} := \red^{-1}(\bar P) \subseteq C(K')$.
+\end{definition}
+
+\begin{lemma}[Square-root series]
+\label{lem:sqrt-series}
+\lean{ChabautyColeman.sqrtSeries}
+\leanok
+Let $c \in O[[z]]$ with $c(0)$ a square of a unit, $p$ odd. Then there is
+$\eta \in O[[z]]$ with $\eta^2 = c$ and prescribed $\eta(0)$; explicitly, the binomial
+series.
+\end{lemma}
+\begin{proof}
+\leanok
+The coefficient recursion
+$\eta_n = \bigl(c_n - \sum_{0<i,j,\ i+j=n}\eta_i\eta_j\bigr)/(2\eta_0)$, solvable since
+$2\eta_0 \in O^\times$, defines $\eta$; no completeness is needed. \emph{Formalization:}
+\texttt{sqrtSeries} is constructed over an arbitrary commutative ring under the sole
+hypothesis $2\eta_0 \in O^\times$.
+\end{proof}
+
+\begin{lemma}[Disk parametrizations]
+\label{lem:disk-param}
+\lean{ChabautyColeman.diskParamGeneric, ChabautyColeman.diskParamWeierstrass,
+  ChabautyColeman.diskParamInf}
+\leanok
+\uses{def:disk, lem:sqrt-series, thm:hensel, lem:two-charts}
+For each $\bar P \in \bar C(\kappa)$ there is a bijection
+$z \colon D_{\bar P} \to \mathfrak m$ with inverse given by power series over $O$:
+\begin{itemize}
+\item[(i)] \emph{generic} $\bar P = (\bar a, \bar b)$ with $\bar b \ne 0$: fix the Hensel
+lift $(a,b)$; then $z = x - a$ and $y = b\,\eta(z)$, with $\eta$ the square-root series
+of $f(a+z)/f(a)$ (Lemma~\ref{lem:sqrt-series});
+\item[(ii)] \emph{Weierstrass} $\bar P = (\bar\omega, 0)$: $z = y$ and
+$x = \omega + \theta(z)$ with $\theta \in z^2 O[[z^2]]$ solving $z^2 = f(\omega +
+\theta)$ by Theorem~\ref{thm:hensel} in series form; here $f'(\omega) \in O^\times$
+because $\bar f$ is squarefree;
+\item[(iii)] \emph{infinity}: $z = t = x^g/y$, and $x = z^{-2}\xi(z)$,
+$y = z^{-(2g+1)}\psi(z)$ with $\xi, \psi \in 1 + zO[[z]]$ obtained by reverting
+$t^2 = x^{2g}/f(x)$ in the variable $1/x$.
+\end{itemize}
+Weierstrass and generic disks over $\Fq$-points of the residue curve are treated over
+$W(\Fq')$ for the field of definition $\Fq'$ of $\bar P$.
+\end{lemma}
+\begin{proof}
+\leanok
+In each chart, Hensel's lemma gives existence and uniqueness of the lift with prescribed
+parameter value, and bijectivity onto $\mathfrak m$ follows from the uniqueness. For
+(iii), revert by the standard inverse-series lemma in $O[[z]]$ (unit linear coefficient
+after normalization). \emph{Formalization.} The Weierstrass and infinity charts need no
+explicit power series in the parameter: for each parameter value the coordinate is the
+unique Hensel root of a (in the $\infty$ case non-monic) polynomial equation.
+\end{proof}
+
+\begin{lemma}[Integral expansions of differentials]
+\label{lem:omega-expansion}
+\lean{ChabautyColeman.omegaExpansionGeneric, ChabautyColeman.omegaExpansionWeierstrass,
+  ChabautyColeman.omegaExpansionInf}
+\leanok
+\uses{lem:disk-param}
+Let $\omega = h(x)\,dx/y$ with $h \in O[x]$, $\deg h \le g-1$, and let $D$ be one of the
+disks of Lemma~\ref{lem:disk-param}. Then $\omega|_{D} = w_D(z)\,dz$ with
+$w_D \in O'[[z]]$ integral over the disk's base ring $O'$:
+(i) $w = h(a+z)\,b^{-1}\eta(z)^{-1}$;
+(ii) $w = 2h(x(z))/f'(x(z))$ times a unit series;
+(iii) $w$ is the Laurent computation of
+$h(z^{-2}\xi)\,d(z^{-2}\xi)\big/\bigl(z^{-(2g+1)}\psi\bigr)$, which is pole-free, of
+order $2(g-1) - 2\deg h$ at lowest order.
+\end{lemma}
+\begin{proof}
+\leanok
+(i), (ii): chain rule (Lemma~\ref{lem:eval-hom}); the denominators are units because
+$\bar f$ is squarefree and $p$ is odd. (iii): a valuation computation transcribing
+$v_\infty(x^i\, dx/y) = 2g-2-2i \ge 0$; the leading coefficient is a unit multiple of
+the leading coefficient of $h$. \emph{Formalization.} Each $w_D$ is a power series over
+$O$ by construction, so integrality is definitional; the identity
+``$\omega|_D = w_D\,dz$'' is a cleared-denominator differential identity in each chart,
+and the order computation in (iii) is deferred to Lemma~\ref{lem:ord-match}.
+\end{proof}
+
+\begin{definition}[Disk antiderivatives]
+\label{def:disk-antider}
+\lean{ChabautyColeman.antideriv, ChabautyColeman.diskAntiderivGeneric,
+  ChabautyColeman.diskAntiderivWeierstrass, ChabautyColeman.diskAntiderivInf}
+\leanok
+\uses{lem:omega-expansion}
+$G^{\omega}_{D}(z) := \sum_k \tfrac{(w_D)_k}{k+1}\,z^{k+1}$ (so $G(0) = 0$), a
+convergent function on $\mathfrak m$ by the estimates of
+Theorem~\ref{thm:antideriv-zeros}.
+\end{definition}
+
+\begin{lemma}[Order matching]
+\label{lem:ord-match}
+\lean{ChabautyColeman.ordMatch_generic, ChabautyColeman.ordMatch_weierstrass,
+  ChabautyColeman.ordMatch_inf,
+  ChabautyColeman.isUnit_coeff_ordAffine_omegaExpansionGeneric,
+  ChabautyColeman.isUnit_coeff_ordAffine_omegaExpansionWeierstrass,
+  ChabautyColeman.isUnit_coeff_ordInf_omegaExpansionInf,
+  ChabautyColeman.isUnit_coeff_of_order_map_eq}
+\leanok
+\uses{lem:omega-expansion, def:disk}
+Let $\bar\omega := \bar h\,dx/y$ on $\bar C_{\Fpbar}$ with $\bar h \ne 0$. For every
+$\bar P$:
+$\ord_{\bar P}(\bar\omega) = \ord_z(\bar w_{D_{\bar P}}) =: m_{\bar P} < \infty$.
+\end{lemma}
+\begin{proof}
+\leanok
+The reduction of the expansion series is the expansion of the reduction, because the
+parametrizations of Lemma~\ref{lem:disk-param} reduce to local parameters at $\bar P$ by
+construction. The intrinsic order of the differential is computed on the Dedekind
+coordinate ring $\A{\bar\kappa}$ at finite points --- the multiplicity of the point
+ideal in $(\bar h)$, since $dx/y$ is regular and nonvanishing there --- and at $\infty$
+as $\ord_\infty(\bar h) + (2g-2)$, with $\ord_\infty(\bar h) = -2\deg\bar h$ the order
+at the infinite place (via the norm to $\bar\kappa(x)$) and $2g-2$ the contribution of
+the canonical divisor. \emph{Formalization.} The form consumed by the per-disk count of
+Theorem~\ref{thm:disk-bound} is the same statement read as a unit coefficient: in each
+of the three charts, the integral expansion has a unit coefficient in degree
+$m_{\bar P}$, because the reduced expansion has exactly that order.
+\end{proof}
+
+\begin{lemma}[Canonical degree over the residue field]
+\label{lem:canon-deg}
+\lean{ChabautyColeman.deg_div_omega_bar}
+\leanok
+\uses{def:hypring, lem:ord-match}
+For $0 \ne \bar h$ of degree $\le g-1$ over $\Fpbar$:
+$\deg \divisor(\bar h\,dx/y) = 2g-2$ on $\bar C_{\Fpbar}$.
+\end{lemma}
+\begin{proof}
+\leanok
+$\divisor(dx/y) = (2g-2)\,\bar\infty$, and $\divisor(\bar h)$ has degree $0$. The degree
+is computed as the sum $\sum_{x_0}\sum_{y_0^2 = f(x_0)} \ord_{(x_0,y_0)}(\bar h)$ over
+the affine points plus the order at $\infty$: each $x$-fibre contributes twice the root
+multiplicity of $\bar h$ at $x_0$ (two points $(x_0,\pm b)$ generically, one doubled
+Weierstrass point), so the affine part is $2\deg\bar h$, and the order at $\infty$ is
+$2g-2-2\deg\bar h$.
+\end{proof}
+
+\begin{remark}[Formalization]
+Lemma~\ref{lem:canon-deg} is formalized in
+\texttt{HyperellipticCurves.Archive.CanonDegExact}; the main theorems do not depend on it,
+since the count only needs the one-sided budget of Corollary~\ref{cor:sum-ord}.
+\end{remark}
+
+\begin{corollary}[Total vanishing budget]
+\label{cor:sum-ord}
+\lean{ChabautyColeman.sum_ord_le, ChabautyColeman.sum_ordPoint_le,
+  ChabautyColeman.ordPoint, ChabautyColeman.finsum_ordPoint,
+  ChabautyColeman.CurvePoint.equivOption, ChabautyColeman.ordAffine_eq_zero,
+  ChabautyColeman.finite_support_ordPoint}
+\leanok
+\uses{lem:ord-match}
+$\sum_{\bar P \in \bar C(\Fp)} m_{\bar P} \le 2g - 2$, with each $m_{\bar P} \ge 0$.
+\end{corollary}
+\begin{proof}
+\leanok
+The orders are nonnegative because $\bar\omega$ is regular
+(Lemma~\ref{lem:omega-expansion} reduced), and the bound follows from a direct fibre
+count over $\Fp$: each $x$-fibre has $0$, $1$ or $2$ rational points, hence contributes
+at most twice the root multiplicity of $\bar h$ at $x_0$; summing the multiplicities
+gives at most $\deg \bar h$; adding the order $2g - 2 - 2\deg\bar h$ at $\infty$ gives
+$\le 2g-2$. The exact canonical degree (Lemma~\ref{lem:canon-deg}) is not needed.
+
+\emph{Formalization.} The form summed in Theorem~\ref{thm:main-count} is: for \emph{any}
+finite set $T$ of residue points, $\sum_{\bar P \in T} m_{\bar P} \le 2g-2$
+(\texttt{sum\_ordPoint\_le}). The residue field is not assumed finite anywhere in this
+chain: for $\bar h \neq 0$ the order vanishes at every point above a non-root of
+$\bar h$, and each $x$-fibre is finite, so $\bar\omega$ has finitely many zeros and the
+point sums are genuine finite sums over any field. This is what lets the counting
+argument compose with Chapter~4, whose base ring has algebraically closed residue
+field.
+\end{proof}
+
+\begin{corollary}[Vanishing budget of a space of differentials]
+\label{cor:sum-ord-space}
+\lean{ChabautyColeman.ordSpace, ChabautyColeman.sum_ordSpace_le,
+  ChabautyColeman.exists_ordPoint_eq_ordSpace,
+  ChabautyColeman.sum_ordPoint_le_two_mul_natDegree,
+  ChabautyColeman.ordAffine_generic, ChabautyColeman.ordAffine_weierstrass,
+  ChabautyColeman.ordAffine_le_ordAffine,
+  Polynomial.finrank_add_natDegree_le_of_forall_dvd,
+  Polynomial.exists_forall_natDegree_le_of_ne_bot,
+  Polynomial.exists_dvd_forall_mem_and_rootMultiplicity_le}
+\leanok
+\uses{cor:sum-ord, lem:ord-match}
+Let $V \ne 0$ be a subspace of the numerators of the regular differentials --- the
+polynomials of degree $< g$ over $\Fpbar$ --- of codimension at most $r$, and put
+\[
+  n(V, \bar P) \;:=\; \min\{\ord_{\bar P}(\bar h\,dx/y) \;:\; 0 \ne \bar h \in V\} .
+\]
+Then $\sum_{\bar P \in T} n(V, \bar P) \le 2r$ for every finite set $T$ of points of
+$\bar C$. For $\dim V = 1$ this is Corollary~\ref{cor:sum-ord}.
+\end{corollary}
+\begin{proof}
+\leanok
+For $x_0 \in \Fpbar$ let $\mu(x_0)$ be the smallest multiplicity of $x_0$ as a root of a
+nonzero element of $V$, and let $q := \prod (x - x_0)^{\mu(x_0)}$, the product over the
+$x$-coordinates of the affine points of $T$. Every nonzero $\bar h \in V$ is divisible by
+$q$, since the factors are coprime and each divides $\bar h$. Let $D$ be the largest
+degree of an element of $V$; then every element of $V$ lies in $q \cdot \{\deg \le D -
+\deg q\}$, so $\dim V + \deg q \le D + 1$, and with $\dim V \ge g - r$,
+\[ \deg q + \bigl(g - 1 - D\bigr) \;\le\; r . \]
+At an affine point $\bar P$ over $x_0$ the order of $\bar h\,dx/y$ is the multiplicity of
+$x_0$ in $\bar h$, doubled at a Weierstrass point, so it is monotone in that multiplicity
+and $n(V, \bar P) = \ord_{\bar P}(q\,dx/y)$; the affine part of the sum is therefore at
+most $2\deg q$ by the fibre count of Corollary~\ref{cor:sum-ord}, applied to $q$ with the
+point at infinity left out. At infinity, the element of $V$ of maximal degree $D$ gives
+$n(V, \infty) \le 2(g - 1 - D)$. Adding the two bounds gives $2r$.
+\end{proof}
+
+\begin{remark}[Formalization]
+The minimum $n(V, \bar P)$ is \texttt{ordSpace}, an infimum over the nonzero elements of
+$V$; it is attained (\texttt{exists\_ordPoint\_eq\_ordSpace}), which is how the per-disk
+bound of Theorem~\ref{thm:disk-bound} is fed with an actual differential. The
+displayed dimension inequality is \texttt{finrank\_add\_natDegree\_le\_of\_forall\_dvd},
+stated for any subspace of polynomials of bounded degree with a common divisor: this is
+the elementary substitute, available for a hyperelliptic curve, for the Riemann--Roch
+argument of Theorem~6.4 of M.~Stoll, \emph{Independence of rational points on twists of
+a given curve}, Compositio Math.\ 142 (2006), 1201--1214.
+\end{remark}
+
+\begin{lemma}[Content normalization of functions]
+\label{lem:content}
+\lean{ChabautyColeman.exists_primitive_smul, ChabautyColeman.exists_primitive_smul_pair,
+  ChabautyColeman.exists_primitive_generator}
+\leanok
+\uses{lem:hypring-units}
+Every $h \in \F{K'}^\times$ has a $K'^\times$-multiple $h_0 = a + by$ with
+$a, b \in K'(x)$ admitting a \emph{primitive} presentation: numerator data in $O[x]$ of
+unit content. The multiple is unique up to $O^\times$, since generators of a principal
+ideal differ by $(\A{K'})^\times = K'^\times$.
+\end{lemma}
+\begin{proof}
+\leanok
+Scale by the content: primitivity is measured by the Gauss content
+$\mathrm{cont}_v(p) = \sup_i v(p_i)$ on $K'[x]$; a common denominator $D$ clears
+$h = a + by$ to $(P + Qy)/D$ with $P, Q, D \in K'[x]$, and scaling $D$ and the pair
+$(P,Q)$ each to unit content --- attain the finite supremum and divide by the attaining
+coefficient --- gives the primitive presentation. The scaling factor is a constant of
+$K'^\times$. The statement holds for any valuation $v$; uniqueness up to $O^\times$ is
+not needed downstream and is not formalized. \emph{Formalization.} Generators arrive in
+the proof as explicit polynomial pairs $(P,Q)$, so only the pair-level normalizations
+are used; the function-level statement is formalized in
+\texttt{HyperellipticCurves.Archive.ContentGenerator}, and the main theorems do not depend on
+it.
+\end{proof}
+
+\begin{theorem}[Specialization of principal divisors]
+\label{thm:spec}
+\leanok
+\lean{ChabautyColeman.exists_center_finsum_emultiplicity_generic,
+ChabautyColeman.exists_center_finsum_emultiplicity_weierstrass}
+\uses{lem:content, lem:disk-param, thm:wprep, lem:two-charts}
+Let $O_K$ be the ring of integers of a finite extension $K/K'$ and let
+$h \in \F{K}^\times$ be primitive as in Lemma~\ref{lem:content}. Then $\bar h \ne 0$ in
+$\F{\bar\kappa}$, and for every \emph{affine} $\bar P \in \bar C(\bar\kappa)$,
+\[ \ord_{\bar P}(\bar h) \;=\; \sum_{P \in \divisor(h),\ \red(P) = \bar P} \ord_P(h), \]
+the zeros of $h$ on the residue disk being enumerated as actual points over a splitting
+discrete valuation ring. Affine points suffice: the reduction map of
+Definition~\ref{def:redJ} takes values in the class group of the \emph{affine}
+coordinate ring, where points escaping to $\bar\infty$ contribute the unit ideal, so the
+statement at $\bar\infty$ is never needed.
+\end{theorem}
+\begin{proof}
+\leanok
+Write $h = P + Q\,y$ and expand it on the disk $D_{\bar P}$ (Lemma~\ref{lem:disk-param},
+with charts over $O_K$). The number of zeros of the expansion in the open disk --- the
+roots of the Weierstrass factor $W$ --- equals the vanishing order of its reduction
+(Theorem~\ref{thm:wprep}); the per-disk point sums enumerate these zeros via Hensel
+lifting of disk centres. At a Weierstrass point the hyperelliptic involution pairs the
+disk parameters ($z \mapsto -z$), so the summed orders factor through the norm and no
+individual conjugate order needs to be isolated. \emph{Formalization.} A chart-level
+$\Cp$-version at every point including $\bar\infty$ is formalized in
+\texttt{HyperellipticCurves.Archive.SpecializationGeneric} and
+\texttt{HyperellipticCurves.Archive.SpecializationInf}; the main theorems do not depend on
+it.
+\end{proof}
+
+\begin{definition}[Reduction of classes]
+\label{def:redJ}
+\lean{ChabautyColeman.redJ, ChabautyColeman.IsRedJPair, ChabautyColeman.exists_isRedJPair,
+  ChabautyColeman.redIdealBar, ChabautyColeman.SplitSupported}
+\leanok
+\uses{lem:mumford-exists, def:disk, thm:spec}
+Define $\redJ \colon \J{K'} \to \Cl(\A{\bar\kappa})$ as follows: represent
+$c = \sum_i n_i\,\aj(P_i)$ with $P_i \in C(K_i)$ and $K_i/K'$ finite (possible by
+Lemma~\ref{lem:mumford-exists}), and set $\redJ(c) := \sum_i n_i\,\aj(\red P_i)$.
+\emph{Formalization.} The map is constructed over a complete discrete valuation ring
+$O$ with algebraically closed residue field (the arithmetic version is the composite
+with the base change to $\mathrm{Frac}\,O$): a class is represented over a finite
+intermediate field $L$ of the algebraic closure by a \emph{split-supported} ideal ---
+all prime divisors are maximal ideals of rational points; Mumford representatives become
+split-supported over the splitting field of $u$ --- which is reduced pointwise to the
+fixed residue curve, running the disk constructions over the integral closure $O_L$,
+again a complete discrete valuation ring with the \emph{same} residue field.
+\end{definition}
+
+\begin{theorem}[Reduction is a well-defined homomorphism]
+\label{thm:redJ-hom}
+\lean{ChabautyColeman.redJHom, ChabautyColeman.isRedJPair_unique, ChabautyColeman.redJ_mul,
+  ChabautyColeman.redJ_aj, ChabautyColeman.isPrincipal_redIdeal_span,
+  ChabautyColeman.redIdealBar_map_of_splitSupported}
+\leanok
+\uses{def:redJ, thm:spec, lem:content}
+$\redJ$ is well defined, is a group homomorphism, and satisfies
+$\redJ(\aj(P)) = \aj(\red P)$.
+\end{theorem}
+\begin{proof}
+\leanok
+Independence of the representative: two representations differ by a principal divisor
+$\divisor(h)$; normalize $h$ primitively (Lemma~\ref{lem:content}); by
+Theorem~\ref{thm:spec} its pointwise reduction is $\divisor(\bar h)$, a principal
+divisor, hence trivial in $\Cl(\A{\bar\kappa})$. Additivity is then formal.
+
+\emph{Formalization.} Two split-supported representatives are compared over the
+compositum and a further finite extension splitting the norms of the connecting
+principal generators. There the reductions of the principal parts are principal ---
+split the generator into a coprime primitive part, killed by Theorem~\ref{thm:spec},
+and a split common factor, handled root by root through
+$\mathfrak m_P\,\mathfrak m_{\iota P} = (x - \bar a)$ --- while the reductions of the
+representatives are unchanged under base change: a split-supported ideal factors into
+rational point ideals, which stay maximal and rational. Compatibility with the
+Abel--Jacobi map: the reduction of the maximal ideal of an integral point is the maximal
+ideal of the reduced point, and points reducing to $\bar\infty$ contribute the unit
+ideal.
+\end{proof}
+
+\begin{lemma}[Frobenius-fixed classes are few]
+\label{lem:frobfix-finite}
+\lean{ChabautyColeman.frobFixed_finite, ChabautyColeman.HypJac.congr}
+\leanok
+\uses{lem:mumford-exists}
+Let $\sigma$ be an automorphism of the base field with finitely many fixed elements that
+fixes $\bar f$ (e.g.\ the $q$-power Frobenius on $\Fpbar$). Then the $\sigma$-fixed
+subgroup of $\Cl(\A{\Fpbar})$ is finite: a fixed class has a $\sigma$-fixed
+\emph{unique} reduced representative (Lemma~\ref{lem:mumford-exists} over $\Fpbar$),
+hence Mumford data $(u,v)$ with coefficients in the fixed field, of which there are
+finitely many.
+\end{lemma}
+\begin{proof}
+\leanok
+The automorphism induces an isomorphism of the coordinate ring and hence of the class
+group (formalized in general: a ring isomorphism of Dedekind domains induces an
+isomorphism of class groups, mapping the class of an ideal to the class of its image).
+Uniqueness of the reduced Mumford representative transports fixedness of a class to
+fixedness of its data; count monic $u$ of degree $\le g$ and $v$ of degree $< g$ with
+coefficients in the fixed field.
+\end{proof}
+
+\begin{theorem}[The kernel of reduction has finite index]
+\label{thm:J1-index}
+\lean{ChabautyColeman.J1, ChabautyColeman.J1_finiteIndex, ChabautyColeman.redJ_fixed,
+  ChabautyColeman.redIdealBar_congr, ChabautyColeman.adjoinRootSetEquiv,
+  ChabautyColeman.congr_mapBase}
+\leanok
+\uses{thm:redJ-hom, lem:frobfix-finite}
+$J^1(K') := \ker(\redJ)$ has finite index in $\J{K'}$, bounded by the number of Mumford
+data $(u,v)$ over $\Fq$.
+\end{theorem}
+\begin{proof}
+\leanok
+Galois-equivariance of $\redJ$ on fixed classes: a class fixed by the arithmetic
+automorphism has a fixed unique reduced Mumford representative $(u,v)$; its splitting
+field $L = K(\text{roots of }u)$ is stable, and the reduction of the Mumford ideal over
+$L$ transports along the induced automorphisms (a split-supported ideal factors into
+rational point ideals, whose reductions are compatible with the semilinear
+residue-field identification). Classes coming from $\J{K'}$ are fixed, since their
+Mumford data live over $K'$, so $\J{K'}/J^1$ embeds into the group of Frobenius-fixed
+classes, which is finite by Lemma~\ref{lem:frobfix-finite}.
+\end{proof}
+
+\begin{remark}[Formalization]
+Since the pairing $\lambda$ of Definition~\ref{def:lambda} is defined on $J^1$
+directly, the main theorems depend neither on Lemma~\ref{lem:frobfix-finite} nor on
+Theorem~\ref{thm:J1-index}. Both are formalized, together with the equivariance apparatus
+(a compatible family of automorphisms of $O$, its fraction field, the algebraic closure
+and the residue field, all fixing $f$), in
+\texttt{HyperellipticCurves.Archive.J1FiniteIndex},
+\texttt{HyperellipticCurves.Archive.Equivariance} and
+\texttt{HyperellipticCurves.Archive.StableSplitting}. The kernel $J^1$ itself, the base
+change into it, and the isomorphism of class groups induced by a ring isomorphism are part
+of the main development.
+\end{remark}

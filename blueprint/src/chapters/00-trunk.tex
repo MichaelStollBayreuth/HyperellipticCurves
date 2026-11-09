@@ -1,0 +1,457 @@
+\chapter{The Jacobian as a class group}
+This chapter develops the class-group model of the Jacobian over an arbitrary field $K$
+with $2 \in K^\times$; we write $f_K$ for the image of $f$ in $K[x]$.
+
+\begin{definition}[Hyperelliptic curve]
+\label{def:hypcurve}
+\lean{HyperellipticCurve, HyperellipticCurve.genus, HyperellipticCurve.IsOdd,
+  HyperellipticCurve.map, HyperellipticCurve.ofSquarefree, HyperellipticCurve.ofMonicOdd,
+  Polynomial.discrOfDegree, Polynomial.discrOfDegree_add_two}
+\leanok
+Let $R$ be a commutative ring in which $2$ is invertible. A hyperelliptic curve of genus $g$
+over $R$ is given by a polynomial $f \in R[x]$ of degree at most $2g + 2$ such that the
+discriminant of the binary form $Z^{2g+2} f(X/Z)$ of degree $2g+2$ is a unit of $R$; we write
+$C \colon y^2 = f(x)$. When $R \ne 0$, the degree of $f$ is $2g+1$ or $2g+2$, and in the first
+case the leading coefficient of $f$ is a unit. The model is of odd degree if $f$ is monic of
+degree $2g+1$; the curve then has exactly one point at infinity. Every ring homomorphism
+$\varphi \colon R \to S$ (with $2$ invertible in $S$) maps $C$ to the curve
+$y^2 = f^\varphi(x)$ of the same genus over $S$, and a nonconstant squarefree polynomial over a
+perfect field defines a curve.
+\end{definition}
+
+\begin{remark}[Formalization]
+The discriminant of the binary form is \texttt{Polynomial.discrOfDegree}: Mathlib's
+discriminant matrix with the degree replaced by $2g+2$, so that it is a polynomial in the
+coefficients of $f$ and commutes with every ring homomorphism. It equals the discriminant of $f$
+when $\deg f = 2g+2$ and $\operatorname{lc}(f)^2$ times it when $\deg f = 2g+1$; the general
+form of the latter is the drop-by-one formula $D_{n+2}(f) = a_{n+1}^2\, D_{n+1}(f)$ for
+$\deg f \le n+1$ (\texttt{Polynomial.discrOfDegree\_add\_two}), proved by expanding Mathlib's
+modified Sylvester matrix along its normalized last row. The invertibility of $2$ is a parameter
+of the type (\texttt{[Invertible (2 : R)]}); the genus is part of the data, so base change needs
+no hypothesis. The coordinate ring, function field and Jacobian below are still indexed by the
+polynomial $f$; a curve supplies their hypotheses (odd degree, squarefreeness over a field)
+through instances.
+\end{remark}
+
+\begin{definition}[Coordinate ring and function field]
+\label{def:hypring}
+\lean{ChabautyColeman.HypRing, ChabautyColeman.HypField,
+  ChabautyColeman.HypRing.iota, ChabautyColeman.HypField.iota}
+\leanok
+$\A{K} := K[x][Y]/(Y^2 - f_K)$, written $K[x,y]$, and
+$\F{K} := K(x)[Y]/(Y^2 - f_K)$. The hyperelliptic involution $\iota$ is the $K[x]$-
+(resp.\ $K(x)$-) algebra automorphism with $\iota(y) = -y$.
+\end{definition}
+
+\begin{lemma}[Irreducibility]
+\label{lem:hyp-irred}
+\lean{ChabautyColeman.irreducible_Ysq_sub_f, ChabautyColeman.not_isSquare_algebraMap_ratFunc,
+  ChabautyColeman.instFactHypField, QuadraticAlgebra.finrank_eq_two,
+  ChabautyColeman.HypRing.toHypField, ChabautyColeman.HypRing.toHypField_injective,
+  ChabautyColeman.HypRing.instIsDomain}
+\leanok
+\uses{def:hypring}
+For every field $K$, the polynomial $Y^2 - f_K$ is irreducible over $K(x)$; hence $\F{K}$
+is a field, quadratic over $K(x)$, and $\A{K}$ is a domain, as it embeds into $\F{K}$.
+(The extension is moreover Galois with group $\{1,\iota\}$; this refinement is not used
+below.)
+\end{lemma}
+\begin{proof}
+\leanok
+A root would give $f_K = r^2$ with $0 \ne r \in K(x)$; comparing degrees,
+$\deg f = 2\deg r$ is even, contradicting $\deg f = 2g+1$. \emph{Formalization.} The
+parity argument is run directly on \texttt{RatFunc.intDegree}, avoiding integral closure.
+\end{proof}
+
+\begin{lemma}[Norm form]
+\label{lem:normform}
+\lean{ChabautyColeman.HypField.norm_eq, ChabautyColeman.HypField.trace_eq,
+  ChabautyColeman.HypField.mul_star_eq_norm, ChabautyColeman.HypRing.norm_eq,
+  ChabautyColeman.HypRing.trace_eq, ChabautyColeman.HypRing.mul_star_eq_norm}
+\leanok
+\uses{lem:hyp-irred}
+For $\alpha = a + by \in \F{K}$ one has
+$\Nm_{\F{K}/K(x)}(\alpha) = \alpha\,\iota(\alpha) = a^2 - b^2 f_K$
+and $\operatorname{Tr}(\alpha) = 2a$. The same formulas hold for the norm and trace of
+$\A{K}$ over $K[x]$ (and over any base ring).
+\end{lemma}
+\begin{proof}
+\leanok
+Computation in the basis $(1,y)$.
+\end{proof}
+
+\begin{lemma}[Integral elements]
+\label{lem:integral-char}
+\lean{ChabautyColeman.HypField.isIntegral_iff, ChabautyColeman.HypField.isIntegral_y,
+  ChabautyColeman.HypRing.isIntegral_toHypField,
+  RatFunc.exists_algebraMap_eq_of_sq_mul_squarefree}
+\leanok
+\uses{lem:hyp-irred, lem:normform}
+If $f_K$ is squarefree (and $2 \in K^\times$), then $a + by \in \F{K}$ is integral over
+$K[x]$ if and only if $a, b \in K[x]$, i.e.\ if and only if $a + by$ lies in the image of
+$\A{K}$.
+\end{lemma}
+\begin{proof}
+\leanok
+($\Leftarrow$) $y$ satisfies $Y^2 = f_K$. ($\Rightarrow$) $\alpha$ and $\iota\alpha$ are
+integral, so $2a \in K[x]$ and $a^2 - b^2 f_K \in K[x]$ ($K[x]$ being integrally closed);
+hence $b^2 f_K \in K[x]$ forces $b \in K[x]$: writing $b = p/q$ in lowest terms with $q$
+monic, $p^2 f_K = c\,q^2$ and $\gcd(p,q) = 1$ give $q^2 \mid f_K$, so $q = 1$ by
+squarefreeness. (This lowest-terms argument replaces a per-prime valuation computation.)
+\end{proof}
+
+\begin{theorem}[The coordinate ring is Dedekind]
+\label{thm:hypring-dedekind}
+\lean{ChabautyColeman.HypRing.instIsIntegralClosure,
+  ChabautyColeman.HypRing.instIsDedekindDomain, ChabautyColeman.HypField.instIsSeparable,
+  Algebra.IsSeparable.of_finrank_le_two}
+\leanok
+\uses{lem:integral-char}
+If $f_K$ is squarefree, then $\A{K}$ is the integral closure of $K[x]$ in $\F{K}$ and is a
+Dedekind domain, free over $K[x]$ with basis $(1,y)$.
+\end{theorem}
+\begin{proof}
+\leanok
+\uses{lem:integral-char, lem:hyp-irred}
+By Lemma~\ref{lem:integral-char} the integral closure is $K[x] \oplus K[x]\,y = \A{K}$;
+the integral closure of the principal ideal domain $K[x]$ in the finite separable
+extension $\F{K}/K(x)$ is Dedekind. Separability holds because the extension is quadratic
+and $2 \in K^\times$: any extension of degree $\le 2$ in characteristic $\ne 2$ is
+separable. Freeness with basis $(1,y)$ is immediate from the construction.
+\emph{Formalization.} The Dedekind property is Mathlib's
+\texttt{IsIntegralClosure.isDedekindDomain}.
+\end{proof}
+
+\begin{lemma}[Units]
+\label{lem:hypring-units}
+\lean{ChabautyColeman.HypRing.isUnit_iff}
+\leanok
+\uses{lem:normform}
+$(\A{K})^\times = K^\times$ for every field $K$. Only the odd degree of $f$ is used; no
+assumption on the characteristic or on squarefreeness is needed.
+\end{lemma}
+\begin{proof}
+\leanok
+$\Nm(u) = a^2 - b^2 f_K \in K[x]^\times = K^\times$; if $b \ne 0$, the right-hand side of
+$a^2 = c + b^2 f_K$ has odd degree $2\deg b + 2g + 1$, while the left-hand side has even
+degree. So $b = 0$ and $a$ is constant.
+\end{proof}
+
+\begin{definition}[Jacobian and Abel--Jacobi map]
+\label{def:hypjac}
+\lean{ChabautyColeman.HypJac, ChabautyColeman.aj, ChabautyColeman.pointIdeal}
+\leanok
+\uses{thm:hypring-dedekind}
+$\J{K} := \Cl(\A{K})$. For an affine point $P = (x_0,y_0) \in C(K)$ set
+$\aj(P) := [\mathfrak m_P] \in \J{K}$, where $\mathfrak m_P = (x - x_0,\, y - y_0)$ is the
+maximal ideal of $P$, and $\aj(\infty) := 0$. More generally, the class of a $K$-rational
+divisor supported on affine points is the class of the corresponding fractional ideal.
+\end{definition}
+
+\begin{remark}[Formalization]
+In Lean, $\Cl$ is Mathlib's multiplicative \texttt{ClassGroup}, so the identity class is
+written $1$; classes of general ideals are obtained through \texttt{ClassGroup.mk0} and
+need no separate definition.
+\end{remark}
+
+\begin{lemma}[The involution acts as inversion on point classes]
+\label{lem:aj-inverse}
+\lean{ChabautyColeman.aj_inv, ChabautyColeman.pointIdeal_mul_pointIdeal_neg}
+\leanok
+\uses{def:hypjac, lem:mumford-norm}
+$\divisor(x - x_0)_{\mathrm{aff}} = \mathfrak m_P \cdot \mathfrak m_{\iota P}$, hence
+$\aj(\iota P) = -\aj(P)$. (That $\iota$ inverts \emph{all} of $\J{K}$ is
+Lemma~\ref{lem:iota-norm}.)
+\end{lemma}
+\begin{proof}
+\leanok
+This is the special case $u = x - x_0$, $v = y_0$ of the Mumford norm identity
+(Lemma~\ref{lem:mumford-norm}), since classes of principal ideals vanish.
+\end{proof}
+
+\begin{lemma}[Conjugate ideal and norm]
+\label{lem:iota-norm}
+\lean{ChabautyColeman.mul_map_star_eq_map_relNorm, ChabautyColeman.classGroup_mk0_map_star,
+  ChabautyColeman.classGroup_mk0_mumfordIdeal_map_star, Squarefree.dvd_of_sq_dvd_mul_sq}
+\leanok
+\uses{thm:hypring-dedekind, lem:normform, lem:integral-char}
+For every ideal $\mathfrak a$ of $\A{K}$:
+$\mathfrak a \cdot \iota(\mathfrak a) = (\Nm \mathfrak a)\,\A{K}$, where
+$\Nm \mathfrak a \subseteq K[x]$ is the relative ideal norm. Hence $\iota$ induces
+inversion on $\J{K}$.
+\end{lemma}
+\begin{proof}
+\leanok
+Since $K[x]$ is a principal ideal domain, $\Nm \mathfrak a = (n_0)$ is principal, and no
+factorization into primes is needed: the inclusion $\supseteq$ holds because
+$N(a) = a\,\iota(a) \in \mathfrak a\,\iota(\mathfrak a)$ for $a \in \mathfrak a$. For
+$\subseteq$, take $t = a\,\iota(b)$ with $a, b \in \mathfrak a$; then
+$t + \iota t = N(a+b) - N(a) - N(b) \in (n_0)$ gives $n_0 \mid 2\,t_{\mathrm{re}}$, and
+$t\,\iota t = N(a)N(b) \in (n_0^2)$ gives
+$n_0^2 \mid t_{\mathrm{re}}^2 - f\,t_{\mathrm{im}}^2$; since $2 \in K^\times$ and $f$ is
+squarefree, $n_0$ divides both components of $t$ (using that $n^2 \mid f b^2$ with $f$
+squarefree forces $n \mid b$ in a unique factorization domain).
+\end{proof}
+
+\begin{remark}[Formalization]
+Lemma~\ref{lem:iota-norm} is formalized in
+\texttt{HyperellipticCurves.Archive.ConjugateIdealNorm}; the main theorems do not depend on it,
+since both places that invert a class invert a \emph{Mumford} ideal, where the Mumford norm
+identity of Lemma~\ref{lem:mumford-norm} gives the inversion directly.
+\end{remark}
+
+\begin{definition}[Mumford ideals]
+\label{def:mumford-ideal}
+\lean{ChabautyColeman.mumfordIdeal, ChabautyColeman.mumfordHom,
+  ChabautyColeman.mumfordQuotEquiv, ChabautyColeman.ker_mumfordHom}
+\leanok
+\uses{def:hypjac}
+For $u, v \in K[x]$, the \emph{Mumford ideal} is
+$\mathfrak a_{u,v} := (u,\, y - v) \subseteq \A{K}$; point ideals are the case
+$(x - x_0,\, y - y_0)$. If $u \mid v^2 - f_K$, then the evaluation
+$p + qy \mapsto p + qv \bmod u$ is a surjective ring homomorphism
+$\A{K} \to K[x]/(u)$ with kernel $\mathfrak a_{u,v}$, so
+$\A{K}/\mathfrak a_{u,v} \cong K[x]/(u)$; in particular $\mathfrak a_{u,v}$ is a
+proper nonzero ideal for nonconstant $u$.
+\end{definition}
+
+\begin{lemma}[Mumford norm identity]
+\label{lem:mumford-norm}
+\lean{ChabautyColeman.mumfordIdeal_mul_map_star, ChabautyColeman.map_star_mumfordIdeal}
+\leanok
+\uses{def:mumford-ideal}
+If $u \mid v^2 - f_K$ with $f_K$ squarefree (and $2 \in K^\times$), then
+$\iota(\mathfrak a_{u,v}) = \mathfrak a_{u,-v}$ and
+$\mathfrak a_{u,v} \cdot \iota(\mathfrak a_{u,v}) = (u)$.
+\end{lemma}
+\begin{proof}
+\leanok
+$\subseteq$: all four generator products are divisible by $u$, using
+$(y-v)(y+v) = f_K - v^2 = -uw$ with $w := (v^2-f_K)/u$. $\supseteq$: a common prime $\pi$
+of $(u, 2v, w)$ would give $\pi \mid v$ and $\pi^2 \mid uw = v^2 - f_K$, so
+$\pi^2 \mid f_K$, contradicting squarefreeness; a B\'ezout identity then exhibits $u$ as
+a combination of $u^2$, $u\cdot 2v$ and $uw$, all of which lie in the product.
+\end{proof}
+
+\begin{lemma}[The divisor of $y - v$]
+\label{lem:mumford-divisor-y}
+\lean{ChabautyColeman.mumfordIdeal_mul_cofactor,
+  ChabautyColeman.classGroup_mk0_mumfordIdeal_cofactor}
+\leanok
+\uses{def:mumford-ideal, def:hypjac}
+If $v^2 - f_K = u\,w$ (with $f_K$ squarefree, $2 \in K^\times$), then
+$\mathfrak a_{u,v} \cdot \mathfrak a_{w,v} = (y - v)$ is principal; hence
+$[\mathfrak a_{w,v}] = [\mathfrak a_{u,v}]^{-1}$ in $\J{K}$. Combined with
+Lemma~\ref{lem:mumford-norm} this yields Cantor's reduction step:
+$[\mathfrak a_{u,v}] = [\mathfrak a_{w,-v}]$ with
+$\deg w \le \max(2\deg v, 2g+1) - \deg u$.
+\end{lemma}
+\begin{proof}
+\leanok
+$\subseteq$: the generator products are divisible by $y - v$, using
+$uw = v^2 - f_K = -(y-v)(y+v)$. $\supseteq$: the same B\'ezout identity for
+$(u, 2v, w)$ as in Lemma~\ref{lem:mumford-norm} exhibits $y - v$ in the product,
+using $(y-v)\cdot 2v = -uw - (y-v)^2$.
+\end{proof}
+
+\begin{lemma}[Semi-reduction]
+\label{lem:mumford-semireduced}
+\lean{ChabautyColeman.exists_span_singleton_mul_mumfordIdeal,
+  ChabautyColeman.exists_mk0_eq_mk0_mumfordIdeal}
+\leanok
+\uses{def:mumford-ideal, lem:normform, def:hypjac}
+Every nonzero ideal $\mathfrak a$ of $\A{K}$ has the form
+$\mathfrak a = (c)\,\mathfrak a_{u,v}$ with $c, u, v \in K[x]$, $c, u \ne 0$ and
+$u \mid v^2 - f_K$; hence every class in $\J{K}$ is the class of a Mumford ideal.
+\end{lemma}
+\begin{proof}
+\leanok
+Hermite normal form over the principal ideal domain $K[x]$, with no factorization into
+primes: let $c$ generate the image of $\mathfrak a$ under the coefficient projection
+$a + by \mapsto b$ and let $a_0$ generate $\mathfrak a \cap K[x]$; multiplying elements
+by $y$ shows $c \mid a_0$ and that $c$ divides the $K[x]$-part of a lift $z_0$ of $c$,
+giving $\mathfrak a = (a_0, z_0) = (c)(u, y - v)$ with $a_0 = cu$, $z_0 = c(y-v)$.
+Stability of $\mathfrak a$ under multiplication by $y$, applied to $z_0$, yields
+$u \mid v^2 - f_K$. (Nonvanishing of $a_0$ uses the norm form:
+$0 \ne \Nm(z) \in \mathfrak a \cap K[x]$.)
+\end{proof}
+
+\begin{lemma}[Existence of reduced representatives]
+\label{lem:mumford-reduce}
+\lean{ChabautyColeman.exists_mk0_mumfordIdeal_reduced}
+\leanok
+\uses{lem:mumford-semireduced, lem:mumford-divisor-y, lem:mumford-norm}
+Every class in $\J{K}$ is the class of a \emph{reduced} Mumford ideal
+$\mathfrak a_{u,v}$: $u$ monic, $\deg v < \deg u \le g$, $u \mid v^2 - f_K$.
+\end{lemma}
+\begin{proof}
+\leanok
+By Lemma~\ref{lem:mumford-semireduced} the class contains a Mumford ideal. The Mumford
+ideal is unchanged by unit rescaling of $u$ and by replacing $v$ with $v \bmod u$;
+while $\deg u > g$, the class-preserving replacement
+$[\mathfrak a_{u,v}] = [\mathfrak a_{w,-v}]$ with $v^2 - f_K = uw$
+(Lemmas~\ref{lem:mumford-divisor-y} and~\ref{lem:mumford-norm}) strictly decreases
+$\deg u$: after reducing $v$ modulo $u$,
+$\deg w \le \max(2\deg v, 2g+1) - \deg u < \deg u$. Conclude by induction on $\deg u$.
+\end{proof}
+
+\begin{lemma}[Uniqueness of reduced representatives]
+\label{lem:mumford-exists}
+\lean{ChabautyColeman.mumfordIdeal_reduced_unique, ChabautyColeman.mem_mumfordIdeal_iff,
+  ChabautyColeman.comap_mumfordIdeal}
+\leanok
+\uses{thm:hypring-dedekind, lem:mumford-norm, def:mumford-ideal,
+  lem:mumford-norm, lem:mumford-divisor-y, lem:mumford-reduce}
+The reduced Mumford ideal representing a class (Lemma~\ref{lem:mumford-reduce}) is
+unique. (Cantor's composition-and-reduction algorithm computes the reduced
+representative of a product of two reduced classes; existence is
+Lemma~\ref{lem:mumford-reduce}.)
+\end{lemma}
+\begin{proof}
+\leanok
+Let $\mathfrak a_1, \mathfrak a_2$ be reduced Mumford ideals in the same class. Then
+$\mathfrak a_1\,\iota(\mathfrak a_2)$ is an integral principal ideal $(h)$, and
+$(\Nm h) = (u_1 u_2)$ by the norm identity, of degree $\le 2g$. Since $\Nm(a + by) =
+a^2 - b^2 f_K$ has degree $\ge 2g+1$ whenever $b \ne 0$ (parity), $h = a \in K[x]$.
+Multiplying $(h) = \mathfrak a_1 \iota(\mathfrak a_2)$ and its conjugate by
+$\mathfrak a_2$ resp.\ $\mathfrak a_1$ and taking traces to $K[x]$ (the trace of
+$\mathfrak a_{u,v}$ is $(u)$, immediate from the quotient description) gives
+$u_1 \sim a \sim u_2$, hence $u_1 = u_2$ by monicity; cancelling the principal factor
+yields $\mathfrak a_1 = \mathfrak a_2$, and then $u \mid v_2 - v_1$ with
+$\deg(v_2 - v_1) < \deg u$ forces $v_1 = v_2$. (The norm-degree parity argument
+replaces the usual pole count at the place at infinity.)
+\end{proof}
+
+\begin{definition}[Base change]
+\label{def:basechange}
+\lean{ChabautyColeman.HypJac.map, ChabautyColeman.HypRing.baseChange,
+  ChabautyColeman.HypJac.map_aj, ChabautyColeman.pointIdeal_map}
+\leanok
+\uses{def:hypjac}
+For a field extension $K \subseteq K'$, the homomorphism $\J{K} \to \J{K'}$ induced by
+ideal extension along $\A{K} \to \A{K'}$. It is compatible with the Abel--Jacobi maps.
+\emph{Formalization:} this is Mathlib's \texttt{ClassGroup.extendedHom} applied to the
+base change of coordinate rings.
+\end{definition}
+
+\begin{lemma}[Injectivity criterion]
+\label{lem:basechange-crit}
+\lean{ChabautyColeman.hypJac_map_injective_iff}
+\leanok
+\uses{def:basechange, def:hypjac}
+$\J{K} \to \J{K'}$ is injective if and only if every nonzero ideal of $\A{K}$ whose
+extension to $\A{K'}$ is principal is itself principal.
+\end{lemma}
+\begin{proof}
+\leanok
+Kernel triviality for the group homomorphism, using the surjectivity of
+$\mathfrak a \mapsto [\mathfrak a]$ and the compatibility of the base-change map with
+ideal extension.
+\end{proof}
+
+\begin{lemma}[Contraction]
+\label{lem:basechange-contract}
+\lean{ChabautyColeman.comap_map_baseChange}
+\leanok
+\uses{def:basechange}
+For every ideal $\mathfrak a$ of $\A{K}$ and every field extension $K \subseteq K'$:
+$(\mathfrak a \A{K'}) \cap \A{K} = \mathfrak a$.
+\end{lemma}
+\begin{proof}
+\leanok
+Choose a $K$-linear splitting $p \colon K' \to K$ of the inclusion and apply it to all
+polynomial coefficients; the resulting additive retraction
+$\pi \colon \A{K'} \to \A{K}$ satisfies $\pi(\iota(a)w) = a\,\pi(w)$, and applying
+it to an element of $\mathfrak a \A{K'} \cap \A{K}$, written as a combination
+$\sum \iota(a_j) w_j$, lands in $\mathfrak a$. No flatness theory is needed.
+\end{proof}
+
+\begin{lemma}[Galois action and the cocycle]
+\label{lem:basechange-galact}
+\lean{ChabautyColeman.HypRing.galAct, ChabautyColeman.HypRing.galAct_algebraMap,
+  ChabautyColeman.HypRing.exists_unit_galAct_eq}
+\leanok
+\uses{def:basechange, lem:hypring-units}
+A $K$-automorphism $\sigma$ of $K'$ acts on $\A{K'}$ coefficientwise, fixing the
+image of $\A{K}$ and stabilizing extended ideals. If
+$\mathfrak a\,\A{K'} = (h)$ is principal, then $\sigma(h) = c_\sigma\, h$ for a
+constant $c_\sigma \in (K')^\times$.
+\end{lemma}
+\begin{proof}
+\leanok
+$(\sigma(h)) = \sigma(\mathfrak a \A{K'}) = \mathfrak a \A{K'} = (h)$, so
+$\sigma(h)$ and $h$ are associated; the unit is a constant by
+Lemma~\ref{lem:hypring-units}.
+\end{proof}
+
+\begin{lemma}[Fixed-point descent]
+\label{lem:basechange-fixed}
+\lean{ChabautyColeman.HypRing.exists_algebraMap_eq_of_forall_galAct}
+\leanok
+\uses{lem:basechange-galact}
+For a finite Galois extension $K \subseteq K'$, an element of $\A{K'}$ fixed by the
+full Galois action lies in the image of $\A{K}$.
+\end{lemma}
+\begin{proof}
+\leanok
+Coefficientwise from $(K')^{\mathrm{Gal}(K'/K)} = K$.
+\end{proof}
+
+\begin{lemma}[Descent of principality along Galois extensions]
+\label{lem:basechange-galois}
+\lean{ChabautyColeman.HypRing.isPrincipal_of_map_isPrincipal,
+  ChabautyColeman.hypJac_map_injective_of_isGalois}
+\leanok
+\uses{lem:basechange-crit, lem:basechange-contract, lem:basechange-galact,
+  lem:basechange-fixed}
+Let $K \subseteq K'$ be a finite Galois extension. If an ideal $\mathfrak a$ of $\A{K}$
+extends to a principal ideal of $\A{K'}$, then $\mathfrak a$ is principal. Consequently
+(by Lemma~\ref{lem:basechange-crit}) the map $\J{K} \to \J{K'}$ is injective.
+\end{lemma}
+\begin{proof}
+\leanok
+Let $\mathfrak a\,\A{K'} = (h)$; then $h \ne 0$ unless $\mathfrak a = 0$ (which is
+trivially principal). Lemma~\ref{lem:basechange-galact} gives
+$c \colon \mathrm{Gal}(K'/K) \to (K')^\times$ with $\sigma(h) = c_\sigma h$; cancelling
+$h$ from the two evaluations of $(\sigma\tau)(h)$ shows $c$ is a $1$-cocycle. By
+Hilbert's Theorem~90 it is a coboundary, $c_\sigma = \sigma(\beta)/\beta$ for some
+$\beta \in (K')^\times$. Then $h' = \beta^{-1} h$ is a Galois-fixed generator of
+$\mathfrak a\,\A{K'}$, so $h'$ comes from some $w \in \A{K}$ by
+Lemma~\ref{lem:basechange-fixed}. Contracting via Lemma~\ref{lem:basechange-contract}
+gives $\mathfrak a = \mathfrak a\,\A{K'} \cap \A{K} = w\A{K'} \cap \A{K} = w\A{K}$.
+\end{proof}
+
+\begin{theorem}[Base-change injectivity]
+\label{thm:basechange-inj}
+\lean{ChabautyColeman.hypJac_map_injective, ChabautyColeman.mumfordIdeal_map}
+\leanok
+\uses{def:basechange, lem:mumford-reduce, lem:mumford-exists}
+For \emph{every} field extension $K \subseteq K'$ (with the standing hypotheses on $f$
+over both fields), the map $\J{K} \to \J{K'}$ is injective. In particular this applies
+to $K' \in \{\QQ_p, \Qq, \Cp\}$ over $K = \QQ$; no finiteness, separability, or
+characteristic assumption on the extension is needed.
+\end{theorem}
+\begin{proof}
+\leanok
+\uses{lem:mumford-reduce, lem:mumford-exists}
+Represent two classes with equal images by their reduced Mumford representatives
+$(u_1, v_1)$ and $(u_2, v_2)$ (Lemma~\ref{lem:mumford-reduce}). Base change sends
+Mumford ideals to Mumford ideals and preserves the reducedness conditions (monicity,
+the degree bounds, $u \mid v^2 - f$), so the base-changed pairs are reduced
+representatives of the common image class, and by uniqueness
+(Lemma~\ref{lem:mumford-exists}) they coincide over $K'$. Since all coefficients lie in
+$K$ and $K \to K'$ is injective, $(u_1, v_1) = (u_2, v_2)$, so the classes agree.
+\end{proof}
+
+\begin{remark}[Formalization]
+Base-change injectivity and its Galois-descent chain
+(Lemmas~\ref{lem:basechange-crit}--\ref{lem:basechange-galois},
+Theorem~\ref{thm:basechange-inj}) are formalized in
+\texttt{HyperellipticCurves.Archive.BaseChangeInjectivity}; the main theorems do not depend on
+them, since the main development only uses the base-change \emph{homomorphism} of
+Definition~\ref{def:basechange}. The comparison of reduced representatives in the proof of
+Theorem~\ref{thm:basechange-inj} needs no descent and works for any field extension, whereas
+descent through finite Galois subextensions (Hilbert~90) covers only algebraic extensions: a
+transcendental extension such as $\QQ_p/\QQ$ would require an additional specialization
+argument.
+\end{remark}

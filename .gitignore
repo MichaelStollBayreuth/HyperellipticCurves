@@ -1,0 +1,21 @@
+/.lake
+/blueprint/print
+/blueprint/web
+/blueprint/lean_decls
+/blueprint/src/*.aux
+/blueprint/src/*.log
+/blueprint/src/*.out
+/blueprint/src/*.toc
+/blueprint/src/*.fls
+/blueprint/src/*.fdb_latexmk
+/blueprint/src/*.synctex.gz
+/blueprint/src/web.paux
+/blueprint/src/web.bbl
+prototype/__pycache__/
+prototype/*.log
+scratch_*.lean
+scratch_*.olean*
+scratch_*.ir
+## Papers are copyrighted and must not be committed. This is deliberately a blanket rule and
+## covers symlinks to papers kept elsewhere on disk: a symlink commits its target path.
+*.pdf
