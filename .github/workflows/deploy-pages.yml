@@ -128,6 +128,19 @@ jobs:
             .lake/build/doc-data/*.doc.trace
           key: DocData-${{ runner.os }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}
 
+      # Without a cache hit above, the documentation build (doc-gen4 compiled from source, Lean core
+      # and the whole import closure documented) runs out of the runner's memory: Lake then fails to
+      # spawn `git` for the source links with "resource exhausted (error code: 12, not enough
+      # memory)". A second swap file of 16 GB on the temporary disk gives it room.
+      - name: Add swap space
+        run: |
+          df -h /mnt
+          sudo fallocate -l 16G /mnt/swapfile-docs
+          sudo chmod 600 /mnt/swapfile-docs
+          sudo mkswap /mnt/swapfile-docs
+          sudo swapon /mnt/swapfile-docs
+          free -h
+
       # Last, because it is by far the most expensive step even when the cache above hits.
       - name: Build the API documentation
         run: ~/.elan/bin/lake build HyperellipticCurves:docs
