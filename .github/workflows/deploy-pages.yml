@@ -129,12 +129,17 @@ jobs:
           key: DocData-${{ runner.os }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}
 
       # Without a cache hit above, the documentation build (doc-gen4 compiled from source, Lean core
-      # and the whole import closure documented) runs out of the runner's memory: Lake then fails to
-      # spawn `git` for the source links with "resource exhausted (error code: 12, not enough
-      # memory)". A second swap file of 16 GB on the temporary disk gives it room.
-      - name: Add swap space
+      # and the whole import closure documented) can fail when Lake spawns `git` for the source
+      # links: "resource exhausted (error code: 12, not enough memory)", although `free` shows
+      # plenty of memory. The suspect is the kernel's commit accounting while several doc-gen4
+      # processes hold Mathlib, so the step turns overcommit on (mode 1) and adds a swap file; it
+      # prints the settings before, and the step after the build prints them on failure.
+      - name: Prepare the memory settings
         run: |
-          df -h /mnt
+          sysctl vm.overcommit_memory vm.overcommit_ratio vm.max_map_count
+          grep -E 'Commit|MemTotal|SwapTotal' /proc/meminfo
+          ulimit -a
+          sudo sysctl -w vm.overcommit_memory=1
           sudo fallocate -l 16G /mnt/swapfile-docs
           sudo chmod 600 /mnt/swapfile-docs
           sudo mkswap /mnt/swapfile-docs
@@ -144,6 +149,13 @@ jobs:
       # Last, because it is by far the most expensive step even when the cache above hits.
       - name: Build the API documentation
         run: ~/.elan/bin/lake build HyperellipticCurves:docs
+
+      - name: Show the memory state after a failed documentation build
+        if: failure()
+        run: |
+          sysctl vm.overcommit_memory vm.max_map_count
+          cat /proc/meminfo
+          free -h
 
       - name: Configure Pages
         uses: actions/configure-pages@v6
