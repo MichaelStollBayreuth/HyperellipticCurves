@@ -547,7 +547,7 @@ $H\circ F_\pi = H(\mathbf X) + H(\mathbf Y)$ for the scaled group law $F_\pi$
 \begin{theorem}[Hensel's lemma, smooth-point form]
 \label{thm:hensel}
 \lean{ChabautyColeman.exists_smooth_root, ChabautyColeman.hensel_unique,
-  ChabautyColeman.exists_weierstrass_root, ChabautyColeman.instHenselianLocalRing}
+  ChabautyColeman.exists_weierstrass_root, IsAdicComplete.henselianLocalRing}
 \leanok
 Let $g \in O[X]$ (not necessarily monic) with $g(a_0) \in \mathfrak m$ and
 $g'(a_0) \in O^\times$. Then $g$ has a unique root $x \equiv a_0 \pmod{\mathfrak m}$. In
@@ -564,7 +564,8 @@ $\mathfrak m$-adic metric: the residual after $k$ steps lies in $\mathfrak m^{k+
 increments telescope to a limit by nonarchimedean summability, and the limit is a root
 by Hausdorffness. Uniqueness: the difference of two roots is killed by a unit times
 itself modulo $\mathfrak m$. \emph{Formalization.} For monic polynomials this is
-Mathlib's Henselian-ring property, derived from adic completeness
-(\texttt{instHenselianLocalRing}); a multivariate smooth-point form is formalized in
-\texttt{HyperellipticCurves.Archive.HenselSmooth}, and the main theorems do not depend on it.
+Mathlib's Henselian-ring property: a local ring that is adically complete at its maximal
+ideal is Henselian (\texttt{IsAdicComplete.henselianLocalRing}); a multivariate smooth-point
+form is formalized in \texttt{HyperellipticCurves.Archive.HenselSmooth}, and the main theorems
+do not depend on it.
 \end{proof}

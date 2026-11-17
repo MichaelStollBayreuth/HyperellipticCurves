@@ -5,6 +5,8 @@ Authors: Michael Stoll
 -/
 module
 
+-- The instance `IsAdicComplete.henselianLocalRing`, which the importers use too.
+public import HyperellipticCurves.Mathlib.RingTheory.Henselian
 public import HyperellipticCurves.Series.PSeries
 public import Mathlib.RingTheory.Henselian
 
@@ -16,7 +18,7 @@ import Mathlib.Algebra.Polynomial.Identities
 # Hensel roots in a complete local ring
 
 A complete local ring `O` (adically complete at its maximal ideal) is Henselian
-(`ChabautyColeman.instHenselianLocalRing`), so `Mathlib`'s `HenselianLocalRing.is_henselian`
+(`IsAdicComplete.henselianLocalRing`), so `Mathlib`'s `HenselianLocalRing.is_henselian`
 lifts simple approximate roots of *monic* polynomials. We add the missing **uniqueness**
 (`ChabautyColeman.hensel_unique`) and a **non-monic (smooth)** existence result
 (`ChabautyColeman.exists_smooth_root`, by Newton iteration): for any `g` with `g(a₀) ∈ 𝔪` and
@@ -163,12 +165,6 @@ theorem exists_lift_curve_point {f : O[X]} (h2 : IsUnit (2 : O)) {x' y' : Residu
 end smooth
 
 variable [IsAdicComplete (maximalIdeal O) O]
-
-/-- A complete local ring is Henselian. -/
-instance instHenselianLocalRing : HenselianLocalRing O where
-  is_henselian f hf a₀ h₁ h₂ :=
-    (inferInstance : HenselianRing O (maximalIdeal O)).is_henselian f hf a₀ h₁
-      (h₂.map (Ideal.Quotient.mk _))
 
 /-- The Weierstrass-disk root: for `y ∈ 𝔪`, a root `x ≡ ω` of `f(X) = y²`, existing since
 `f(ω) = 0` (so `f(ω) - y² ∈ 𝔪`) and `f'(ω)` is a unit. Uniqueness is `hensel_unique`. -/

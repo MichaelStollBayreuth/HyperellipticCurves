@@ -8,13 +8,20 @@ module
 -- Beyond the sibling `Mathlib.RingTheory.Polynomial.Resultant.Basic`: separability
 -- (`Mathlib.FieldTheory.Separable`) and residue fields of local rings
 -- (`Mathlib.RingTheory.LocalRing.ResidueField.Basic`), for the statements of the separability
--- criteria.
+-- criteria, and `Polynomial.degreeLT` with the division by a monic polynomial on it (the mirror
+-- `HyperellipticCurves.Mathlib.RingTheory.Polynomial.Quotient`), for the Sylvester blocks.
+public import HyperellipticCurves.Mathlib.RingTheory.Polynomial.Quotient
 public import Mathlib.FieldTheory.Separable
 public import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 public import Mathlib.RingTheory.Polynomial.Resultant.Basic
 
+-- For the proofs only.
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Div
+import HyperellipticCurves.Mathlib.Data.Nat.Choose.Vandermonde
+import HyperellipticCurves.Mathlib.RingTheory.Polynomial.Basic
+
 /-!
-# Bézout certificates from unit resultants, and the discriminant at a given degree
+# Bézout certificates, the discriminant at a given degree, and the Sylvester block form
 
 If the `(m, n)`-resultant of `u` and `g` is a unit, then `s * u + t * g = 1` is solvable with
 `deg s < n`, `deg t < m`; read for `g = f'` this is a separability certificate.
@@ -27,11 +34,23 @@ coefficients of `f` up to degree `n`, so it commutes with every ring homomorphis
 last row, whose two minors are padded Sylvester matrices — identifies it with `discr f`,
 `leadingCoeff f ^ 2 * discr f` or `0` according to the degree of `f`.
 
+Let `g` be monic over a commutative ring `R`, `m = g.natDegree`, and let
+`S : R[X]_m × R[X]_n →ₗ R[X]_(m + n)`, `(u, v) ↦ g * v + p * u`, be the Sylvester map of `g`
+and `p` (`Polynomial.sylvesterMap`), whose matrix is the Sylvester matrix. For `p = 1` it is a
+linear equivalence `Ψ`, with inverse `q ↦ (q %ₘ g, q /ₘ g)`, and `B = Ψ⁻¹ ∘ₗ S` is the
+endomorphism `(u, v) ↦ ((p * u) %ₘ g, v + (p * u) /ₘ g)` of `R[X]_m × R[X]_n`. In the product of
+the monomial bases its matrix is block lower triangular with diagonal blocks the matrix of
+multiplication by `p` modulo `g` and `1`. No signs appear: `B` is an endomorphism, so the two
+blocks are never reordered. This is the linear algebra behind `AdjoinRoot.norm_mk_eq_resultant`.
+
 ## Main definitions
 
 * `Polynomial.sylvesterDerivOfDegree`: `Polynomial.sylvesterDeriv` for `f` viewed as a
   polynomial of degree `n`.
 * `Polynomial.discrOfDegree`: the discriminant of `f` viewed as a polynomial of degree `n`.
+* `Polynomial.mulModByMonic`: multiplication by `p` on `R[X]_m`, `q ↦ (p * q) %ₘ g`.
+* `Polynomial.sylvesterEquivOne`: the Sylvester map `Ψ` of `g` and `1`, as a linear equivalence.
+* `Polynomial.sylvesterBlock`: the endomorphism `B = Ψ⁻¹ ∘ₗ S`.
 
 ## Main statements
 
@@ -52,9 +71,29 @@ last row, whose two minors are padded Sylvester matrices — identifies it with 
   degree-preserving ring homomorphism.
 * `Polynomial.isUnit_discr_iff_separable`, `Polynomial.Monic.isUnit_discr_iff`: for a unit
   leading coefficient, the discriminant is a unit if and only if the polynomial is separable.
+* `Polynomial.resultant_C_sub_X`: `Res(f, C x - X) = f(x)`.
+* `Polynomial.Monic.resultant_one_right`: `Res(g, 1) = 1` for monic `g`.
+* `Polynomial.sylvesterMap_one_comp_sylvesterBlock`: `Ψ ∘ₗ B = S`.
+* `Polynomial.toMatrix_sylvesterBlock`: the block form of the matrix of `B`.
+* `Polynomial.det_sylvesterBlock`: `det B = det (Polynomial.mulModByMonic hg p)`.
+* `Polynomial.eval_dvd_resultant_of_eval_eq_zero`: the value of `q` at a root of `g` divides
+  `Res(g, q)`.
+* `Polynomial.resultant_sq_add_mul_right`,
+  `Polynomial.isSquare_leadingCoeff_pow_mul_resultant_of_dvd_sq_sub`: `Res(a, f)` for
+  `f ≡ b ^ 2` modulo `a` is a square up to a power of `lc(a)`.
+* `Polynomial.discr_ne_zero_of_isCoprime_derivative`: a polynomial prime to its derivative over a
+  domain has a nonzero discriminant.
+* `Polynomial.Monic.discr_mul`: `disc (f g) = disc f * disc g * Res(f, g) ^ 2` for monic `f` and
+  `g`, from `Polynomial.Monic.resultant_derivative_mul`, `Res(f, (f g)') = Res(f, f') Res(f, g)`.
+* `Polynomial.separable_of_discr_ne_zero`: a polynomial over a field with nonzero discriminant is
+  separable.
+* `Polynomial.discr_map_of_injective`: the discriminant commutes with injective ring
+  homomorphisms.
 
-Auxiliary material for the formalization of the Chabauty–Coleman bound for hyperelliptic
-curves; upstreaming candidates for Mathlib.
+The Sylvester material is vendored from EllipticCurves (`EllipticCurves/Mathlib/Basic.lean`).
+
+Auxiliary material for the formalization of the Chabauty–Coleman bound and of `2`-descent for
+hyperelliptic curves; upstreaming candidates for Mathlib.
 -/
 
 @[expose] public section
@@ -386,6 +425,287 @@ theorem Monic.isUnit_discr_iff (hf : f.Monic) : IsUnit f.discr ↔ f.Separable :
   isUnit_discr_iff_separable (hf.leadingCoeff ▸ isUnit_one)
 
 end discr
+
+end Polynomial
+
+namespace Polynomial
+
+variable {R : Type*} [CommRing R] {g : R[X]}
+
+theorem Monic.resultant_one_right (hg : g.Monic) (n : ℕ) : g.resultant 1 g.natDegree n = 1 := by
+  rw [Polynomial.resultant_one_right, hg.coeff_natDegree, one_pow]
+
+/-- The resultant of `f` with the linear polynomial `C x - X` is `f.eval x`.
+There is no sign: `C x - X` is `-(X - C x)`, and the two signs cancel. -/
+theorem resultant_C_sub_X (f : R[X]) (x : R) {m : ℕ} (hm : f.natDegree ≤ m) :
+    f.resultant (C x - X) m 1 = f.eval x := by
+  rw [← neg_sub, ← neg_one_mul, ← C_1, ← C_neg, resultant_C_mul_right]
+  simp [hm, ← mul_assoc, ← mul_pow]
+
+section Sylvester
+
+open Module LinearMap
+
+variable [Nontrivial R] {p : R[X]} {n : ℕ}
+
+/-- Multiplication by `p` on `R[X]_(g.natDegree)`, that is, `q ↦ (p * q) %ₘ g`: the map that
+`AdjoinRoot.degreeLTEquiv` turns into multiplication by `AdjoinRoot.mk g p`. -/
+noncomputable def mulModByMonic (hg : g.Monic) (p : R[X]) :
+    degreeLT R g.natDegree →ₗ[R] degreeLT R g.natDegree where
+  toFun q := ⟨p * (q : R[X]) %ₘ g, modByMonic_mem_degreeLT hg _⟩
+  map_add' q₁ q₂ := by ext : 1; simp [mul_add, add_modByMonic]
+  map_smul' c q := by ext : 1; simp [smul_modByMonic]
+
+@[simp]
+theorem mulModByMonic_apply_coe (hg : g.Monic) (p : R[X]) (q : degreeLT R g.natDegree) :
+    (mulModByMonic hg p q : R[X]) = p * (q : R[X]) %ₘ g :=
+  rfl
+
+/-- For monic `g`, the Sylvester map of `g` and `1`, `(u, v) ↦ g * v + u`, as a linear
+equivalence `R[X]_(g.natDegree) × R[X]_n ≃ₗ R[X]_(g.natDegree + n)`; its inverse is division
+with remainder by `g`. -/
+noncomputable def sylvesterEquivOne (hg : g.Monic) (n : ℕ) :
+    (degreeLT R g.natDegree × degreeLT R n) ≃ₗ[R] degreeLT R (g.natDegree + n) where
+  __ := sylvesterMap g 1 le_rfl (by simp)
+  invFun q := (⟨q %ₘ g, modByMonic_mem_degreeLT hg q⟩, ⟨q /ₘ g, divByMonic_mem_degreeLT hg q.2⟩)
+  left_inv w := by
+    have h := (mem_degreeLT_natDegree_iff hg.ne_zero).mp w.1.2
+    refine Prod.ext (Subtype.ext ?_) (Subtype.ext ?_)
+    · simp [self_mul_add_modByMonic hg, (modByMonic_eq_self_iff hg).mpr h]
+    · simp [self_mul_add_divByMonic hg, (divByMonic_eq_zero_iff hg).mpr h]
+  right_inv q := Subtype.ext <| by simpa [add_comm] using modByMonic_add_div (q : R[X]) g
+
+@[simp]
+theorem coe_sylvesterEquivOne (hg : g.Monic) (n : ℕ) :
+    (sylvesterEquivOne hg n).toLinearMap = sylvesterMap g 1 le_rfl (by simp) :=
+  rfl
+
+theorem coe_sylvesterEquivOne_symm_apply_fst (hg : g.Monic) (n : ℕ)
+    (q : degreeLT R (g.natDegree + n)) :
+    (((sylvesterEquivOne hg n).symm q).1 : R[X]) = (q : R[X]) %ₘ g :=
+  rfl
+
+theorem coe_sylvesterEquivOne_symm_apply_snd (hg : g.Monic) (n : ℕ)
+    (q : degreeLT R (g.natDegree + n)) :
+    (((sylvesterEquivOne hg n).symm q).2 : R[X]) = (q : R[X]) /ₘ g :=
+  rfl
+
+/-- The block-triangular endomorphism `Ψ⁻¹ ∘ₗ S` of `R[X]_(g.natDegree) × R[X]_n`, for the
+Sylvester map `S` of `g` and `p` and `Ψ = Polynomial.sylvesterEquivOne hg n`. -/
+noncomputable def sylvesterBlock (hg : g.Monic) (p : R[X]) (hp : p.natDegree ≤ n) :
+    degreeLT R g.natDegree × degreeLT R n →ₗ[R] degreeLT R g.natDegree × degreeLT R n :=
+  (sylvesterEquivOne hg n).symm.toLinearMap ∘ₗ sylvesterMap g p le_rfl hp
+
+theorem coe_sylvesterBlock_apply_fst (hg : g.Monic) (p : R[X]) (hp : p.natDegree ≤ n)
+    (u : degreeLT R g.natDegree) (v : degreeLT R n) :
+    ((sylvesterBlock hg p hp (u, v)).1 : R[X]) = p * (u : R[X]) %ₘ g := by
+  rw [sylvesterBlock, comp_apply, LinearEquiv.coe_coe, coe_sylvesterEquivOne_symm_apply_fst,
+    sylvesterMap_apply_coe, self_mul_add_modByMonic hg]
+
+theorem coe_sylvesterBlock_apply_snd (hg : g.Monic) (p : R[X]) (hp : p.natDegree ≤ n)
+    (u : degreeLT R g.natDegree) (v : degreeLT R n) :
+    ((sylvesterBlock hg p hp (u, v)).2 : R[X]) = (v : R[X]) + p * (u : R[X]) /ₘ g := by
+  rw [sylvesterBlock, comp_apply, LinearEquiv.coe_coe, coe_sylvesterEquivOne_symm_apply_snd,
+    sylvesterMap_apply_coe, self_mul_add_divByMonic hg]
+
+theorem sylvesterBlock_apply_fst (hg : g.Monic) (p : R[X]) (hp : p.natDegree ≤ n)
+    (x : degreeLT R g.natDegree × degreeLT R n) :
+    (sylvesterBlock hg p hp x).1 = mulModByMonic hg p x.1 :=
+  Subtype.ext <| coe_sylvesterBlock_apply_fst hg p hp x.1 x.2
+
+theorem sylvesterBlock_apply_zero_left (hg : g.Monic) (p : R[X]) (hp : p.natDegree ≤ n)
+    (v : degreeLT R n) :
+    sylvesterBlock hg p hp (0, v) = (0, v) :=
+  Prod.ext (Subtype.ext <| by simp [coe_sylvesterBlock_apply_fst])
+    (Subtype.ext <| by simp [coe_sylvesterBlock_apply_snd])
+
+theorem sylvesterMap_one_comp_sylvesterBlock (hg : g.Monic) (p : R[X]) (hp : p.natDegree ≤ n) :
+    sylvesterMap g 1 le_rfl (by simp) ∘ₗ sylvesterBlock hg p hp = sylvesterMap g p le_rfl hp := by
+  rw [sylvesterBlock, ← LinearMap.comp_assoc, ← coe_sylvesterEquivOne hg n,
+    LinearEquiv.comp_coe, LinearEquiv.symm_trans_self, LinearEquiv.refl_toLinearMap, id_comp]
+
+open Matrix in
+/-- The matrix of `Polynomial.sylvesterBlock hg p hp` in the product of the monomial bases is
+block lower triangular, with diagonal blocks the matrix of `Polynomial.mulModByMonic hg p` and
+`1`. -/
+theorem toMatrix_sylvesterBlock (hg : g.Monic) (p : R[X]) (hp : p.natDegree ≤ n) :
+    toMatrix ((degreeLT.basis R g.natDegree).prod (degreeLT.basis R n))
+        ((degreeLT.basis R g.natDegree).prod (degreeLT.basis R n)) (sylvesterBlock hg p hp) =
+      fromBlocks (toMatrix (degreeLT.basis R g.natDegree) (degreeLT.basis R g.natDegree)
+          (mulModByMonic hg p)) 0
+        (.of fun i j ↦ (degreeLT.basis R n).repr
+          (sylvesterBlock hg p hp (degreeLT.basis R g.natDegree j, 0)).2 i) 1 := by
+  set bm := degreeLT.basis R g.natDegree
+  set bn := degreeLT.basis R n
+  have hinl j : (bm.prod bn) (Sum.inl j) = (bm j, 0) :=
+    Prod.ext (Basis.prod_apply_inl_fst ..) (Basis.prod_apply_inl_snd ..)
+  have hinr j : (bm.prod bn) (Sum.inr j) = (0, bn j) :=
+    Prod.ext (Basis.prod_apply_inr_fst ..) (Basis.prod_apply_inr_snd ..)
+  ext i j
+  rcases i with i | i <;> rcases j with j | j
+  · rw [toMatrix_apply, hinl, Basis.prod_repr_inl, fromBlocks_apply₁₁, toMatrix_apply,
+      sylvesterBlock_apply_fst]
+  · rw [toMatrix_apply, hinr, sylvesterBlock_apply_zero_left, Basis.prod_repr_inl,
+      fromBlocks_apply₁₂]
+    simp
+  · rw [toMatrix_apply, hinl, Basis.prod_repr_inr, fromBlocks_apply₂₁, of_apply]
+  · rw [toMatrix_apply, hinr, sylvesterBlock_apply_zero_left, Basis.prod_repr_inr,
+      fromBlocks_apply₂₂, Basis.repr_self, one_apply, Finsupp.single_apply]
+    exact if_congr eq_comm rfl rfl
+
+open Matrix in
+/-- The determinant of the block-triangular map `Polynomial.sylvesterBlock hg p hp` is the
+determinant of its upper-left block `Polynomial.mulModByMonic hg p`. -/
+theorem det_sylvesterBlock (hg : g.Monic) (p : R[X]) (hp : p.natDegree ≤ n) :
+    LinearMap.det (sylvesterBlock hg p hp) = LinearMap.det (mulModByMonic hg p) := by
+  rw [← det_toMatrix ((degreeLT.basis R g.natDegree).prod (degreeLT.basis R n)),
+    ← det_toMatrix (degreeLT.basis R g.natDegree), toMatrix_sylvesterBlock,
+    det_fromBlocks_zero₁₂, det_one, mul_one]
+
+end Sylvester
+
+/-- `Res(a, b ^ 2 + a * r) = lc(a) ^ (n - 2 deg b) * Res(a, b) ^ 2` in degree `n`, if `n` is at
+least `2 deg b` and `deg r + deg a`: the multiple of `a` drops out
+(`Polynomial.resultant_add_mul_right`), and the resultant is multiplicative in its second
+argument (`Polynomial.resultant_mul_right`). -/
+theorem resultant_sq_add_mul_right (a b r : R[X]) {n : ℕ} (hb : 2 * b.natDegree ≤ n)
+    (hr : r.natDegree + a.natDegree ≤ n) :
+    a.resultant (b ^ 2 + a * r) a.natDegree n =
+      a.leadingCoeff ^ (n - 2 * b.natDegree) * a.resultant b ^ 2 := by
+  obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hb
+  rw [resultant_add_mul_right _ _ _ _ _ hr le_rfl, add_tsub_cancel_left,
+    resultant_add_right_deg _ _ _ _ _ (natDegree_pow_le_of_le 2 le_rfl), two_mul, sq b,
+    resultant_mul_right _ _ _ _ le_rfl, coeff_natDegree, sq]
+
+/-- If `f` is a square modulo `a`, then `lc(a) ^ deg f * Res(a, f)` is a square: over a splitting
+field, `Res(a, f)` is `lc(a) ^ deg f` times the product of the values `f(α) = b(α) ^ 2` at the
+roots `α` of `a`. The proof computes `Res(a, f)` in a large even excess degree in two ways,
+with `Polynomial.resultant_add_right_deg` and `Polynomial.resultant_sq_add_mul_right`. -/
+theorem isSquare_leadingCoeff_pow_mul_resultant_of_dvd_sq_sub {K : Type*} [Field K] {a b f : K[X]}
+    (h : a ∣ b ^ 2 - f) : IsSquare (a.leadingCoeff ^ f.natDegree * a.resultant f) := by
+  rcases eq_or_ne a 0 with rfl | ha
+  · exact ⟨0 ^ f.natDegree, by simp⟩
+  obtain ⟨q, hq⟩ := h
+  set e := q.natDegree + a.natDegree
+  have h₁ := resultant_add_right_deg a f a.natDegree f.natDegree (2 * (b.natDegree + e)) le_rfl
+  have h₂ := resultant_sq_add_mul_right a b (-q) (n := f.natDegree + 2 * (b.natDegree + e)) (by lia)
+    (by lia [natDegree_neg q])
+  rw [show b ^ 2 + a * -q = f by linear_combination hq, h₁, coeff_natDegree,
+    show f.natDegree + 2 * (b.natDegree + e) - 2 * b.natDegree = f.natDegree + 2 * e by lia] at h₂
+  have hl : a.leadingCoeff ≠ 0 := leadingCoeff_ne_zero.mpr ha
+  refine ⟨a.leadingCoeff ^ (f.natDegree + e) * a.resultant b / a.leadingCoeff ^ (b.natDegree + e),
+    ?_⟩
+  linear_combination (norm := field)
+    a.leadingCoeff ^ f.natDegree * h₂ / a.leadingCoeff ^ (2 * (b.natDegree + e))
+
+/-- The value of `q` at a root of `g` divides the resultant of `g` and `q`: evaluate a Bézout
+identity `g a + q b = Res(g, q)` there. -/
+theorem eval_dvd_resultant_of_eval_eq_zero {q : R[X]} {θ : R} (hθ : g.eval θ = 0) {m n : ℕ}
+    (hm : g.natDegree ≤ m) (hn : q.natDegree ≤ n) (H : m ≠ 0 ∨ n ≠ 0) :
+    q.eval θ ∣ g.resultant q m n := by
+  obtain ⟨_, b, -, -, e⟩ := exists_mul_add_mul_eq_C_resultant g q hm hn H
+  exact ⟨b.eval θ, by simpa [hθ] using congr(eval θ $e).symm⟩
+
+section Map
+
+variable {S : Type*} [CommRing S] {φ : R →+* S}
+
+theorem discr_map_of_injective (hφ : Function.Injective φ) (f : R[X]) :
+    (f.map φ).discr = φ f.discr :=
+  discr_map φ (natDegree_map_eq_of_injective hφ f)
+
+end Map
+
+/-- Over a domain, a polynomial prime to its derivative (a separable one) has a nonzero
+discriminant: by `Polynomial.resultant_deriv`, `lc(f) * disc(f)` is up to sign the resultant of `f`
+and `f'` with `f'` of formal degree `deg f - 1`, which is a power of `lc(f)` times their resultant
+(`Polynomial.resultant_add_right_deg`) and does not vanish as `f` and `f'` are coprime. -/
+theorem discr_ne_zero_of_isCoprime_derivative [IsDomain R] {f : R[X]}
+    (hf : IsCoprime f (derivative f)) : f.discr ≠ 0 := by
+  rcases le_or_gt f.degree 0 with h | h
+  · rw [eq_C_of_degree_le_zero h, discr_C]
+    exact one_ne_zero
+  obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le (natDegree_derivative_le f)
+  have h0 := resultant_deriv h
+  rw [hk, resultant_add_right_deg _ _ _ _ k le_rfl, coeff_natDegree] at h0
+  exact right_ne_zero_of_mul (h0 ▸ mul_ne_zero
+    (pow_ne_zero _ (leadingCoeff_ne_zero.mpr (ne_zero_of_degree_gt h))) (resultant_ne_zero f _ hf))
+
+section
+
+variable {f : R[X]}
+
+/-- For monic `f`, the resultant `Res(f, h)` does not depend on the formal degree of `h`. -/
+theorem Monic.resultant_eq_of_natDegree_le (hf : f.Monic) {h : R[X]} {n n' : ℕ}
+    (hh : h.natDegree ≤ n) (hn : n ≤ n') :
+    resultant f h f.natDegree n' = resultant f h f.natDegree n := by
+  obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hn
+  rw [resultant_add_right_deg _ _ _ _ k hh, hf.coeff_natDegree, one_pow, one_mul]
+
+theorem Monic.resultant_mul_right (hf : f.Monic) {h₁ h₂ : R[X]} {n₁ n₂ : ℕ}
+    (h₁n : h₁.natDegree ≤ n₁) (h₂n : h₂.natDegree ≤ n₂) :
+    resultant f (h₁ * h₂) f.natDegree (n₁ + n₂) =
+      resultant f h₁ f.natDegree n₁ * resultant f h₂ f.natDegree n₂ := by
+  rw [hf.resultant_eq_of_natDegree_le (natDegree_mul_le.trans (add_le_add h₁n h₂n)) le_rfl,
+    hf.resultant_eq_of_natDegree_le natDegree_mul_le (add_le_add h₁n h₂n),
+    Polynomial.resultant_mul_right _ _ _ _ le_rfl, hf.resultant_eq_of_natDegree_le le_rfl h₁n,
+    hf.resultant_eq_of_natDegree_le le_rfl h₂n]
+
+/-- `Res(f, (f g)') = Res(f, f') Res(f, g)` for monic `f` of positive degree, as `f` divides
+`f g'`. -/
+theorem Monic.resultant_derivative_mul (hf : f.Monic) (hf0 : 0 < f.natDegree)
+    (hg0 : 0 < g.natDegree) :
+    resultant f (derivative (f * g)) f.natDegree (f.natDegree + g.natDegree - 1) =
+      resultant f (derivative f) f.natDegree (f.natDegree - 1) * resultant f g := by
+  rw [derivative_mul, resultant_add_mul_right _ _ _ _ _ _ le_rfl, Nat.sub_add_comm hf0,
+    hf.resultant_mul_right (natDegree_derivative_le f) le_rfl]
+  have := natDegree_derivative_le g
+  lia
+
+@[simp]
+theorem discr_one : discr (1 : R[X]) = 1 :=
+  C_1 (R := R) ▸ discr_C 1
+
+private theorem neg_one_pow_add_mul_sub_one_div_two (m n : ℕ) :
+    (-1 : R) ^ ((m + n) * (m + n - 1) / 2) =
+      (-1) ^ (m * (m - 1) / 2) * (-1) ^ (n * (n - 1) / 2) * (-1) ^ (m * n) := by
+  simp only [← Nat.choose_two_right, Nat.add_choose_two, pow_add]
+
+/-- The **discriminant of a product** of monic polynomials:
+`disc (f g) = disc f * disc g * Res(f, g) ^ 2`. -/
+theorem Monic.discr_mul (hf : f.Monic) (hg : g.Monic) :
+    (f * g).discr = f.discr * g.discr * resultant f g ^ 2 := by
+  nontriviality R
+  rcases Nat.eq_zero_or_pos f.natDegree with hf0 | hf0
+  · simp [hf.natDegree_eq_zero.mp hf0]
+  rcases Nat.eq_zero_or_pos g.natDegree with hg0 | hg0
+  · simp [hg.natDegree_eq_zero.mp hg0]
+  have key := resultant_deriv (f := f * g) (natDegree_pos_iff_degree_pos.mp (by
+    rw [hf.natDegree_mul hg]; lia))
+  rw [(hf.mul hg).leadingCoeff, hf.natDegree_mul hg, resultant_mul_left _ _ _ _
+    ((natDegree_derivative_le _).trans (by rw [hf.natDegree_mul hg])),
+    hf.resultant_derivative_mul hf0 hg0, mul_comm f g, add_comm f.natDegree,
+    hg.resultant_derivative_mul hg0 hf0, resultant_deriv (natDegree_pos_iff_degree_pos.mp hf0),
+    resultant_deriv (natDegree_pos_iff_degree_pos.mp hg0), resultant_comm g f,
+    hf.leadingCoeff, hg.leadingCoeff, add_comm g.natDegree,
+    neg_one_pow_add_mul_sub_one_div_two, mul_comm g f, mul_comm g.natDegree f.natDegree] at key
+  refine (((isUnit_neg_one.pow (f.natDegree * (f.natDegree - 1) / 2)).mul
+    (isUnit_neg_one.pow (g.natDegree * (g.natDegree - 1) / 2))).mul
+      (isUnit_neg_one.pow (f.natDegree * g.natDegree))).mul_left_cancel ?_
+  linear_combination -key
+
+/-- A polynomial over a field with nonzero discriminant is separable, as `Res(f, f')` is
+`± lc(f) * disc f` (`Polynomial.resultant_deriv`). -/
+theorem separable_of_discr_ne_zero {K : Type*} [Field K] {f : K[X]} (hf : 0 < f.degree)
+    (h : f.discr ≠ 0) : f.Separable := by
+  by_contra hc
+  have h0 := resultant_eq_zero_iff.mpr ⟨.inl (ne_zero_of_degree_gt hf), hc⟩
+  have hd := resultant_deriv hf
+  obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le (natDegree_derivative_le f)
+  rw [hk, resultant_add_right_deg _ _ _ _ _ le_rfl, h0, mul_zero] at hd
+  simp [h, ne_zero_of_degree_gt hf] at hd
+
+end
 
 end Polynomial
 

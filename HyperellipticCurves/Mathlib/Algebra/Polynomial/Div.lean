@@ -8,15 +8,19 @@ module
 public import Mathlib.Algebra.Polynomial.Div
 
 /-!
-# The root multiplicity at `0` of a reflected polynomial
+# The root multiplicity at `0` of a reflected polynomial; division of `g * v + u` by `g`
 
 ## Main statements
 
 * `Polynomial.rootMultiplicity_zero_reflect`: `rootMultiplicity 0 (reflect N p) = N - deg p` for
   `p ≠ 0` with `deg p ≤ N`.
+* `Polynomial.self_mul_add_modByMonic`, `Polynomial.self_mul_add_divByMonic`: for monic `g`,
+  `(g * v + u) %ₘ g = u %ₘ g` and `(g * v + u) /ₘ g = v + u /ₘ g` (vendored from EllipticCurves,
+  `EllipticCurves/Mathlib/Basic.lean`, there `Polynomial.Monic.modByMonic_mul_add` and
+  `Polynomial.Monic.divByMonic_mul_add`).
 
-Auxiliary material for the formalization of the Chabauty–Coleman bound for hyperelliptic
-curves; an upstreaming candidate for Mathlib.
+Auxiliary material for the formalization of the Chabauty–Coleman bound and of `2`-descent for
+hyperelliptic curves; upstreaming candidates for Mathlib.
 -/
 
 @[expose] public section
@@ -35,6 +39,19 @@ theorem rootMultiplicity_zero_reflect {R : Type*} [CommRing R] {p : R[X]} (hp : 
     exact leadingCoeff_ne_zero.mpr hp
   · rw [coeff_reflect, revAt_le (by lia)]
     exact coeff_eq_zero_of_natDegree_lt (by lia)
+
+end Polynomial
+
+namespace Polynomial
+
+variable {R : Type*} [CommRing R] {g : R[X]}
+
+theorem self_mul_add_modByMonic (hg : g.Monic) (v u : R[X]) : (g * v + u) %ₘ g = u %ₘ g := by
+  rw [add_modByMonic, self_mul_modByMonic hg, zero_add]
+
+theorem self_mul_add_divByMonic (hg : g.Monic) (v u : R[X]) :
+    (g * v + u) /ₘ g = v + u /ₘ g := by
+  rw [add_divByMonic, mul_divByMonic_cancel_left v hg]
 
 end Polynomial
 

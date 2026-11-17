@@ -30,6 +30,11 @@ with $v(p) \le e$ bounding the absolute ramification index, and the condition on
 is then $p > 2r + e + 1$ --- Corollary~6.7 of \emph{loc.\ cit.}, which is what admits
 ramified primes over a general base field. Over $\QQ$ one has $\pi = p$ and $e = 1$.
 
+The blueprint also covers $2$-descent on the Jacobian (Chapter~\ref{ch:descent}): the $x - T$ map
+$J(K) \to L^\times/(L^\times)^2$, $L = K[x]/(f)$, whose kernel is $2J(K)$, certificates for halving
+points, the $2$-Selmer group over a number field with the bound on the rank of~$J(K)$ that it
+gives when~$J(K)$ is finitely generated, and two examples of genus~$2$ over~$\QQ$.
+
 \subsection*{The strategy}
 
 The proof follows the classical outline. The $p$-adic points of $C$ decompose into
@@ -159,6 +164,18 @@ a direct factor of $W(\Fpbar) \otimes_{\ZZ} O_K$ (Definition~\ref{def:local-fact
 Lemma~\ref{lem:factor-dvr}), giving the bound
 $\#C(K) \le \#\bar C(\Fq) + 2r$ for $p > 2r + e + 1$ (Theorem~\ref{thm:main-nf}).
 
+\emph{Chapter 7} develops $2$-descent over an arbitrary field~$K$ in which $2 \ne 0$, for $f$
+squarefree of odd degree and not necessarily monic: the classes of Mumford ideals of arbitrary
+pairs of polynomials (Definition~\ref{def:hv-class}), the $x - T$ map~$\mu$
+(Definition~\ref{def:ds-mu}, Theorem~\ref{thm:ds-formula}), certificates for halving points
+(Theorem~\ref{thm:hv-general}, Corollary~\ref{cor:hv-record}), the kernel $\ker\mu = 2J(K)$
+(Theorem~\ref{thm:ds-kernel}) and the rank formula (Theorem~\ref{thm:ds-rank}), the image of~$\mu$
+over the fraction field of a Dedekind domain (Theorem~\ref{thm:ds-image-selmer}), the $2$-Selmer
+group and the rank bound over a number field (Theorems~\ref{thm:ds-sel2}
+and~\ref{thm:ds-rank-bound}), with the Mordell--Weil theorem and Mattuck's theorem as cited inputs
+(Definition~\ref{def:ds-cited}), and two examples over~$\QQ$ (Theorems~\ref{thm:ds-e1}
+and~\ref{thm:ds-e2}).
+
 \subsection*{Notation and standing hypotheses}
 
 Throughout: $f \in \ZZ[x]$ is monic and squarefree with $\deg f = 2g+1$, $g \ge 1$ (the
@@ -188,3 +205,4 @@ the modules \texttt{HyperellipticCurves.Archive.*}, and a remark says so at each
 \input{chapters/03-log}
 \input{chapters/04-count}
 \input{chapters/05-numberfield}
+\input{chapters/06-descent}

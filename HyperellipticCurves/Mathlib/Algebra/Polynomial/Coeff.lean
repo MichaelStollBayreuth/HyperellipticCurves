@@ -8,15 +8,16 @@ module
 public import Mathlib.Algebra.Polynomial.Coeff
 
 /-!
-# Coefficients in the monomial basis indexed by `Fin n`
+# Coefficients of sums of monomials
 
 ## Main statements
 
 * `Polynomial.coeff_sum_C_mul_X_pow`: the coefficients of `∑ j : Fin n, C (c j) * X ^ (j : ℕ)`
   are the `c j`.
+* `Polynomial.C_mul_X_add_C_eq_zero`: a polynomial `a X + b` vanishes iff `a = b = 0`.
 
-Auxiliary material for the formalization of the Chabauty–Coleman bound for hyperelliptic
-curves; an upstreaming candidate for Mathlib.
+Auxiliary material for the formalization of the Chabauty–Coleman bound and of `2`-descent for
+hyperelliptic curves; upstreaming candidates for Mathlib.
 -/
 
 @[expose] public section
@@ -36,6 +37,18 @@ theorem coeff_sum_C_mul_X_pow {R : Type*} [Semiring R] {n : ℕ} (c : Fin n → 
   simp
 
 end Coeffs
+
+variable {R : Type*}
+
+section Semiring
+
+variable [Semiring R]
+
+theorem C_mul_X_add_C_eq_zero {a b : R} : C a * X + C b = 0 ↔ a = 0 ∧ b = 0 :=
+  ⟨fun h ↦ ⟨by simpa using congr(coeff $h 1), by simpa using congr(coeff $h 0)⟩,
+    fun ⟨ha, hb⟩ ↦ by simp [ha, hb]⟩
+
+end Semiring
 
 end Polynomial
 

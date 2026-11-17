@@ -8,15 +8,21 @@ module
 public import Mathlib.Algebra.Squarefree.Basic
 
 /-!
-# Squarefreeness transports along multiplicative equivalences
+# Squarefreeness along multiplicative equivalences, and divisors of `b ^ 2 - f`
 
 ## Main statements
 
 * `MulEquiv.squarefree_iff`: an element is squarefree if and only if its image under a
   multiplicative equivalence is, with `Squarefree.map` the direction used in practice.
+* `Squarefree.dvd_of_dvd_of_dvd_sq_sub`: `d ∣ f` and `d ∣ b ^ 2 - f` give `d ∣ b`.
+* `Squarefree.isRelPrime_of_dvd_of_mul_dvd_sq_sub`: `d ∣ f` and `d * e ∣ b ^ 2 - f` give
+  `IsRelPrime d e`.
 
-Auxiliary material for the formalization of the Chabauty–Coleman bound for hyperelliptic
-curves; an upstreaming candidate for Mathlib.
+The last two are for a squarefree `f` and a divisor `d` of `f` (for polynomials: the common part of
+`f` and the first polynomial of a Mumford pair `(a, b)`).
+
+Auxiliary material for the formalization of the Chabauty–Coleman bound and of `2`-descent for
+hyperelliptic curves; upstreaming candidates for Mathlib.
 -/
 
 @[expose] public section
@@ -27,5 +33,20 @@ theorem MulEquiv.squarefree_iff {M N F : Type*} [Monoid M] [Monoid N] [EquivLike
   simp [Squarefree, (EquivLike.surjective f).forall, ← map_mul, map_dvd_iff, -isUnit_map_iff]
 
 alias ⟨_, Squarefree.map⟩ := MulEquiv.squarefree_iff
+
+variable {R : Type*} [CommRing R] [DecompositionMonoid R] {f d b : R}
+
+/-- A divisor `d` of `f` and `b ^ 2 - f` divides `b ^ 2`, and it is squarefree as a divisor of the
+squarefree `f`, so it divides `b`. -/
+theorem Squarefree.dvd_of_dvd_of_dvd_sq_sub (hf : Squarefree f) (hd : d ∣ f)
+    (h : d ∣ b ^ 2 - f) : d ∣ b :=
+  ((hf.squarefree_of_dvd hd).dvd_pow_iff_dvd two_ne_zero).mp ((dvd_sub_left hd).mp h)
+
+/-- A common divisor `t` of `d` and `e` divides `b` by `Squarefree.dvd_of_dvd_of_dvd_sq_sub`, so
+`t * t` divides `b ^ 2` and `b ^ 2 - f`, hence the squarefree `f`. -/
+theorem Squarefree.isRelPrime_of_dvd_of_mul_dvd_sq_sub {e : R} (hf : Squarefree f) (hd : d ∣ f)
+    (h : d * e ∣ b ^ 2 - f) : IsRelPrime d e := fun t htd hte ↦ by
+  have hb := hf.dvd_of_dvd_of_dvd_sq_sub (htd.trans hd) ((htd.trans (dvd_mul_right d e)).trans h)
+  exact hf t ((dvd_sub_right (sq b ▸ mul_dvd_mul hb hb)).mp ((mul_dvd_mul htd hte).trans h))
 
 end

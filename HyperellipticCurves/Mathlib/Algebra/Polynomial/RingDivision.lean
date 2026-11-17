@@ -7,12 +7,13 @@ module
 
 public import Mathlib.Algebra.Polynomial.RingDivision
 
--- Beyond the sibling, for the proof of `Polynomial.isCoprime_X_sub_C_of_isUnit_eval` only: the
--- tactic `linear_combination`.
+-- Beyond the sibling, for the proofs only: the tactic `linear_combination` (for
+-- `Polynomial.isCoprime_X_sub_C_of_isUnit_eval`) and `isCoprime_iff_of_dvd_sub`.
+import HyperellipticCurves.Mathlib.RingTheory.Coprime.Basic
 import Mathlib.Tactic.LinearCombination
 
 /-!
-# The top-coefficient functional, and coprimality with linear factors
+# The top-coefficient functional, coprimality with linear factors, and coprime values
 
 The *top-coefficient functional* `Polynomial.topCoeffMod u` of a monic polynomial `u` is the
 coefficient of `X ^ (deg u - 1)` in `p %ₘ u`. Classically it is the trace form
@@ -42,9 +43,13 @@ separability of `u`.
   coprimality with `X - C x` from a unit (nonzero) value at `x`.
 * `Polynomial.pair_dvd_of_eval`: a polynomial vanishing at two distinct points is divisible by
   the product of the two linear factors.
+* `Polynomial.isCoprime_eval_iff_of_dvd_sub`: if `m ∣ x - y`, then `Q.eval x` is coprime to `m` if
+  and only if `Q.eval y` is.
+* `Polynomial.exists_isCoprime_eval_mul`: for coprime `m` and `n`, a value of `Q` coprime to `m`
+  and one coprime to `n` give a value coprime to `m * n`.
 
-Auxiliary material for the formalization of the Chabauty–Coleman bound for hyperelliptic
-curves; upstreaming candidates for Mathlib.
+Auxiliary material for the formalization of the Chabauty–Coleman bound and of `2`-descent for
+hyperelliptic curves; upstreaming candidates for Mathlib.
 -/
 
 @[expose] public section
@@ -234,6 +239,25 @@ theorem pair_dvd_of_eval {p : K[X]} {a c : K} (hne : a ≠ c) (h₁ : p.eval a =
   IsCoprime.mul_dvd
     (isCoprime_X_sub_C_of_eval_ne_zero (by simpa using sub_ne_zero.mpr (Ne.symm hne)))
     (dvd_iff_isRoot.mpr h₁) (dvd_iff_isRoot.mpr h₂)
+
+end Polynomial
+
+namespace Polynomial
+
+variable {R : Type*} [CommRing R]
+
+theorem isCoprime_eval_iff_of_dvd_sub {Q : R[X]} {m x y : R} (h : m ∣ x - y) :
+    IsCoprime (Q.eval x) m ↔ IsCoprime (Q.eval y) m :=
+  isCoprime_iff_of_dvd_sub (h.trans (sub_dvd_eval_sub x y Q))
+
+/-- By the Chinese remainder theorem, values of `Q` coprime to `m` and to `n` combine to a value
+coprime to `m * n` when `m` and `n` are coprime. -/
+theorem exists_isCoprime_eval_mul {Q : R[X]} {m n s t : R} (hmn : IsCoprime m n)
+    (hs : IsCoprime (Q.eval s) m) (ht : IsCoprime (Q.eval t) n) :
+    ∃ k, IsCoprime (Q.eval k) (m * n) := by
+  obtain ⟨k, hks, hkt⟩ := hmn.exists_dvd_sub_and_dvd_sub s t
+  exact ⟨k, .mul_right ((isCoprime_eval_iff_of_dvd_sub hks).mpr hs)
+    ((isCoprime_eval_iff_of_dvd_sub hkt).mpr ht)⟩
 
 end Polynomial
 

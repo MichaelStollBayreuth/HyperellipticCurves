@@ -8,7 +8,7 @@ module
 public import Mathlib.Algebra.Polynomial.Degree.Domain
 
 /-!
-# Degrees of `v ^ 2 - f` for `f` of odd degree
+# Degrees and leading coefficients of `v ^ 2 - f` and `p ^ 2 - f * q ^ 2` for `f` of odd degree
 
 ## Main statements
 
@@ -16,9 +16,13 @@ public import Mathlib.Algebra.Polynomial.Degree.Domain
   `deg (v ^ 2 - f) = max (2 * deg v) (deg f)`, the two arguments of the maximum never coinciding.
 * `Polynomial.sq_mul_ne_sq_of_odd_natDegree`: a polynomial of odd degree is not a quotient of
   squares: `A ^ 2 * f ≠ B ^ 2` for `B ≠ 0`.
+* `Polynomial.eq_zero_of_mul_sq_eq_mul_sq`, `Polynomial.ne_zero_of_dvd_sq_sub`: parity of degrees
+  of `p * u ^ 2` and of squares.
+* `Polynomial.isSquare_neg_leadingCoeff_pow_mul_leadingCoeff_sq_sub_mul_sq`: for `f` of odd
+  degree, `(-f.leadingCoeff) ^ N.natDegree * N.leadingCoeff` is a square, `N = p ^ 2 - f * q ^ 2`.
 
-Auxiliary material for the formalization of the Chabauty–Coleman bound for hyperelliptic
-curves; upstreaming candidates for Mathlib.
+Auxiliary material for the formalization of the Chabauty–Coleman bound and of `2`-descent for
+hyperelliptic curves; upstreaming candidates for Mathlib.
 -/
 
 @[expose] public section
@@ -56,5 +60,52 @@ theorem sq_mul_ne_sq_of_odd_natDegree (hf0 : f ≠ 0) (hf : Odd f.natDegree) {A 
 end SqSub
 
 end Polynomial
+
+open Polynomial
+
+/-- If `p * q` has odd degree, the two sides of `p * u ^ 2 = q * v ^ 2` have degrees of
+different parity unless `u = 0`. -/
+theorem Polynomial.eq_zero_of_mul_sq_eq_mul_sq {R : Type*} [Semiring R] [NoZeroDivisors R]
+    {p q u v : R[X]} (h : Odd (p * q).natDegree)
+    (huv : p * u ^ 2 = q * v ^ 2) : u = 0 := by
+  by_contra hu
+  obtain ⟨hp, hq⟩ := mul_ne_zero_iff.mp (fun h0 ↦ by simp [h0] at h : p * q ≠ 0)
+  have hv : v ^ 2 ≠ 0 := right_ne_zero_of_mul (huv ▸ mul_ne_zero hp (pow_ne_zero 2 hu))
+  have := congr(natDegree $huv)
+  rw [natDegree_mul hp (pow_ne_zero 2 hu), natDegree_mul hq hv, natDegree_pow, natDegree_pow]
+    at this
+  rw [natDegree_mul hp hq] at h
+  obtain ⟨k, hk⟩ := h
+  lia
+
+/-- A polynomial of odd degree is not a square, so `0` does not divide `b ^ 2 - f`. -/
+theorem Polynomial.ne_zero_of_dvd_sq_sub {R : Type*} [Ring R] [NoZeroDivisors R] {f a b : R[X]}
+    (hf : Odd f.natDegree) (h : a ∣ b ^ 2 - f) : a ≠ 0 := by
+  rintro rfl
+  rw [zero_dvd_iff, sub_eq_zero] at h
+  simp [← h, natDegree_pow, Nat.odd_iff] at hf
+
+/-- For `f` of odd degree, the leading term of `p ^ 2 - f * q ^ 2` is that of `p ^ 2`, in even
+degree, or that of `-f * q ^ 2`, in odd degree; so its leading coefficient is a square or
+`-f.leadingCoeff` times a square, according to the parity of its degree. -/
+theorem Polynomial.isSquare_neg_leadingCoeff_pow_mul_leadingCoeff_sq_sub_mul_sq {R : Type*}
+    [CommRing R] [NoZeroDivisors R] {f : R[X]} (hf : Odd f.natDegree) (p q : R[X]) :
+    IsSquare ((-f.leadingCoeff) ^ (p ^ 2 - f * q ^ 2).natDegree *
+      (p ^ 2 - f * q ^ 2).leadingCoeff) := by
+  rcases eq_or_ne q 0 with rfl | hq
+  · rw [zero_pow two_ne_zero, mul_zero, sub_zero, natDegree_pow, leadingCoeff_pow]
+    exact ⟨(-f.leadingCoeff) ^ p.natDegree * p.leadingCoeff, by ring⟩
+  have hd : (f * q ^ 2).natDegree = f.natDegree + 2 * q.natDegree := by
+    rw [natDegree_mul (ne_zero_of_natDegree_gt hf.pos) (pow_ne_zero 2 hq), natDegree_pow]
+  obtain ⟨k, hk⟩ := hf
+  rcases lt_or_gt_of_ne (show (p ^ 2).natDegree ≠ (f * q ^ 2).natDegree by
+    rw [natDegree_pow, hd]; lia) with hlt | hlt
+  · rw [natDegree_sub_eq_right_of_natDegree_lt hlt,
+      leadingCoeff_sub_of_degree_lt' (degree_lt_degree hlt), hd, leadingCoeff_mul,
+      leadingCoeff_pow, hk]
+    exact ⟨(-f.leadingCoeff) ^ (k + 1 + q.natDegree) * q.leadingCoeff, by ring⟩
+  · rw [natDegree_sub_eq_left_of_natDegree_lt hlt,
+      leadingCoeff_sub_of_degree_lt (degree_lt_degree hlt), natDegree_pow, leadingCoeff_pow]
+    exact ⟨(-f.leadingCoeff) ^ p.natDegree * p.leadingCoeff, by ring⟩
 
 end

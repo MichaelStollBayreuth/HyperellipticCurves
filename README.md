@@ -57,7 +57,8 @@ The Lean sources are in [`HyperellipticCurves`](HyperellipticCurves) (namespace
 `ChabautyColeman`):
 
 - [`Curve`](HyperellipticCurves/Curve): hyperelliptic curves, the coordinate ring as a Dedekind
-  domain, the Jacobian as its class group, Mumford representation, base change;
+  domain, the Jacobian as its class group, Mumford representation and the classes of Mumford
+  ideals, base change, and the cited structure results on the Jacobian that the descent uses;
 - [`Series`](HyperellipticCurves/Series): the `p`-adic power-series kit — evaluation on the
   maximal ideal, Weierstrass preparation, Strassmann's theorem, interpolation, formal group laws
   and their logarithms;
@@ -74,6 +75,12 @@ The Lean sources are in [`HyperellipticCurves`](HyperellipticCurves) (namespace
   (`Analytic`);
 - [`Count`](HyperellipticCurves/Count): the annihilating differentials, the bound per residue
   disk, the main theorems, and their instantiations over number fields and over `ℚ`;
+- [`Descent`](HyperellipticCurves/Descent): `2`-descent on the Jacobian — the `x - T` map
+  `J(K) → L^× / (L^×)²`, `L = K[x]/(f)`, with kernel `2 J(K)` (through certificates for halving
+  points), its image in the Selmer group over the fraction field of a Dedekind domain, the
+  `2`-Selmer group and the bound on the rank over a number field (with the Mordell–Weil theorem
+  and Mattuck's theorem as cited inputs), and two examples of genus `2` over `ℚ`; the main
+  theorems do not depend on it;
 - [`Mathlib`](HyperellipticCurves/Mathlib): auxiliary declarations missing from Mathlib, stated
   in their natural generality; these are candidates for upstreaming. The folder mirrors Mathlib's
   file structure: `Mathlib/X/Y.lean` holds the declarations whose eventual home is the Mathlib
@@ -100,7 +107,8 @@ sources, which check statements symbolically or numerically at small genus; see
 blueprint that develops the mathematics, with statements and proofs, and links each item to the
 declarations that formalize it: the class-group model of the Jacobian (chapter 1), the `p`-adic
 power-series kit (chapter 2), residue disks and the reduction of classes (chapter 3), the
-logarithm (chapter 4), the count (chapter 5), and the theorem over number fields (chapter 6).
+logarithm (chapter 4), the count (chapter 5), the theorem over number fields (chapter 6), and
+`2`-descent (chapter 7).
 Every node of the dependency graph is formalized.
 
 To build it, install [leanblueprint](https://github.com/PatrickMassot/leanblueprint) and a TeX

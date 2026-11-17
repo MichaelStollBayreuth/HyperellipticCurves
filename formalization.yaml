@@ -25,6 +25,13 @@ sources:
     license: "© Duke University Press"
     author_contacted: "no"
     prior_work: ""
+  - title: "Chabauty without the Mordell-Weil group"
+    authors: ["Michael Stoll"]
+    id: "MR3792746"   # in: Algorithmic and Experimental Methods in Algebra, Geometry, and Number Theory, Springer, Cham (2017), 623-663
+    type: "book chapter"
+    license: "© Springer International Publishing AG 2017"
+    author_contacted: "yes"    # the source author is the formalization author
+    prior_work: ""
 
 # project status
 status:
@@ -58,8 +65,17 @@ status:
     Mathlib generality is in HyperellipticCurves/Mathlib/, a tree mirroring Mathlib's file
     structure, as upstreaming candidates.
     Statements that are formalized but not needed for the main theorems are kept in
-    HyperellipticCurves/Archive/. A LaTeX blueprint with a dependency graph and the generated
-    API documentation are published at
+    HyperellipticCurves/Archive/. Independently of the main theorems, the library formalizes
+    2-descent on these Jacobians, following Section 5 of Stoll's "Chabauty without the
+    Mordell-Weil group" (2017), for f squarefree of odd degree over any field of characteristic
+    ≠ 2 (HyperellipticCurves/Descent/): the x - T map J(K) → L^×/(L^×)², L = K[x]/(f), with
+    kernel 2J(K) (through certificates for halving points), its image in the group A(Σ, 2) over
+    the fraction field of a Dedekind domain, the 2-Selmer group and the rank bound over a number
+    field, with the Mordell-Weil theorem and Mattuck's structure theorem for J over p-adic fields
+    as cited inputs (structures and a class in HyperellipticCurves/Curve/JacobianStructure.lean),
+    and two examples of genus 2 over ℚ: J(ℚ) = J(ℚ)[2] and the rational points of
+    y² = x(x² - 1)(x² - 9), and rank J(ℚ) = 1 for y² = (x + 4)(x + 3)(x³ - x + 1). A LaTeX
+    blueprint with a dependency graph and the generated API documentation are published at
     https://michaelstollbayreuth.github.io/HyperellipticCurves/ .
   sorry_count: 0
   sorry_in_definitions: 0
@@ -119,6 +135,30 @@ status:
     axioms: ["propext", "Classical.choice", "Quot.sound"]
     comparator_config: ""
     literature_dependencies: []
+  - declaration: "ChabautyColeman.HypJac.ker_descentMap"
+    file: "HyperellipticCurves/Descent/Kernel.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: ""
+    literature_dependencies: []
+  - declaration: "ChabautyColeman.HypJac.pow_rank_le_card_selmerGroupTwo"
+    file: "HyperellipticCurves/Descent/Local.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: ""
+    literature_dependencies: ["finite generation of J(K) (the Mordell-Weil theorem), as the instance IsMulFG (HypJac K f), which the class ChabautyColeman.HypJac.MordellWeil provides"]
+  - declaration: "ChabautyColeman.DescentExample1.ratPoints_eq"
+    file: "HyperellipticCurves/Descent/Example1.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: ""
+    literature_dependencies: ["Mattuck's structure theorem for J over ℚ_2 and ℚ_3 (ChabautyColeman.HypJac.LocalStructure)", "injectivity of reduction modulo 5 on the torsion of J(ℚ) (ChabautyColeman.HypJac.TorsionReduction)"]
+  - declaration: "ChabautyColeman.DescentExample2.finrank_hypJac"
+    file: "HyperellipticCurves/Descent/Example2/Rank.lean"
+    sorry_count: 0
+    axioms: ["propext", "Classical.choice", "Quot.sound"]
+    comparator_config: ""
+    literature_dependencies: ["finite generation of J(ℚ) (the Mordell-Weil theorem), as the instance IsMulFG (HypJac ℚ f)", "Mattuck's structure theorem for J over ℚ_23 and ℚ_59 (ChabautyColeman.HypJac.LocalStructure)"]
 
 # how it was produced.
 automation:
@@ -236,6 +276,16 @@ alignment:
       module: "HyperellipticCurves.Count.Arithmetic"
       status: "proved"
       note: "for odd-degree hyperelliptic curves with f ∈ ℤ[x]: the case r = g - 1 of main_affine_int_of_rank_le, where the prime condition reads p ≥ deg f = 2g + 1"
+    - source: "Stoll 2017, Section 5 and Proposition 5.1 (the x - T map μ, with kernel 2J(K))"
+      lean: "HypJac.descentMap, HypJac.descentMap_mumfordClass, HypJac.ker_descentMap"
+      module: "HyperellipticCurves.Descent.Kernel"
+      status: "proved"
+      note: "for f squarefree of odd degree over any field of characteristic ≠ 2, not necessarily monic; μ is defined in HyperellipticCurves.Descent.Map from Mumford representatives prime to f, and ker μ ⊆ 2J(K) is proved through the halving certificates of HyperellipticCurves.Descent.Halving"
+    - source: "Stoll 2017, Section 5 (μ(J(K)) lies in A(Σ, 2), and the 2-Selmer group bounds the rank)"
+      lean: "HypJac.range_descentMap_le_selmerGroup, HypJac.range_descentMap_le_selmerGroupTwo, HypJac.pow_rank_le_card_selmerGroupTwo, pow_rank_le_card_relaxedSelmerGroup"
+      module: "HyperellipticCurves.Descent.Local"
+      status: "proved"
+      note: "the image statement over the fraction field of any Dedekind domain (HyperellipticCurves.Descent.Image); the rank bound assumes J(K) finitely generated, and the local conditions use Mattuck's theorem as the cited structure HypJac.LocalStructure"
     - source: "Finiteness of C(K) when the rank is smaller than the genus (Chabauty)"
       lean: "NumberFieldBase.ratPoints_finite_numberField, NumberFieldBase.ratPoints_finite_numberField_int"
       module: "HyperellipticCurves.Count.NumberField"

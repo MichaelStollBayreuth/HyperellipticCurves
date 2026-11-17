@@ -5,12 +5,19 @@ Authors: Michael Stoll
 -/
 module
 
--- Beyond the sibling `Mathlib.NumberTheory.Padics.PadicIntegers`: `IsAdic`, for the statements.
+-- Beyond the sibling `Mathlib.NumberTheory.Padics.PadicIntegers`: `IsAdic`, `AdjoinRoot` and
+-- `HenselianRing`, for the statements.
 public import Mathlib.NumberTheory.Padics.PadicIntegers
+public import Mathlib.RingTheory.AdjoinRoot
+public import Mathlib.RingTheory.Henselian
 public import Mathlib.Topology.Algebra.Nonarchimedean.AdicTopology
 
+-- For the proofs only.
+import HyperellipticCurves.Mathlib.RingTheory.AdjoinRoot
+import Mathlib.Analysis.Normed.Group.Ultra
+
 /-!
-# The topology of `ℤ_[p]` is the adic topology of its maximal ideal
+# The topology of `ℤ_[p]` is the adic topology of its maximal ideal; units of `ℤ_[p]`
 
 The ideals `p ^ n * ℤ_[p]` are exactly the closed balls of radius `p ^ (-n)`, which are open and
 form a neighborhood basis of `0`. The statement is registered as a `Fact` instance, so that
@@ -21,9 +28,12 @@ form a neighborhood basis of `0`. The statement is registered as a `Fact` instan
 
 * `PadicInt.isAdic`: the metric topology of `ℤ_[p]` is the adic topology of its maximal ideal.
 * `PadicInt.instFactIsAdic`: the same, as a `Fact` instance.
+* `PadicInt.coe_ofNat`: the coercion `ℤ_[p] → ℚ_[p]` on numerals.
+* `PadicInt.isUnit_natCast_iff`: a natural number is a unit of `ℤ_[p]` iff it is prime to `p`.
+* `PadicInt.valuation_units`: a unit of `ℤ_[p]` has valuation `0`.
 
-Auxiliary material for the formalization of the Chabauty–Coleman bound for hyperelliptic
-curves; upstreaming candidates for Mathlib.
+Auxiliary material for the formalization of the Chabauty–Coleman bound and of `2`-descent for
+hyperelliptic curves; upstreaming candidates for Mathlib.
 -/
 
 @[expose] public section
@@ -59,5 +69,24 @@ theorem isAdic : IsAdic (maximalIdeal ℤ_[p]) := by
 instance instFactIsAdic : Fact (IsAdic (maximalIdeal ℤ_[p])) := ⟨isAdic⟩
 
 end PadicInt
+
+open Polynomial IsLocalRing
+
+@[simp, norm_cast]
+theorem PadicInt.coe_ofNat {p : ℕ} [Fact p.Prime] (n : ℕ) [n.AtLeastTwo] :
+    ((ofNat(n) : ℤ_[p]) : ℚ_[p]) = ofNat(n) :=
+  rfl
+
+@[simp]
+theorem PadicInt.isUnit_natCast_iff {p : ℕ} [Fact p.Prime] {n : ℕ} :
+    IsUnit (n : ℤ_[p]) ↔ p.Coprime n :=
+  isUnit_iff.trans norm_natCast_eq_one_iff
+
+@[simp]
+theorem PadicInt.valuation_units {p : ℕ} [Fact p.Prime] (u : ℤ_[p]ˣ) :
+    (u : ℤ_[p]).valuation = 0 := by
+  have := PadicInt.valuation_mul u.ne_zero u⁻¹.ne_zero
+  rw [← Units.val_mul, mul_inv_cancel, Units.val_one, PadicInt.valuation_one] at this
+  lia
 
 end

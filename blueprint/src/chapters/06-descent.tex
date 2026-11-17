@@ -1,0 +1,2351 @@
+\chapter{The \texorpdfstring{$x - T$}{x − T} map and \texorpdfstring{$2$}{2}-descent}
+\label{ch:descent}
+
+Let $K$ be a field in which $2 \ne 0$, let $f \in K[x]$ be squarefree of odd degree $2g + 1$ with
+leading coefficient~$c$, let $L = K[x]/(f)$, and let~$\theta$ be the image of~$x$ in~$L$. The
+\emph{descent map}, or $x - T$ map, of Section~5 of M.~Stoll, \emph{Chabauty without the
+Mordell--Weil group}, in: Algorithmic and Experimental Methods in Algebra, Geometry, and Number
+Theory, Springer, 2017, pp.~623--663 [Sto17], is the homomorphism
+\[ \mu \colon J(K) \to L^\times/(L^\times)^2\,, \qquad
+   [a, b] \mapsto (-c)^{\deg a}\bigl(a(\theta) - a_1(\theta) f_1(\theta)\bigr)(L^\times)^2\,, \]
+where~$a$ is monic and~$a_1$ and~$f_1$ are~$a$ and~$f$ divided by their monic gcd; its kernel
+is~$2J(K)$. Over a number field, $\mu$ is the basis of $2$-descent: its image lies in the
+$2$-Selmer group, a finite group computable from local data, whose order bounds the rank
+of~$J(K)$ when~$J(K)$ is finitely generated. This chapter develops the map, its kernel and the
+rank bound, and works out two examples over~$\QQ$.
+
+Section~\ref{sec:hv-classes} introduces the classes $[u, v] \in J(K)$ of Mumford ideals for
+arbitrary pairs of polynomials and the identities between them. Section~\ref{sec:ds-map}
+defines~$\mu$ without valuation theory, from Mumford representatives prime to~$f$ and an explicit
+moving lemma, and proves the formula above, including the correction term~$a_1 f_1$.
+Sections~\ref{sec:hv-certificates} and~\ref{sec:hv-cantor} put Proposition~5.1 of [Sto17], which
+computes a half of a point of~$2J(K)$, into certificate form: a short list of polynomial
+identities and divisibilities between the polynomials that the computation produces implies that
+the result is a half, and can be checked by polynomial arithmetic. Section~\ref{sec:ds-kernel}
+proves $\ker\mu = 2J(K)$ by the existence half of Proposition~5.1 of [Sto17], which ends in such a
+certificate. Section~\ref{sec:ds-basic} shows that the image of~$\mu$ lies in the kernel of the
+norm, describes~$J(K)[2]$, and proves the compatibility with base change and the rank formula.
+Section~\ref{sec:ds-dedekind}, over the fraction field of a Dedekind domain, bounds the image by
+the group $A(\Sigma, 2)$ of classes unramified outside a set~$\Sigma$ of primes, and
+Section~\ref{sec:ds-number} defines the $2$-Selmer group and the relaxed Selmer groups over a
+number field and proves the rank bound, with the Mordell--Weil theorem and Mattuck's description
+of~$J(K_v)$ as cited inputs. Section~\ref{sec:ds-examples} treats two curves of genus~$2$
+over~$\QQ$: for the first, $J(\QQ) = J(\QQ)[2]$ and~$C(\QQ)$ is determined without the
+Mordell--Weil theorem; for the second, $J(\QQ)$ has rank~$1$.
+
+\emph{Standing hypotheses and conventions.} Throughout the chapter, $K$ is a field in which
+$2 \ne 0$, and $f \in K[x]$ is squarefree of odd degree $2g + 1$ with leading coefficient~$c$; as in
+Section~5 of [Sto17], $f$ need not be monic. As in Chapter~1, $\A{K} = K[x][y]/(y^2 - f)$ is the
+coordinate ring, with the hyperelliptic involution~$\iota$, and $J(K) = \Cl(\A{K})$
+(Definitions~\ref{def:hypring} and~\ref{def:hypjac}); the results of Chapters~1 and~4 on Mumford
+ideals that are used here need only that~$f$ be squarefree of odd degree. Polynomials are elements
+of~$K[x]$; $a \mid b$ means divisibility in~$K[x]$, and $b \equiv b' \bmod a$ means $a \mid b - b'$.
+For a nonzero polynomial~$a$, $\operatorname{lc}(a)$ is its leading coefficient. The group~$J(K)$ is
+written additively; the groups of square classes are written multiplicatively, so that
+$\mu(P + Q) = \mu(P)\mu(Q)$. Sets of primes are denoted by~$\Sigma$, as in Remark~4.2 of [Sto17].
+
+\begin{remark}[Formalization]
+The standing hypotheses are a \texttt{variable} block: a field \texttt{K} with
+\texttt{[NeZero (2 : K)]} and \texttt{f : K[X]} with \texttt{[Fact (Odd f.natDegree)]} and
+\texttt{[Fact (Squarefree f)]}, the instances under which \texttt{HypRing K f} is a Dedekind
+domain; the genus is not a variable. The ring~$L$ is \texttt{AdjoinRoot f}, $\theta$ is
+\texttt{AdjoinRoot.root f} and~$c$ is \texttt{f.leadingCoeff}. As in Chapter~1, the Jacobian
+\texttt{HypJac K f} is Mathlib's multiplicative \texttt{ClassGroup}, so sums, doubles, negatives
+and~$0$ in~$J(K)$ become products, squares, inverses and~$1$; $2J(K)$ is the range of
+\texttt{powMonoidHom 2}, and $J(K)[2]$ its kernel. The group $L^\times/(L^\times)^2$ is
+\texttt{Units.ModPow (AdjoinRoot f) 2}. Lean and Mathlib call a set of primes \texttt{S}. Lean
+names without a namespace are in \texttt{ChabautyColeman}. The declarations of this chapter are in
+the modules \texttt{HyperellipticCurves.Descent.*} and in \texttt{MumfordValue},
+\texttt{MumfordClass} and \texttt{JacobianStructure} of \texttt{HyperellipticCurves.Curve}; the
+main theorems of Chapters~5 and~6 do not depend on them.
+\end{remark}
+
+\section{Classes of Mumford ideals}
+\label{sec:hv-classes}
+
+The Mumford ideal $\mathfrak a_{u,v} = (u, y - v)$ of Definition~\ref{def:mumford-ideal} is
+defined for all $u, v \in K[x]$. This section names its class in~$J(K)$ and collects the
+identities between such classes that the descent map and the certificates of this chapter
+consume. None of them needs a coprimality, degree or monicity condition.
+
+\begin{definition}[Mumford classes]
+\label{def:hv-class}
+\lean{ChabautyColeman.HypRing.y_sub_algebraMap_ne_zero, ChabautyColeman.mumfordIdeal_ne_bot',
+  ChabautyColeman.mumfordIdeal_mem_nonZeroDivisors', ChabautyColeman.mumfordClass,
+  ChabautyColeman.mumfordClass_eq_mk0, ChabautyColeman.mumfordClass_eq_one_iff}
+\leanok
+\uses{def:mumford-ideal, def:hypjac}
+For $u, v \in K[x]$, the ideal~$\mathfrak a_{u,v}$ is nonzero, since it contains $y - v \ne 0$.
+Its class in~$J(K)$ is denoted by~$[u, v]$; so $[u, v] = 0$ if and only if~$\mathfrak a_{u,v}$ is
+principal.
+\end{definition}
+
+Every point of~$J(K)$ is~$[u, v]$ for exactly one reduced pair $(u, v)$, that is, one with~$u$
+monic, $\deg v < \deg u \le g$ and $u \mid v^2 - f$ (Lemmas~\ref{lem:mumford-reduce}
+and~\ref{lem:mumford-exists}). For every pair with~$u$ monic and $u \mid v^2 - f$, $[u, v]$ is the
+point denoted in the same way in [Sto17], the class of $(u, v) - (\deg u)\infty$ for the effective
+divisor~$(u, v)$ with this Mumford representation. The class~$[u, v]$ is defined for every pair,
+not only for pairs with $u \mid v^2 - f$; for instance, $[0, v] = 0$, since
+$\mathfrak a_{0,v} = (y - v)$ is principal.
+
+\begin{remark}[Formalization]
+\texttt{mumfordClass f u v} is \texttt{ClassGroup.mk0} applied to \texttt{mumfordIdeal f u v} with
+the proof \texttt{mumfordIdeal\_mem\_nonZeroDivisors' f u v}, which needs no hypothesis $u \ne 0$.
+By proof irrelevance it is the class \texttt{ClassGroup.mk0} of Chapter~1 for any other membership
+proof (\texttt{mumfordClass\_eq\_mk0}); the class-level lemmas of Chapter~1 apply after a rewrite
+with this lemma, and proofs never unfold the definition. \texttt{mumfordClass\_eq\_one\_iff} is
+Mathlib's \texttt{ClassGroup.mk0\_eq\_one\_iff} for \texttt{mumfordClass}.
+\texttt{HypRing.y\_sub\_algebraMap\_ne\_zero} holds over every nontrivial commutative ring and needs
+nothing about~$f$.
+\end{remark}
+
+\begin{lemma}[Basic rules]
+\label{lem:hv-class-basic}
+\lean{ChabautyColeman.mumfordClass_eq_of_dvd_sub, ChabautyColeman.mumfordClass_one,
+  ChabautyColeman.mumfordClass_C_mul, ChabautyColeman.mumfordClass_neg,
+  ChabautyColeman.mumfordClass_eq_inv_of_dvd_add, ChabautyColeman.mumfordClass_zero_sq}
+\leanok
+\uses{def:hv-class}
+Let $u, v, v' \in K[x]$.
+\begin{enumerate}
+  \item If $v \equiv v' \bmod u$, then $[u, v] = [u, v']$. Moreover, $[1, v] = 0$, and
+    $[\lambda u, v] = [u, v]$ for $\lambda \in K^\times$.
+  \item If $u \mid v^2 - f$, then $[u, -v] = -[u, v]$, and $[u, v'] = -[u, v]$ whenever
+    $v' \equiv -v \bmod u$. In particular, $2[u, 0] = 0$ if $u \mid f$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:mumford-norm, lem:iota-norm}
+(1) Already the ideals agree: $y - v = (y - v') - (v - v')$ with $v - v' \in (u)$ gives
+$\mathfrak a_{u,v} = \mathfrak a_{u,v'}$; $1 \in \mathfrak a_{1,v}$; and $\lambda u$ and~$u$
+generate the same ideal. (2) Here $u \ne 0$, as $v^2 - f \ne 0$: $v^2$ is zero or of even degree,
+and~$f$ has odd degree. By Lemma~\ref{lem:mumford-norm},
+$\mathfrak a_{u,v}\,\mathfrak a_{u,-v} = \mathfrak a_{u,v}\,\iota(\mathfrak a_{u,v}) = (u)$ is
+principal, so $[u, -v] = -[u, v]$; the second claim follows with~(1), and the last one is the case
+$v = 0$, where $[u, 0] = [u, -0] = -[u, 0]$.
+
+\emph{Formalization.} The ideal-level facts in~(1) and $v^2 - f \ne 0$ are those of Chapter~1
+(\texttt{mumfordIdeal\_eq\_of\_dvd\_sub}, \texttt{mumfordIdeal\_one},
+\texttt{mumfordIdeal\_C\_mul}, \texttt{sq\_sub\_ne\_zero}), and the inversion in~(2) is
+\texttt{classGroup\_mk0\_mumfordIdeal\_map\_star}. In multiplicative notation, (2) consists of
+\texttt{mumfordClass\_neg} (the class of $(u, -v)$ is the inverse of that of $(u, v)$),
+\texttt{mumfordClass\_eq\_inv\_of\_dvd\_add} (the same for $(u, v')$ under $u \mid v + v'$) and
+\texttt{mumfordClass\_zero\_sq} ($[u, 0]^2 = 1$).
+\end{proof}
+
+\begin{lemma}[A B\'ezout identity]
+\label{lem:hv-bezout}
+\lean{Squarefree.span_eq_top_of_mul_dvd_sq_sub}
+\leanok
+Let $u_1, u_2, v \in K[x]$ with $u_1 u_2 \mid v^2 - f$. Then~$u_1$, $u_2$ and~$v$ generate the
+unit ideal of~$K[x]$: there are $s_1, s_2, s_3 \in K[x]$ with $s_1 u_1 + s_2 u_2 + s_3 v = 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let~$t$ generate the ideal $(u_1, u_2, v)$ of the principal ideal domain~$K[x]$. Then~$t^2$
+divides~$v^2$ and~$u_1 u_2$, hence also $f = v^2 - (v^2 - f)$. Since~$f$ is squarefree, $t$~is a
+unit.
+
+\emph{Formalization.} The statement is the equation of ideals $(u_1, u_2, v) = (1)$, for elements
+$f, u_1, u_2, v$ of a commutative ring in which every finitely generated ideal is principal
+(\texttt{IsBezout}); the proof applies the definition of \texttt{Squarefree f} to a generator,
+with no factorization into primes. The triple $(u, 2v, w)$ with $v^2 - f = uw$ in the proof of
+Lemma~\ref{lem:mumford-norm} is a special case, as~$2$ is a unit.
+\end{proof}
+
+\begin{lemma}[Factorization]
+\label{lem:hv-factor}
+\lean{ChabautyColeman.mumfordIdeal_mul_mumfordIdeal, ChabautyColeman.mumfordClass_mul,
+  ChabautyColeman.mumfordClass_mul_of_dvd_sub, ChabautyColeman.mumfordClass_pow,
+  ChabautyColeman.mumfordClass_sq_mul}
+\leanok
+\uses{def:hv-class}
+Let $v \in K[x]$.
+\begin{enumerate}
+  \item If $u_1, u_2 \in K[x]$ with $u_1 u_2 \mid v^2 - f$, then
+    $\mathfrak a_{u_1,v}\,\mathfrak a_{u_2,v} = \mathfrak a_{u_1 u_2, v}$; hence
+    $[u_1 u_2, v] = [u_1, v] + [u_2, v]$.
+  \item In~(1), $[u_1 u_2, v] = [u_1, v_1] + [u_2, v_2]$ for all $v_1, v_2 \in K[x]$ with
+    $v \equiv v_1 \bmod u_1$ and $v \equiv v_2 \bmod u_2$.
+  \item If $u \in K[x]$ and $n \ge 0$ with $u^n \mid v^2 - f$, then $[u^n, v] = n[u, v]$. In
+    particular, if $A = a_0^2 a$ and $A \mid B^2 - f$, then $[A, B] = 2[a_0, B] + [a, B]$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:hv-bezout, def:cantor-map, lem:cantor-correct, lem:hv-class-basic}
+(1) By Lemma~\ref{lem:hv-bezout}, and since~$2$ is a unit, there are $s_1, s_2, s_3 \in K[x]$
+with $s_1 u_1 + s_2 u_2 + s_3 (v + v) = 1$. Cantor's composition in certificate form
+(Lemma~\ref{lem:cantor-correct}), with $v_1 = v_2 = v$, gives
+$\mathfrak a_{u_1,v}\,\mathfrak a_{u_2,v} = \mathfrak a_{u_1 u_2, V}$, where
+\[ V = (s_1 u_1 + s_2 u_2) v + s_3 (v^2 + f) = (1 - 2 s_3 v) v + s_3 (v^2 + f)
+     = v - s_3 (v^2 - f)\,. \]
+So $V \equiv v \bmod u_1 u_2$, and $\mathfrak a_{u_1 u_2, V} = \mathfrak a_{u_1 u_2, v}$, as in
+the proof of Lemma~\ref{lem:hv-class-basic}\,(1). (2) follows from~(1) and
+Lemma~\ref{lem:hv-class-basic}\,(1). (3) By induction on~$n$: the case $n = 0$ is
+Lemma~\ref{lem:hv-class-basic}\,(1), and for $n \ge 1$ apply~(1) to $u_1 = u$ and
+$u_2 = u^{n-1}$. The last claim is~(1) for $u_1 = a_0^2$ and $u_2 = a$, followed by the case
+$n = 2$.
+
+\emph{Formalization.} No coprimality of~$u_1$ and~$u_2$ is assumed: a common prime factor~$\pi$
+satisfies $\pi^2 \mid v^2 - f$, so $\pi \nmid f$, and the case $u_1 = u_2$ gives
+$[u^2, v] = 2[u, v]$. The ideal-level statement takes \texttt{Squarefree f} and $2 \ne 0$ as
+explicit hypotheses, the class-level ones the instances. In \texttt{mumfordClass\_pow} the
+exponent~$n$ is implicit, as the hypothesis $u^n \mid v^2 - f$ determines it. The last claim
+of~(3), \texttt{mumfordClass\_sq\_mul}, is the reduction to squarefree~$a$ in Section~5 of [Sto17]:
+$[A, B] \in 2J(K)$ if and only if $[a, B] \in 2J(K)$, and the halves of~$[A, B]$ are the points
+$[a_0, B] + Q$ with $2Q = [a, B]$.
+\end{proof}
+
+\begin{lemma}[Finite products]
+\label{lem:hv-split}
+\lean{ChabautyColeman.mumfordClass_prod_of_dvd_sub}
+\leanok
+\uses{def:hv-class}
+Let $n \ge 0$ and $u_1, \dots, u_n, v, v_1, \dots, v_n \in K[x]$ with
+$u_1 \cdots u_n \mid v^2 - f$ and $v \equiv v_i \bmod u_i$ for $i = 1, \dots, n$. Then
+$[u_1 \cdots u_n, v] = [u_1, v_1] + \dots + [u_n, v_n]$. In particular, if
+$b, d_f, d_a, w_1, R, w, r \in K[x]$ satisfy $w = d_f d_a w_1$, $w \mid r^2 - f$,
+$r \equiv 0 \bmod d_f$, $r \equiv b \bmod d_a$ and $r \equiv R \bmod w_1$, then
+$[w, r] = [d_f, 0] + [d_a, b] + [w_1, R]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:hv-factor, lem:hv-class-basic}
+By induction on~$n$: the case $n = 0$ is Lemma~\ref{lem:hv-class-basic}\,(1), and for $n \ge 1$,
+Lemma~\ref{lem:hv-factor}\,(2), applied to~$u_1 \cdots u_{n-1}$ and~$u_n$, reduces the claim to
+the case~$n - 1$. The last claim is the case $n = 3$.
+
+\emph{Formalization.} The factors are indexed by a finite set, and no coprimality is assumed; the
+case of distinct linear factors~$u_i$ is \texttt{mk0\_mumfordIdeal\_prod}. The last
+claim has no declaration of its own: the proof of Theorem~\ref{thm:hv-general} splits off~$w_1$
+and then~$d_f$ and~$d_a$ by Lemma~\ref{lem:hv-factor} (\texttt{mumfordClass\_mul},
+\texttt{mumfordClass\_mul\_of\_dvd\_sub}).
+\end{proof}
+
+\begin{lemma}[Changing signs on a factor]
+\label{lem:hv-twist}
+\lean{ChabautyColeman.dvd_sq_sub_of_dvd_sub_of_dvd_add,
+  ChabautyColeman.mumfordClass_mul_eq_mul_sq}
+\leanok
+\uses{def:hv-class}
+Let $a_+, a_-, b, \tilde b \in K[x]$ and $a = a_+ a_-$ with $a \mid b^2 - f$,
+$\tilde b \equiv b \bmod a_+$ and $\tilde b \equiv -b \bmod a_-$. Then $a \mid \tilde b^2 - f$
+and $[a, b] = [a, \tilde b] + 2[a_-, b]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:hv-factor, lem:hv-class-basic}
+As $\tilde b^2 - f = (b^2 - f) + (\tilde b - b)(\tilde b + b)$ and $a_+ a_-$ divides the product,
+$a \mid \tilde b^2 - f$. By Lemma~\ref{lem:hv-factor}, $[a, b] = [a_+, b] + [a_-, b]$ and
+$[a, \tilde b] = [a_+, b] + [a_-, -b]$; and $[a_-, -b] = -[a_-, b]$ by
+Lemma~\ref{lem:hv-class-basic}\,(2), since $a_- \mid b^2 - f$.
+
+\emph{Formalization.} The lemma does not assume that~$a_+$ and~$a_-$ are coprime. The
+divisibility, \texttt{dvd\_sq\_sub\_of\_dvd\_sub\_of\_dvd\_add}, holds in every commutative ring.
+\end{proof}
+
+\begin{lemma}[Common factors]
+\label{lem:hv-cancel}
+\lean{ChabautyColeman.mumfordClass_mul_mumfordClass_eq_of_dvd_add}
+\leanok
+\uses{def:hv-class}
+Let $t, p_1, p_2, v_1, v_2 \in K[x]$ with $t p_1 \mid v_1^2 - f$, $t p_2 \mid v_2^2 - f$ and
+$t \mid v_1 + v_2$. Then $[t p_1, v_1] + [t p_2, v_2] = [p_1, v_1] + [p_2, v_2]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:hv-factor, lem:hv-class-basic}
+By Lemma~\ref{lem:hv-factor}\,(1), $[t p_i, v_i] = [t, v_i] + [p_i, v_i]$ for $i = 1, 2$. Since
+$t \mid v_1^2 - f$ and $v_2 \equiv -v_1 \bmod t$, Lemma~\ref{lem:hv-class-basic}\,(2) gives
+$[t, v_2] = -[t, v_1]$.
+
+\emph{Formalization.} No coprimality is assumed; the hypothesis $t \mid v_1 + v_2$ gives the
+name its suffix \texttt{\_of\_dvd\_add}.
+\end{proof}
+
+At the level of ideals, the same argument (Lemmas~\ref{lem:hv-factor}\,(1)
+and~\ref{lem:mumford-norm}) gives
+\[ \mathfrak a_{tp_1,v_1}\,\mathfrak a_{tp_2,v_2} =
+   (t)\,\mathfrak a_{p_1,v_1}\,\mathfrak a_{p_2,v_2}\,, \]
+as $\mathfrak a_{t,v_1}\,\mathfrak a_{t,v_2} = \mathfrak a_{t,v_1}\,\iota(\mathfrak a_{t,v_1})
+= (t)$: the common factor~$t$ collects the points of the first effective divisor whose images
+under~$\iota$ lie on the second, and Cantor's composition removes them together with their images
+as the divisor of the function~$t$.
+
+\begin{lemma}[Cantor's reduction steps, certificate form]
+\label{lem:hv-reduce}
+\lean{ChabautyColeman.mumfordClass_eq_of_sq_sub_eq,
+  ChabautyColeman.mumfordClass_eq_of_forall_sq_sub_eq}
+\leanok
+\uses{def:hv-class}
+Let $u, v, u', v' \in K[x]$ and $\lambda \in K$ with $v^2 - f = \lambda u u'$ and
+$v' \equiv -v \bmod u'$. Then $[u, v] = [u', v']$. In particular, if $n \ge 0$,
+$u_0, v_0, \dots, u_n, v_n \in K[x]$ and $\lambda_0, \dots, \lambda_{n-1} \in K$ satisfy
+$v_i^2 - f = \lambda_i u_i u_{i+1}$ and $v_{i+1} \equiv -v_i \bmod u_{i+1}$ for $0 \le i < n$,
+then $[u_0, v_0] = [u_n, v_n]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:mumford-divisor-y, lem:hv-class-basic}
+Since $v^2 - f \ne 0$ (proof of Lemma~\ref{lem:hv-class-basic}\,(2)), $\lambda \ne 0$.
+Lemma~\ref{lem:mumford-divisor-y}, applied with $w = \lambda u'$, gives
+$[u, v] = [\lambda u', -v]$; by Lemma~\ref{lem:hv-class-basic}\,(1), this is $[u', -v]$, which is
+$[u', v']$. The last claim follows by induction on~$n$.
+
+\emph{Formalization.} The step of Lemma~\ref{lem:mumford-divisor-y} used is
+\texttt{mk0\_mumfordIdeal\_eq\_mk0\_cofactor\_neg}, with \texttt{mumfordIdeal\_C\_mul};
+$\lambda \ne 0$ is not a hypothesis. Unlike the normalized reduction step of
+Lemma~\ref{lem:cantor-correct}, which makes the cofactor monic and takes the remainder of~$-v$
+modulo it, the lemma allows the cofactor divided by any constant and replaces the remainder by a
+congruence. In the second statement the chain consists of sequences $\mathbb N \to K[x]$ and
+$\mathbb N \to K$, of which only the values at $0, \dots, n$ (at $0, \dots, n - 1$ for~$\lambda$)
+matter, with one hypothesis for all $i < n$ for each condition.
+\end{proof}
+
+In Cantor's algorithm, $u'$ is the cofactor $(v^2 - f)/u$ divided by its leading
+coefficient~$\lambda$, and~$v'$ is the remainder of~$-v$ modulo~$u'$; if $\deg v < \deg u$ and
+$\deg u > g$, then $\deg u' < \deg u$, so that the algorithm terminates
+(Lemma~\ref{lem:mumford-reduce}). The lemma needs neither the degree bound nor the normalization.
+
+\section{The descent map}
+\label{sec:ds-map}
+
+\begin{setting}
+\label{set:ds-setting}
+Let $L = K[x]/(f)$, let $\theta \in L$ be the image of~$x$, and let
+$L^\square = L^\times/(L^\times)^2$ and $K^\square = K^\times/(K^\times)^2$. Let
+$N \colon L^\square \to K^\square$ be the homomorphism induced by the norm~$N_{L/K}$. For a nonzero
+$a \in K[x]$, let $d = \gcd(a, f)$ be the monic gcd, and $a = d a_1$, $f = d f_1$, as in
+Section~5 of [Sto17].
+\end{setting}
+
+Since~$f$ is squarefree, the Chinese remainder theorem gives an isomorphism
+$L \cong \prod_p L_p$, $L_p = K[x]/(p)$, over the monic irreducible factors~$p$ of~$f$, which
+maps~$\theta$ to the family of the images~$\theta_p$ of~$x$. An element of~$L$ is a unit if and
+only if all its components are nonzero, and a unit is a square if and only if all its components
+are squares. For $h \in K[x]$, the component of~$h(\theta)$ at~$p$ is~$h(\theta_p)$, which
+vanishes if and only if $p \mid h$.
+
+\begin{definition}[The value of a Mumford polynomial]
+\label{def:ds-value}
+\lean{ChabautyColeman.mumfordValue}
+\leanok
+For a nonzero $a \in K[x]$ let
+\[ m(a) = (-c)^{\deg a}\operatorname{lc}(a)^{-1}\bigl(a(\theta) - a_1(\theta) f_1(\theta)\bigr)
+   \in L\,. \]
+If~$a$ is prime to~$f$, then $d = 1$, $f_1 = f$, and
+$m(a) = (-c)^{\deg a}\operatorname{lc}(a)^{-1} a(\theta)$.
+\end{definition}
+
+For monic~$a$, the class of~$m(a)$ is the class $\tilde\mu(a)$ of Section~5 of [Sto17]. The factor
+$\operatorname{lc}(a)^{-1}$ makes $m(\lambda a) = m(a)$ for $\lambda \in K^\times$ (multiplying~$a$
+by~$\lambda$ multiplies~$a_1$ by~$\lambda$ and leaves~$d$ and~$f_1$ unchanged), in accordance with
+$[\lambda a, b] = [a, b]$ (Lemma~\ref{lem:hv-class-basic}\,(1)). The value depends only on~$a$; a
+second polynomial~$b$ enters only through the hypothesis $a \mid b^2 - f$ of the next lemma, which
+makes~$m(a)$ a unit.
+
+\begin{lemma}[Units and multiplicativity]
+\label{lem:ds-value}
+\lean{ChabautyColeman.isUnit_mumfordValue, ChabautyColeman.mumfordValue_mul,
+  Squarefree.dvd_of_dvd_of_dvd_sq_sub, Squarefree.isRelPrime_of_dvd_of_mul_dvd_sq_sub}
+\leanok
+\uses{def:ds-value}
+\begin{enumerate}
+  \item Let $a, b \in K[x]$ with $a \mid b^2 - f$. Then~$d$ is squarefree, $d$ and~$a_1$ are
+    coprime, $d \mid b$, and~$m(a)$ is a unit of~$L$: at a monic irreducible factor~$p$ of~$f$,
+    its component is $-(-c)^{\deg a}\operatorname{lc}(a)^{-1}a_1(\theta_p)f_1(\theta_p)$ if
+    $p \mid d$, and $(-c)^{\deg a}\operatorname{lc}(a)^{-1}a(\theta_p)$ if $p \mid f_1$; both are
+    nonzero.
+  \item If $a, a' \in K[x]$ are nonzero and prime to~$f$, then $m(aa') = m(a)m(a')$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) $a \ne 0$, as $b^2 - f \ne 0$ ($f$ has odd degree), and~$d$ divides the squarefree~$f$. Every
+prime factor of~$d$ divides~$f$ and $b^2 - f$, hence~$b$; so the squarefree~$d$ divides~$b$. If a
+prime~$p$ divided both~$d$ and~$a_1$, then $p^2 \mid a \mid b^2 - f$ and $p \mid b$, so
+$p^2 \mid f$, which is impossible. Let $p \mid f$ be monic irreducible. If $p \mid d$, then
+$p \mid a$, $p \nmid a_1$ and $p \nmid f_1$, as~$f$ is squarefree. If $p \mid f_1$, then
+$p \nmid d$, so $p \nmid a$, as a common factor of~$a$ and~$f$ divides~$d$; and
+$f_1(\theta_p) = 0$. (2) $aa'$ is prime to~$f$, and degrees and leading coefficients are
+multiplicative.
+
+\emph{Formalization.} \texttt{mumfordValue f a} is the image in \texttt{AdjoinRoot f} of
+$(-c)^{\deg a}\operatorname{lc}(a)^{-1}(a - a_1 f_1)$, with the normalized (monic) gcd
+of~$K[x]$, taken classically; its value at $a = 0$ is~$0$, as $\operatorname{lc}(0)^{-1} = 0$ in
+Lean. Proofs rewrite with \texttt{mumfordValue\_eq\_of\_mul\_eq}, which computes~$m(a)$ from any
+factorizations $a = d a_1$, $f = d f_1$ with monic~$d$ and $a_1$ prime to~$f_1$. The proof of~(1)
+needs no decomposition of~$L$: it writes $a - a_1 f_1 = a_1(d - f_1)$, where~$a_1$ is prime to
+$f = d f_1$ and $d - f_1$ is prime to $d f_1$
+(\texttt{Squarefree.isCoprime\_sub\_mul\_of\_dvd\_sq\_sub}), and an element prime to~$f$ has a unit
+image in \texttt{AdjoinRoot f} (\texttt{AdjoinRoot.isUnit\_mk\_iff}). The claims that~$d$
+divides~$b$ and is prime to~$a_1$ hold in every commutative ring that is a decomposition monoid.
+\end{proof}
+
+\begin{lemma}[Well-definedness]
+\label{lem:ds-coprime}
+\lean{ChabautyColeman.isSquare_mumfordValue_mul_of_mumfordClass_eq}
+\leanok
+\uses{def:ds-value, def:hv-class}
+Let $a, b, a', b' \in K[x]$ with $a \mid b^2 - f$ and $a' \mid b'^2 - f$, with~$a$ and~$a'$ prime
+to~$f$, and with $[a, b] = [a', b']$. Then $m(a)m(a')$ is a square in~$L^\times$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:mumford-norm, lem:iota-norm, lem:normform, lem:hv-class-basic, lem:ds-value}
+By Lemma~\ref{lem:hv-class-basic}\,(2), $[a', -b'] = -[a', b'] = -[a, b]$, so the ideal
+$\mathfrak a_{a,b}\,\mathfrak a_{a',-b'}$ is principal, generated by $h = p + qy$ with
+$p, q \in K[x]$. By Lemma~\ref{lem:mumford-norm},
+$\mathfrak a_{a,b}\,\iota(\mathfrak a_{a,b}) = (a)$ and
+$\mathfrak a_{a',-b'}\,\iota(\mathfrak a_{a',-b'}) = (a')$, so the principal ideal of~$\A{K}$
+generated by the norm $h\,\iota(h) = p^2 - fq^2 \in K[x]$ (Lemma~\ref{lem:normform}) is generated
+by~$aa'$. As~$\A{K}$ is a free $K[x]$-module with basis $1, y$, an ideal of~$K[x]$ is the
+contraction of the ideal of~$\A{K}$ that it generates; hence $p^2 - fq^2 = \lambda aa'$ with
+$\lambda \in K^\times$. Evaluating at~$\theta$, where~$f$ vanishes, gives
+$p(\theta)^2 = \lambda a(\theta)a'(\theta)$, so
+\[ m(a)m(a') = (-c)^D\bigl(\lambda\operatorname{lc}(a)\operatorname{lc}(a')\bigr)^{-1}
+   p(\theta)^2\,, \qquad D = \deg a + \deg a'\,. \]
+The degree of~$p^2$ is even, and that of~$fq^2$ is odd if $q \ne 0$, so the leading term of
+$p^2 - fq^2$ is that of~$p^2$ if~$D$ is even and that of~$-fq^2$ if~$D$ is odd. In the first case
+$\lambda\operatorname{lc}(a)\operatorname{lc}(a') = \operatorname{lc}(p)^2$, and $(-c)^D$ is a
+square; in the second $\lambda\operatorname{lc}(a)\operatorname{lc}(a') =
+-c\operatorname{lc}(q)^2$, and
+$(-c)^D/(-c\operatorname{lc}(q)^2) = (-c)^{D-1}\operatorname{lc}(q)^{-2}$ is a square. In both
+cases $m(a)m(a')$ is a square constant times~$p(\theta)^2$, and~$p(\theta)$ is a unit, as
+$a(\theta)$ and~$a'(\theta)$ are (Lemma~\ref{lem:ds-value}\,(1)).
+
+\emph{Formalization.} The norm identity of Lemma~\ref{lem:mumford-norm} carries the
+well-definedness; no valuation theory of~$\A{K}$ is needed. The contraction is Mathlib's
+\texttt{Ideal.map\_injective\_of\_faithfullyFlat}, as~$\A{K}$ is free over~$K[x]$
+(\texttt{associated\_norm\_of\_mumfordIdeal\_mul\_mumfordIdeal\_eq\_span}). Associated polynomials
+have the same value (\texttt{mumfordValue\_eq\_of\_associated}), and the case distinction on the
+leading term is
+\texttt{Polynomial.isSquare\_neg\_leadingCoeff\_pow\_mul\_leadingCoeff\_sq\_sub\_mul\_sq}; the step
+that~$p(\theta)$ is a unit is not needed. The conclusion is that $m(a)m(a')$ is a square in
+\texttt{AdjoinRoot f}; in~$L^\square$, \texttt{Units.ModPow.mk\_eq\_one\_iff\_isSquare} translates
+it.
+\end{proof}
+
+\begin{lemma}[Moving, {[Sto17, Section~5]}]
+\label{lem:ds-move}
+\lean{ChabautyColeman.mumfordClass_eq_of_mul_eq_sub_sq,
+  ChabautyColeman.exists_isCoprime_mumfordClass_eq}
+\leanok
+\uses{def:hv-class}
+Let $a, b \in K[x]$ with $a \mid b^2 - f$.
+\begin{enumerate}
+  \item Let $h, a'' \in K[x]$ with $aa'' = f - (b + ha)^2$. Then $a'' \mid (b + ha)^2 - f$ and
+    $[a, b] = [a'', -(b + ha)]$.
+  \item For every nonzero $g \in K[x]$ there is $h \in K[x]$ such that the polynomial~$a''$
+    of~(1) is prime to~$fg$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:hv-class-basic, lem:hv-reduce}
+(1) The divisibility is clear. By Lemma~\ref{lem:hv-class-basic}\,(1), $[a, b] = [a, b + ha]$;
+and since $(b + ha)^2 - f = (-1) \cdot a \cdot a''$, Lemma~\ref{lem:hv-reduce} with
+$\lambda = -1$ and $v' = -(b + ha)$ gives $[a, b + ha] = [a'', -(b + ha)]$.
+
+(2) Write $f - b^2 = a a_0''$; then $a'' = a_0'' - 2hb - h^2 a$. For a monic irreducible
+factor~$p$ of~$fg$, let~$\theta_p$ be the image of~$x$ in the field $k_p = K[x]/(p)$ and
+\[ Q_p(t) = a_0''(\theta_p) - 2b(\theta_p)t - a(\theta_p)t^2 \in k_p[t]\,, \]
+so that $a''(\theta_p) = Q_p(h(\theta_p))$. The polynomial~$Q_p$ is not zero: otherwise~$p$
+divides~$a$, $b$ and~$a_0''$, hence $p^2 \mid aa_0'' + b^2 = f$, which is impossible. So~$Q_p$ has
+at most two roots in~$k_p$, while~$k_p$ has at least three elements, as $2 \ne 0$ in~$K$. Choose
+$t_p \in k_p$ with $Q_p(t_p) \ne 0$ for each of the finitely many~$p$, and~$h$ with
+$h(\theta_p) = t_p$ for all~$p$, by the Chinese remainder theorem. Then no~$p$ divides~$a''$,
+so~$a''$ is prime to~$fg$.
+
+\emph{Formalization.} In~(1), \texttt{k} stands for~$h$. The proof of~(2) avoids the residue
+fields: \texttt{Squarefree.exists\_mul\_eq\_sub\_sq\_and\_isCoprime} holds in every principal
+ideal domain in which~$2$ is a unit, with any nonzero~$N$ in place of~$fg$. No prime~$p$ divides
+the values of $a_0'' - 2bt - at^2$ at all three of $t = 0, 1, -1$, as it would then divide~$a$,
+$b$ and~$a_0''$; an induction over the prime factors of~$N$, with the Chinese remainder theorem for
+two coprime elements at each step (\texttt{IsCoprime.exists\_dvd\_sub\_and\_dvd\_sub}), gives~$h$.
+\end{proof}
+
+In the notation of [Sto17], after Proposition~5.1, $f - b^2 = ac'$ and
+$[c' - 2hb - h^2 a, -b - ha] = [a, b]$; so $a'' = c' - 2hb - h^2 a$, and [Sto17] takes~$h$
+constant to make~$a''$ prime to~$f$. If~$K$ is infinite, all but finitely many constants
+$h = t \in K$ make~$a''$ prime to~$fg$, as in the proof of Lemma~\ref{lem:ds-move}\,(2):
+$a''(\theta_p) = Q_p(t)$, and each~$Q_p$ has at most two roots in $K \subseteq k_p$. This remark
+is not formalized.
+
+\begin{definition}[The $x - T$ map]
+\label{def:ds-mu}
+\lean{ChabautyColeman.HypJac.descentMap,
+  ChabautyColeman.HypJac.descentMap_mumfordClass_of_isCoprime}
+\leanok
+\uses{def:ds-value, def:hv-class}
+There is a unique homomorphism $\mu \colon J(K) \to L^\square$ with
+$\mu([a, b]) = m(a)(L^\times)^2$ for all $a, b \in K[x]$ with $a \mid b^2 - f$ and~$a$ prime
+to~$f$.
+\end{definition}
+
+\begin{proof}
+\leanok
+\uses{lem:ds-move, lem:ds-coprime, lem:ds-value, lem:mumford-reduce, lem:hv-factor}
+Every point of~$J(K)$ is $[a, b]$ with $a \mid b^2 - f$ (Lemma~\ref{lem:mumford-reduce}), and by
+Lemma~\ref{lem:ds-move}\,(2) with $g = 1$ also with~$a$ prime to~$f$. So the formula determines a
+map, which does not depend on the representative by Lemma~\ref{lem:ds-coprime}, as~$L^\square$
+has exponent~$2$. Let $P = [a, b]$ and $Q = [a', b']$ with~$a$ and~$a'$ prime to~$f$; by
+Lemma~\ref{lem:ds-move}\,(2) with $g = a$, the polynomial~$a'$ can be chosen prime to~$a$ as well.
+By the Chinese remainder theorem there is~$B$ with $B \equiv b \bmod a$ and
+$B \equiv b' \bmod a'$; then $aa' \mid B^2 - f$, as~$a$ and~$a'$ are coprime and each divides
+$B^2 - f$, and $[aa', B] = P + Q$ by Lemma~\ref{lem:hv-factor}\,(2). As~$aa'$ is prime to~$f$,
+$\mu(P + Q)$ is the class of $m(aa') = m(a)m(a')$ (Lemma~\ref{lem:ds-value}\,(2)).
+
+\emph{Formalization.} \texttt{HypJac.descentMap f} chooses, for each point, a representative prime
+to~$f$ (\texttt{HypJac.exists\_isCoprime\_mumfordClass\_eq}, from
+\texttt{exists\_mk0\_mumfordIdeal\_reduced} and the moving lemma), and
+\texttt{HypJac.descentMap\_mumfordClass\_of\_isCoprime} characterizes it: the value is the class of
+any unit~$u$ with $u = m(a)$. Later proofs use only this lemma and
+Theorem~\ref{thm:ds-formula}, never the choice. Two units have the same class if and only if their
+product is a square (\texttt{Units.ModPow.mk\_eq\_mk\_iff\_isSquare\_mul}), which turns
+Lemma~\ref{lem:ds-coprime} into the independence of the choice.
+\end{proof}
+
+\begin{theorem}[The formula for~$\mu$, {[Sto17, Section~5]}]
+\label{thm:ds-formula}
+\lean{ChabautyColeman.HypJac.descentMap_mumfordClass,
+  ChabautyColeman.HypJac.descentMap_mumfordClass_X_sub_C}
+\leanok
+\uses{def:ds-mu, def:ds-value}
+For all $a, b \in K[x]$ with $a \mid b^2 - f$, $\mu([a, b])$ is the class of~$m(a)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:ds-move, lem:ds-value}
+By Lemma~\ref{lem:ds-move}, there are~$h$ and~$a''$ with $aa'' = f - v^2$, $v = b + ha$, such
+that~$a''$ is prime to~$f$ and $[a, b] = [a'', -v]$; so~$\mu([a, b])$ is the class of~$m(a'')$.
+By Lemma~\ref{lem:ds-value}\,(1), $d \mid b$, so $v = dv_1$ with $v_1 = b/d + ha_1$, and
+$a_1a'' = f_1 - dv_1^2$ after cancelling~$d$. Hence the polynomial identity
+\[ (a - a_1f_1)\,a'' = f\,(1 + v_1)^2 - (v + f_1)^2\,: \]
+indeed $(a - a_1f_1)a'' = aa'' - f_1 \cdot a_1a'' = f - v^2 - f_1^2 + fv_1^2$ and
+$(v + f_1)^2 = v^2 + 2fv_1 + f_1^2$. Evaluating at~$\theta$ gives
+$\bigl(a(\theta) - a_1(\theta)f_1(\theta)\bigr)a''(\theta) = -s^2$ with $s = (v + f_1)(\theta)$,
+so
+\[ m(a)m(a'') = -(-c)^D\bigl(\operatorname{lc}(a)\operatorname{lc}(a'')\bigr)^{-1}s^2\,, \qquad
+   D = \deg a + \deg a''\,. \]
+If $2\deg v > 2g + 1$, then~$D$ is even and
+$\operatorname{lc}(a)\operatorname{lc}(a'') = -\operatorname{lc}(v)^2$, so
+$m(a)m(a'') = c^D\operatorname{lc}(v)^{-2}s^2$; otherwise $D = 2g + 1$ and
+$\operatorname{lc}(a)\operatorname{lc}(a'') = c$, so $m(a)m(a'') = c^{2g}s^2$. In both cases
+$m(a)m(a'')$ is a square in~$L^\times$ (both factors are units by
+Lemma~\ref{lem:ds-value}\,(1), so~$s$ is one), and the classes of~$m(a)$ and~$m(a'')$ agree.
+
+\emph{Formalization.} The comparison of~$m(a)$ and $m(a'')$ is
+\texttt{isSquare\_mumfordValue\_mul\_of\_mul\_eq\_sub\_sq}; the identity is checked by
+\texttt{linear\_combination} after substituting $a = da_1$, $f = df_1$ and $v = dv_1$. Only one
+move is needed, the moving lemma with~$f$ as the polynomial to avoid.
+\texttt{HypJac.descentMap\_mumfordClass\_X\_sub\_C} is the case $a = x - x_0$ for a point
+$(x_0, y_0)$ with $f(x_0) \ne 0$, where $m(a) = c(x_0 - \theta)$.
+\end{proof}
+
+Section~5 of [Sto17] states this formula and refers to Schaefer for it; the identity above proves
+it. For~$a$ prime to~$f$, Theorem~\ref{thm:ds-formula} is the definition.
+
+\begin{corollary}[Values at the points of order~$2$]
+\label{cor:ds-torsion-values}
+\lean{ChabautyColeman.HypJac.descentMap_mumfordClass_zero_of_mul_eq,
+  ChabautyColeman.HypJac.map_liftAlgHom_descentMap_mumfordClass_X_sub_C_zero_of_ne,
+  ChabautyColeman.HypJac.map_liftAlgHom_descentMap_mumfordClass_X_sub_C_zero_self}
+\leanok
+\uses{def:ds-mu}
+Let $h \in K[x]$ be a nonzero divisor of~$f$. Then $\mu([h, 0])$ is the class of
+\[ (-c)^{\deg h}\operatorname{lc}(h)^{-1}\bigl(h(\theta) - (f/h)(\theta)\bigr)\,, \]
+whose component at a monic irreducible factor~$p$ of~$f$ is
+$-(-c)^{\deg h}\operatorname{lc}(h)^{-1}(f/h)(\theta_p)$ if $p \mid h$ and
+$(-c)^{\deg h}\operatorname{lc}(h)^{-1}h(\theta_p)$ if $p \nmid h$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-formula}
+$h \mid 0^2 - f$. Here $d = \operatorname{lc}(h)^{-1}h$, $a_1 = \operatorname{lc}(h)$ and
+$f_1 = \operatorname{lc}(h)f/h$, so $a_1f_1 = \operatorname{lc}(h)^2f/h$. Hence~$m(h)$ differs from
+the displayed element by the square factor~$\operatorname{lc}(h)^2$ in the components at the
+factors of~$h$ and agrees with it in the others; apply Theorem~\ref{thm:ds-formula}.
+
+\emph{Formalization.} The Lean statement takes the cofactor~$e$ with $he = f$ in place of~$f/h$,
+so that no division appears. For a root~$x_0$ of~$f$ in~$K$ and $h = x - x_0$, the components of
+the value at the roots~$x_1$ of~$f$ are $\operatorname{lc}(f)(x_0 - x_1)$ for $x_1 \ne x_0$ and
+$\operatorname{lc}(f)f'(x_0)$ for $x_1 = x_0$ (the two declarations with
+\texttt{map\_liftAlgHom}, for the evaluation $L \to K$ at~$x_1$).
+\end{proof}
+
+For monic~$h$ the two elements are equal. The values $\mu([h, 0])$ describe~$\mu$ on~$J(K)[2]$
+(Theorem~\ref{thm:ds-two-torsion}).
+
+\begin{remark}[The elliptic case]
+\label{rem:ds-ec}
+For $g = 1$ and monic~$f$, $\mu$ is the classical $x - T$ map of the elliptic curve
+$y^2 = f(x)$. A point $P = (x_0, y_0)$ corresponds to $[x - x_0, y_0]$ (the Abel--Jacobi map of
+Definition~\ref{def:hypjac}), and $m(x - x_0) = x_0 - \theta$ if $f(x_0) \ne 0$, while for
+$f(x_0) = 0$, where $d = x - x_0$, $a_1 = 1$ and $f_1 = f/(x - x_0)$,
+$m(x - x_0) = x_0 - \theta + f_1(\theta)$, whose component at $x - x_0$ is $f'(x_0)$.
+\end{remark}
+
+\section{Halving certificates}
+\label{sec:hv-certificates}
+
+For a point $P \in 2J(K)$, Proposition~5.1 of [Sto17] computes a point~$Q$ with $2Q = P$ from the
+solution of a system of linear congruences. This section and the next turn that computation into
+a certificate: Theorems~\ref{thm:hv-generic}, \ref{thm:hv-general} and~\ref{thm:hv-add} and
+Corollary~\ref{cor:hv-record} say that a short list of polynomial identities and divisibilities
+between the polynomials that the computation produces implies $2Q = P$. These conditions can be
+checked by polynomial arithmetic, so neither the linear system, nor the square root~$s$ of the
+proposition, nor the minimality of its solution, nor Cantor's algorithm has to be trusted. The
+one new idea is Lemma~\ref{lem:hv-principal}: the function~$uy - v$ in the proof of
+Proposition~5.1 of [Sto17] generates a Mumford ideal. This turns the computation of the divisor
+of~$uy - v$ there into an identity of ideals, so that the halving itself needs no reduction step;
+Cantor's composition and reduction enter only through the sum that forms the half when the first
+polynomial of~$P$ is not squarefree (Section~\ref{sec:hv-cantor}). The proof of
+$\ker\mu = 2J(K)$ in Section~\ref{sec:ds-kernel} ends in a certificate of this section.
+
+\begin{lemma}[The function $uy - v$]
+\label{lem:hv-principal}
+\lean{ChabautyColeman.dvd_mul_sq_sub_of_dvd_sq_sub_sq_mul,
+  ChabautyColeman.span_singleton_mul_y_sub_eq_mumfordIdeal,
+  ChabautyColeman.mumfordClass_eq_one_of_sq_sub_eq}
+\leanok
+\uses{def:mumford-ideal, def:hv-class}
+Let $u, v, e \in K[x]$, and let $N = v^2 - u^2 f$ be the norm of~$uy - v$.
+\begin{enumerate}
+  \item If $eu \equiv 1 \bmod N$, then the principal ideal $(uy - v)$ of~$\A{K}$ is the Mumford
+    ideal~$\mathfrak a_{N, ev}$.
+  \item Let $A \in K[x]$ and $\lambda \in K$ with $N = \lambda A$ and $eu \equiv 1 \bmod A$. Then
+    $A \mid (ev)^2 - f$. If moreover $\lambda \ne 0$, then $[A, ev] = 0$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:hv-class-basic, lem:mumford-exists}
+(1) Write $eu = 1 + tN$ with $t \in K[x]$. Then $uy - v = u (y - ev) + tvN$ lies
+in~$\mathfrak a_{N, ev}$. Conversely, $(uy - v)(uy + v) = u^2 f - v^2 = -N$, so~$N$ lies
+in~$(uy - v)$, and so does $y - ev = (uy - v)\bigl(e + ty(uy + v)\bigr)$. Hence
+$(uy - v) = \mathfrak a_{N, ev}$.
+(2) Write $eu = 1 + tA$ with $t \in K[x]$. Then
+\[ (ev)^2 - f = e^2 (v^2 - u^2 f) + (e^2 u^2 - 1) f
+               = A\bigl(\lambda e^2 + t (eu + 1) f\bigr)\,. \]
+If $\lambda \ne 0$, then $eu \equiv 1 \bmod N$, so $[N, ev] = 0$ by~(1), and
+$[A, ev] = [\lambda A, ev] = [N, ev]$ by Lemma~\ref{lem:hv-class-basic}\,(1).
+
+\emph{Formalization.} The ideal statement~(1) is stated for the norm~$N$ itself,
+without~$\lambda$, and holds over every field, with no hypothesis on~$f$; its proof checks
+membership in the Mumford ideal with \texttt{mem\_mumfordIdeal\_iff}. The statements of~(2), which
+the certificates use, keep~$\lambda$, called \texttt{lam} as~$\lambda$ is a keyword of Lean; the
+class-level one also assumes $\lambda \ne 0$ and passes from~$\lambda A$ to~$A$ by
+\texttt{mumfordClass\_C\_mul}. For $u = e = 1$, (1) says that~$(y - v)$ is the Mumford ideal
+of~$v^2 - f$; with Lemma~\ref{lem:hv-factor} this gives the ideal identity of
+Lemma~\ref{lem:mumford-divisor-y}.
+\end{proof}
+
+The second polynomial of the Mumford ideal is $ev \equiv v/u \bmod N$, as it must be: at a
+root~$\xi$ of~$N$, the function~$uy - v$ vanishes at the point $(\xi, v(\xi)/u(\xi))$.
+
+\begin{definition}[Halving certificates]
+\label{def:hv-cert}
+\lean{ChabautyColeman.HalvingCertificate}
+\leanok
+Let $a, b, w, r \in K[x]$. A \emph{halving certificate} for $(a, b)$ with half $(w, r)$ consists
+of polynomials $u, v, e, e' \in K[x]$ and a constant $\lambda \in K^\times$ such that
+\begin{description}
+  \item[\textmd{(H1)}] $u^2 f = v^2 - \lambda a w^2$,
+  \item[\textmd{(H2)}] $v \equiv ub \bmod a$,
+  \item[\textmd{(H3)}] $ur \equiv -v \bmod w$, and
+  \item[\textmd{(H4)}] $eu + e' a w^2 = 1$.
+\end{description}
+\end{definition}
+
+In Proposition~5.1 of [Sto17], let $d = \gcd(a, f)$, so that $a = d a_1$ and $f = d f_1$, let
+$(u, v, w)$ be the solution of the congruences~(6) there with the degree bounds~(7) and~$w$ monic
+of minimal degree, and let $d_1 = \gcd(u, w)$. In the generic case $d_1 = 1$, the
+polynomials~$u$, $dv$, $w$, the polynomial~$r$ of the proposition and $\lambda = (-c)^{\deg a}$
+satisfy (H1) to~(H3), with~$dv$ in the role of~$v$: (H1) is relation~(8) multiplied by~$d$, (H2)
+is the second congruence in~(6) modulo~$a_1$ and holds modulo~$d$ since $d \mid b$, and~(H3)
+defines~$r$. Also, $u$ is coprime to~$a$: a common prime divisor~$\pi$ of~$u$ and~$a$
+divides~$dv$ by~(H2), hence~$\pi^2$ divides $\lambda a w^2$ by~(H1), so $\pi \mid w$, since~$a$ is
+squarefree; this contradicts $d_1 = 1$. So cofactors as in~(H4) exist.
+
+\begin{remark}[Formalization]
+\texttt{HalvingCertificate f a b w r} is a structure with the data fields \texttt{u}, \texttt{v},
+\texttt{e}, \texttt{e'} and~\texttt{lam} and one field for each condition, including
+$\lambda \ne 0$; it needs only a field~$K$. It is a structure because its data come from a
+computation and each condition is checked separately. The field for~(H1) is the norm identity
+$v^2 - u^2 f = \lambda (a w^2)$, in the form that Lemma~\ref{lem:hv-principal} consumes; (H2)
+and~(H3) are the divisibilities $a \mid v - ub$ and $w \mid ur + v$, which a concrete check proves
+by supplying the quotients; (H4) is the coprimality of~$u$ and~$aw^2$ with its witnesses as data
+fields. There are no monicity, degree or squarefreeness conditions: Theorem~\ref{thm:hv-generic}
+needs none of them. They matter for the existence of a certificate (Proposition~5.1 of [Sto17])
+and for reading $[w, r]$ as the point with the Mumford representation $(w, r)$
+(Lemma~\ref{lem:mumford-exists}).
+\end{remark}
+
+\begin{lemma}[The pairs of a certificate]
+\label{lem:hv-cert-mumford}
+\lean{ChabautyColeman.HalvingCertificate.dvd_mul_sub_one,
+  ChabautyColeman.HalvingCertificate.dvd_mul_sq_sub,
+  ChabautyColeman.HalvingCertificate.dvd_mul_sub,
+  ChabautyColeman.HalvingCertificate.dvd_mul_add_half,
+  ChabautyColeman.HalvingCertificate.dvd_sq_sub,
+  ChabautyColeman.HalvingCertificate.dvd_sq_sub_half}
+\leanok
+\uses{def:hv-cert}
+Let $(u, v, e, e', \lambda)$ be a halving certificate for $(a, b)$ with half $(w, r)$. Then
+$eu \equiv 1 \bmod a w^2$ and
+\[ a w^2 \mid (ev)^2 - f\,, \qquad ev \equiv b \bmod a\,, \qquad ev \equiv -r \bmod w\,; \]
+in particular $a \mid b^2 - f$ and $w \mid r^2 - f$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:hv-principal}
+The first claim is~(H4). By~(H1), $v^2 - u^2 f = \lambda (a w^2)$, so
+$a w^2 \mid (ev)^2 - f$ by Lemma~\ref{lem:hv-principal}\,(2). Since~$a$ and~$w$ divide~$eu - 1$,
+the identities $ev - b = e(v - ub) + (eu - 1)b$ and $ev + r = e(ur + v) - (eu - 1)r$ give the two
+congruences, by~(H2) and~(H3). Finally,
+$b^2 - f = \bigl((ev)^2 - f\bigr) - (ev - b)(ev + b)$ and
+$r^2 - f = \bigl((ev)^2 - f\bigr) - (ev + r)(ev - r)$.
+
+\emph{Formalization.} In the namespace \texttt{HalvingCertificate}, the six statements are
+separate declarations, as the proof of Theorem~\ref{thm:hv-general} uses one of them as well; the
+suffix \texttt{\_half} marks the statements on the half~$(w, r)$ that have a counterpart
+for~$(a, b)$.
+\end{proof}
+
+\begin{theorem}[Halving, generic case, certificate form]
+\label{thm:hv-generic}
+\lean{ChabautyColeman.HalvingCertificate.mumfordClass_eq_sq}
+\leanok
+\uses{def:hv-cert, def:hv-class}
+If $(a, b)$ has a halving certificate with half $(w, r)$, then $[a, b] = 2[w, r]$ in~$J(K)$. This
+is the generic case of Proposition~5.1 of [Sto17].
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:hv-principal, lem:hv-cert-mumford, lem:hv-factor, lem:hv-class-basic}
+Let $(u, v, e, e', \lambda)$ be the certificate. By Lemma~\ref{lem:hv-principal}\,(2), applied as
+in the proof of Lemma~\ref{lem:hv-cert-mumford}, $[a w^2, ev] = 0$. By
+Lemma~\ref{lem:hv-cert-mumford}, $a w^2 \mid (ev)^2 - f$, $ev \equiv b \bmod a$ and
+$ev \equiv -r \bmod w$; so Lemma~\ref{lem:hv-factor}, applied to~$a$ and~$w^2$ and then to~$w$
+and~$w$, gives
+\[ 0 = [a w^2, ev] = [a, ev] + 2[w, ev] = [a, b] + 2[w, -r]\,. \]
+Since $w \mid r^2 - f$ (Lemma~\ref{lem:hv-cert-mumford}), $[w, -r] = -[w, r]$ by
+Lemma~\ref{lem:hv-class-basic}\,(2). Hence $[a, b] = 2[w, r]$.
+
+\emph{Formalization.} The conclusion reads $[a, b] = [w, r]^2$ in the multiplicative group
+\texttt{HypJac K f}. Passed as terms, the field for~(H1) and \texttt{dvd\_mul\_sub\_one} determine
+all implicit arguments of \texttt{mumfordClass\_eq\_one\_of\_sq\_sub\_eq}; with that lemma and those
+of Lemma~\ref{lem:hv-cert-mumford}, the proof is a chain of rewrites.
+\end{proof}
+
+At the level of ideals, the same argument (Lemmas~\ref{lem:hv-principal}\,(1),
+\ref{lem:hv-cert-mumford} and~\ref{lem:hv-factor}\,(1), and the ideal identities in the proof of
+Lemma~\ref{lem:hv-class-basic}\,(1)) gives
+$(uy - v) = \mathfrak a_{a,b}\,\mathfrak a_{w,-r}^2$; this is the identity
+$\divisor(uy - v) = (a, b) + 2(w, -r) - (\deg a + 2\deg w)\infty$ in the proof of
+Proposition~5.1 of [Sto17], where $(a, b)$ and~$(w, -r)$ denote divisors, as there. Neither the
+degree bounds~(7) there nor the minimality of~$w$ is used.
+
+\begin{remark}[Halves of sums]
+\label{rem:hv-sums}
+Definition~\ref{def:hv-cert} puts no condition on the degree of~$a$, and Proposition~5.1
+of [Sto17] admits $\deg a \le 2g + 1$. So Theorem~\ref{thm:hv-generic} also certifies the halves
+of a sum that is never formed. Let $P = [a_P, b_P]$ and $S = [a_S, b_S]$, put $A = a_P a_S$, and
+let~$b_A$ satisfy $A \mid b_A^2 - f$, $b_A \equiv b_P \bmod a_P$ and $b_A \equiv b_S \bmod a_S$.
+Then $[A, b_A] = P + S$ by Lemma~\ref{lem:hv-factor}\,(2), and a halving certificate for
+$(A, b_A)$ with half $(w, r)$ shows $P + S = 2[w, r]$. This is the second variant in Remark~5.2
+of [Sto17]; the first one, with $0 \ne S \in J(K)[2]$, has $\gcd(A, f) \ne 1$ and is covered by
+Theorem~\ref{thm:hv-generic} if $d_1 = 1$ and by Theorem~\ref{thm:hv-general} in general.
+\end{remark}
+
+In general, $d_1 = \gcd(u, w)$ need not be~$1$ in Proposition~5.1 of [Sto17]. There
+$d_1 = d_f d_a$ with $d_f = \gcd(d_1, f)$ and $d_a = \gcd(d_1, a_1)$, and
+\[ u_1 = u/d_1\,, \qquad v_1 = v/d_1\,, \qquad w_1 = w/d_1\,; \]
+the proposition chooses~$r$ with $r u_1 \equiv -v_1 d \bmod w_1 d_a$ and $r \equiv 0 \bmod d_f$.
+Let~$R$ be the remainder of~$r$ modulo~$w_1$, and let~$\tilde b$ satisfy
+$\tilde b \equiv b \bmod a/d_a$ and $\tilde b \equiv -b \bmod d_a$. Then~$u_1$, $d v_1$
+and~$\lambda$, with B\'ezout cofactors for~$u_1$ and~$a w_1^2$, form a halving certificate for
+$(a, \tilde b)$ with half $(w_1, R)$: (H1) is relation~(8) divided by~$d_1^2$ and multiplied
+by~$d$, and~(H2) and~(H3) follow from the congruences in the proof of the proposition.
+Lemmas~\ref{lem:hv-twist} and~\ref{lem:hv-split}, the content of the divisor computation at the
+end of that proof, transfer $[a, \tilde b] = 2[w_1, R]$ to $[a, b] = 2[w, r]$.
+
+\begin{theorem}[Halving in general, certificate form]
+\label{thm:hv-general}
+\lean{ChabautyColeman.mumfordClass_eq_sq_of_halvingCertificate}
+\leanok
+\uses{def:hv-cert, def:hv-class}
+Let $a, b, w, r \in K[x]$ with $a \mid b^2 - f$. Assume that there are polynomials~$a'$, $d_a$,
+$d_f$, $\tilde b$, $w_1$ and~$R$ in~$K[x]$ such that
+\begin{enumerate}
+  \item $a = a' d_a$, $\tilde b \equiv b \bmod a'$ and $\tilde b \equiv -b \bmod d_a$;
+  \item $w = d_f d_a w_1$, $w \mid r^2 - f$, $r \equiv 0 \bmod d_f$, $r \equiv b \bmod d_a$
+    and $r \equiv R \bmod w_1$;
+  \item $(a, \tilde b)$ has a halving certificate with half $(w_1, R)$.
+\end{enumerate}
+Then $[a, b] = 2[w, r]$. This is Proposition~5.1 of [Sto17] in certificate form.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:hv-generic, lem:hv-twist, lem:hv-factor, lem:hv-class-basic}
+Lemma~\ref{lem:hv-twist} gives $[a, b] = [a, \tilde b] + 2[d_a, b]$. By
+Theorem~\ref{thm:hv-generic}, $[a, \tilde b] = 2[w_1, R]$. By Lemma~\ref{lem:hv-factor}, applied
+to $w = (d_f d_a) w_1$ and then to~$d_f d_a$, $2[w, r] = 2[d_f, 0] + 2[d_a, b] + 2[w_1, R]$, and
+$2[d_f, 0] = 0$ by Lemma~\ref{lem:hv-class-basic}\,(2), since~$d_f$ divides~$r$ and~$r^2 - f$,
+hence~$f$. So $2[w, r] = 2[d_a, b] + 2[w_1, R] = [a, b]$.
+
+\emph{Formalization.} The certificate in~(3) is a hypothesis of type
+\texttt{HalvingCertificate f a Bt W R}, with \texttt{Bt} for~$\tilde b$ and~\texttt{W}
+for~$w_1$, and each condition in~(1) and~(2) is a hypothesis of its own; $a'$, $d_a$, $d_f$,
+$\tilde b$, $w_1$ and~$R$ are implicit, since the hypotheses determine them. The only coprimality
+used anywhere is~(H4): neither~$a'$ and~$d_a$ nor the three factors of~$w$ need to be coprime.
+\end{proof}
+
+If $d_1 = 1$, then $d_a = d_f = 1$, and the theorem with $a' = a$, $\tilde b = b$, $w_1 = w$ and
+$R = r$ is Theorem~\ref{thm:hv-generic}.
+
+\section{Cantor's algorithm and halving records}
+\label{sec:hv-cantor}
+
+When the first polynomial~$A$ of a point $[A, B]$ with $A \mid B^2 - f$ is not squarefree, write
+$A = a_0^2 a$ with~$a$ squarefree; then $[A, B] = 2[a_0, B] + [a, B]$
+(Lemma~\ref{lem:hv-factor}\,(3)), and a half of~$[A, B]$ is the sum of~$[a_0, B]$ and a
+half~$[w, r]$ of~$[a, B]$. To obtain it as a reduced pair, the sum is computed by Cantor's
+algorithm: a composition followed by reduction steps until the degree is at most~$g$. This section
+turns a run of that algorithm into a certificate, as Section~\ref{sec:hv-certificates} does for
+the halving. The composition needs no B\'ezout cofactors, since by Lemma~\ref{lem:hv-factor}\,(2)
+three divisibilities determine the class of the composed pair. Its one special case, a common
+factor of the first polynomials of the two pairs on which the pairs are opposite, cancels
+(Lemma~\ref{lem:hv-cancel}). Each reduction step is an instance of Lemma~\ref{lem:hv-reduce},
+which determines the new first polynomial only up to a constant factor and the new second
+polynomial only by a congruence, so that a certificate needs neither the normalization of
+Cantor's algorithm nor its degree conditions.
+
+\begin{definition}[Addition certificates]
+\label{def:hv-add-cert}
+\lean{ChabautyColeman.AdditionCertificate}
+\leanok
+Let $u_1, v_1, u_2, v_2, u, v \in K[x]$. An \emph{addition certificate} for $(u_1, v_1)$
+and~$(u_2, v_2)$ with sum $(u, v)$ consists of polynomials $t, p_1, p_2 \in K[x]$, an integer
+$n \ge 0$, polynomials $u'_0, v'_0, \dots, u'_n, v'_n \in K[x]$ and constants
+$\lambda_0, \dots, \lambda_{n-1} \in K$ such that
+\begin{description}
+  \item[\textmd{(A1)}] $u_1 = t p_1$, $u_2 = t p_2$ and $t \mid v_1 + v_2$;
+  \item[\textmd{(A2)}] $u'_0 = p_1 p_2$, $u'_0 \mid {v'_0}^2 - f$, $v'_0 \equiv v_1 \bmod p_1$
+    and $v'_0 \equiv v_2 \bmod p_2$;
+  \item[\textmd{(A3)}] ${v'_i}^2 - f = \lambda_i u'_i u'_{i+1}$ and
+    $v'_{i+1} \equiv -v'_i \bmod u'_{i+1}$ for $0 \le i < n$; and
+  \item[\textmd{(A4)}] $(u'_n, v'_n) = (u, v)$.
+\end{description}
+\end{definition}
+
+Cantor's algorithm produces such a certificate for any two pairs $(u_1, v_1)$ and~$(u_2, v_2)$
+with $u_1 \mid v_1^2 - f$ and $u_2 \mid v_2^2 - f$. It takes $t = \gcd(u_1, u_2, v_1 + v_2)$;
+then~$p_1$, $p_2$ and $v_1 + v_2$ generate the unit ideal of~$K[x]$. Indeed, let~$\pi$ be a common
+prime divisor of the three. Then~$\pi$ divides~$t$; let~$\pi^k$, with $k \ge 1$, be the exact
+power of~$\pi$ that divides~$t$. Then~$\pi^{k+1}$ divides $u_1 = t p_1$ and~$u_2$, hence
+$v_1^2 - f$ and $v_2^2 - f$ and so their difference $(v_1 - v_2)(v_1 + v_2)$, whereas
+$v_1 + v_2$ is divisible by~$\pi^k$, but not by~$\pi^{k+1}$, as~$t$ is not. So~$\pi$ divides
+$v_1 - v_2$ as well as $v_1 + v_2$, hence~$2v_1$ and, as $2 \ne 0$ in~$K$, also~$v_1$.
+Then~$\pi^2$ divides~$v_1^2$ and, as $k + 1 \ge 2$, also $v_1^2 - f$, hence~$f$, which is
+impossible. So Cantor's composition (Lemma~\ref{lem:cantor-correct}), applied to $(p_1, v_1)$
+and~$(p_2, v_2)$, gives~$V$ with $V \equiv v_i \bmod p_i$ for $i = 1, 2$ and
+$p_1 p_2 \mid V^2 - f$, and~(A2) holds for $u'_0 = p_1 p_2$ and the remainder~$v'_0$ of~$V$
+modulo~$u'_0$. The reduction steps follow the paragraph after Lemma~\ref{lem:hv-reduce}, until
+$\deg u'_n \le g$.
+
+\begin{theorem}[Cantor's algorithm, certificate form]
+\label{thm:hv-add}
+\lean{ChabautyColeman.AdditionCertificate.mumfordClass_mul_mumfordClass}
+\leanok
+\uses{def:hv-add-cert, def:hv-class}
+Let $u_1, v_1, u_2, v_2, u, v \in K[x]$ with $u_1 \mid v_1^2 - f$ and $u_2 \mid v_2^2 - f$. If
+$(u_1, v_1)$ and~$(u_2, v_2)$ have an addition certificate with sum $(u, v)$, then
+$[u_1, v_1] + [u_2, v_2] = [u, v]$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:hv-cancel, lem:hv-factor, lem:hv-reduce}
+By~(A1) and Lemma~\ref{lem:hv-cancel}, the sum $[u_1, v_1] + [u_2, v_2]$ is
+$[p_1, v_1] + [p_2, v_2]$. By~(A2) and Lemma~\ref{lem:hv-factor}\,(2), this is
+$[p_1 p_2, v'_0] = [u'_0, v'_0]$; by~(A3) and Lemma~\ref{lem:hv-reduce}, it is $[u'_n, v'_n]$,
+which is $[u, v]$ by~(A4).
+
+\emph{Formalization.} \texttt{AdditionCertificate}, with the six polynomials as parameters, is a
+structure with the data $t$, $p_1$, $p_2$ and~$n$, the sequences $\mathbb N \to K[x]$ and
+$\mathbb N \to K$ of the chain, as in Lemma~\ref{lem:hv-reduce}, and one field for each condition,
+those of~(A3) for all $i < n$; it needs only a field~$K$. The fields for $t \mid v_1 + v_2$,
+$v'_0 \equiv v_1 \bmod p_1$ and $v'_0 \equiv v_2 \bmod p_2$ are primed (\texttt{dvd\_add'},
+\texttt{dvd\_sub\_left'}, \texttt{dvd\_sub\_right'}), as Mathlib marks such fields
+(\texttt{Subgroup.mul\_mem'}), so that they do not hide Mathlib's lemmas of the same names in the
+namespace. The divisibilities $u_1 \mid v_1^2 - f$ and $u_2 \mid v_2^2 - f$ are hypotheses of the
+theorem, not fields: in a halving record they follow from~(R1) and~(R3). A concrete certificate
+writes the sequences as lists. The certificate puts no condition on degrees or leading coefficients,
+so it does not show that $(u, v)$ is reduced; that is a separate check, needed only to read~$[u, v]$
+as the point with the Mumford representation $(u, v)$ (Lemma~\ref{lem:mumford-exists}). Compared
+with the composition of Lemma~\ref{lem:cantor-correct}, the certificate needs no B\'ezout cofactors,
+which the proof of Lemma~\ref{lem:hv-factor} obtains from Lemma~\ref{lem:hv-bezout}, and it allows a
+common factor~$t$.
+\end{proof}
+
+A halving computation following Proposition~5.1 of [Sto17], for a point $[A, B]$ with
+$A \mid B^2 - f$, thus produces the factorization $A = a_0^2 a$, a representative~$b$ of~$B$
+modulo~$a$, the data of Theorem~\ref{thm:hv-general} for a half~$[w, r]$ of~$[a, b]$, and a run of
+Cantor's algorithm for $[a_0, B] + [w, r]$. The record of such a computation is the following.
+
+\begin{definition}[Halving records]
+\label{def:hv-record}
+\lean{ChabautyColeman.HalvingData}
+\leanok
+\uses{def:hv-cert, def:hv-add-cert}
+Let $A, B, U_H, V_H \in K[x]$. A \emph{halving record} for $(A, B)$ with half $(U_H, V_H)$
+consists of polynomials~$a_0$, $a$, $b$, $a'$, $d_a$, $d_f$, $\tilde b$, $w_1$, $R$, $w$ and~$r$
+in~$K[x]$, a halving certificate for $(a, \tilde b)$ with half $(w_1, R)$ and an addition
+certificate for $(a_0, B)$ and $(w, r)$ with sum $(U_H, V_H)$ such that
+\begin{description}
+  \item[\textmd{(R1)}] $A = a_0^2 a$, $A \mid B^2 - f$ and $b \equiv B \bmod a$;
+  \item[\textmd{(R2)}] $a = a' d_a$, $\tilde b \equiv b \bmod a'$ and
+    $\tilde b \equiv -b \bmod d_a$;
+  \item[\textmd{(R3)}] $w = d_f d_a w_1$, $w \mid r^2 - f$, $r \equiv 0 \bmod d_f$,
+    $r \equiv b \bmod d_a$ and $r \equiv R \bmod w_1$.
+\end{description}
+\end{definition}
+
+\begin{corollary}[A halving record certifies a half]
+\label{cor:hv-record}
+\lean{ChabautyColeman.HalvingData.mumfordClass_eq_sq}
+\leanok
+\uses{def:hv-record, def:hv-class}
+If $(A, B)$ has a halving record with half $(U_H, V_H)$, then $[A, B] = 2[U_H, V_H]$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:hv-general, thm:hv-add, lem:hv-factor, lem:hv-class-basic}
+By~(R1), $a$ divides~$A$ and hence~$B^2 - f$; as $b^2 - f = (B^2 - f) + (b - B)(b + B)$, also
+$a \mid b^2 - f$. By Lemma~\ref{lem:hv-factor}\,(3) and Lemma~\ref{lem:hv-class-basic}\,(1),
+$[A, B] = 2[a_0, B] + [a, B] = 2[a_0, B] + [a, b]$, and $[a, b] = 2[w, r]$ by
+Theorem~\ref{thm:hv-general}. Finally, $a_0 \mid A \mid B^2 - f$ by~(R1) and $w \mid r^2 - f$
+by~(R3), so $[a_0, B] + [w, r] = [U_H, V_H]$ by Theorem~\ref{thm:hv-add}, and
+$[A, B] = 2\bigl([a_0, B] + [w, r]\bigr) = 2[U_H, V_H]$.
+
+\emph{Formalization.} \texttt{HalvingData f A B UH VH} is a structure with the data fields of the
+definition (\texttt{Bt} for~$\tilde b$, \texttt{W} for~$w_1$ and \texttt{aq} for~$a'$), the
+fields \texttt{cert}, a \texttt{HalvingCertificate}, and \texttt{add}, an
+\texttt{AdditionCertificate}, and one field for each condition (the one for
+$b \equiv B \bmod a$ is \texttt{dvd\_sub'}, primed for the reason given after
+Theorem~\ref{thm:hv-add}). As in a halving certificate, the half is a parameter, so the
+conclusion $[A, B] = [U_H, V_H]^2$ mentions no field of the record. If moreover $(U_H, V_H)$ is
+reduced, a separate check, then $[U_H, V_H]$ is the point with the Mumford representation
+$(U_H, V_H)$ (Lemma~\ref{lem:mumford-exists}).
+\end{proof}
+
+If $d_1 = 1$, then $d_a = d_f = 1$, $a' = a$, $\tilde b = b$, $w_1 = w$ and $R = r$. If~$A$ is
+squarefree, then $a_0 = 1$ and $a = A$, and the addition certificate is trivial: $t = p_1 = 1$,
+$p_2 = w$, $n = 0$ and $(U_H, V_H) = (w, r)$.
+
+\section{The kernel of the descent map}
+\label{sec:ds-kernel}
+
+The inclusion $2J(K) \subseteq \ker\mu$ is formal, as~$L^\square$ has exponent~$2$. The converse
+is the existence half of Proposition~5.1 of [Sto17]: if the class of~$m(a)$ is trivial, the linear
+system of the proposition has a solution, and a descent ending in a halving certificate
+(Theorem~\ref{thm:hv-generic} with Lemma~\ref{lem:hv-twist}) shows $[a, b] \in 2J(K)$.
+
+\begin{theorem}[Existence of halves, {[Sto17, Proposition~5.1]}]
+\label{thm:ds-halving-exists}
+\lean{ChabautyColeman.exists_mumfordClass_eq_sq_of_isSquare_mumfordValue,
+  ChabautyColeman.exists_sq_mul_eq_mul_sq_sub_mul_sq,
+  ChabautyColeman.exists_mumfordClass_eq_sq_of_sq_sub_eq}
+\leanok
+\uses{def:ds-value, def:hv-class}
+Let $a, b, s \in K[x]$ with~$a$ monic and squarefree, $\deg a \le 2g + 1$, $a \mid b^2 - f$ and
+$s^2 \equiv (-c)^{\deg a}(a - a_1f_1) \bmod f$. Then $[a, b] \in 2J(K)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:hv-generic, lem:hv-twist, lem:ds-value}
+As in [Sto17], the polynomials~$d$, $a_1$ and~$f_1$ are squarefree and pairwise coprime, and~$b$
+is prime to~$a_1$ (Lemma~\ref{lem:ds-value}\,(1)). Let $\lambda = (-c)^{\deg a}$.
+\begin{enumerate}
+  \item \emph{A solution.} The congruences~(6) of [Sto17],
+    \[ vd \equiv ws \bmod f_1\,, \qquad vd \equiv ub \bmod a_1\,, \qquad
+       uf_1 \equiv ws \bmod d\,, \]
+    are linear in the coefficients of~$u$, $v$ and~$w$. Under the degree bounds~(7),
+    $\deg u < \deg a/2$, $\deg v \le g + \deg a/2 - \deg d$ and $\deg w \le g$, there are
+    $\deg f_1 + \deg a_1 + \deg d + 1$ coefficients and $\deg f_1 + \deg a_1 + \deg d$ linear
+    conditions, so there is a nonzero solution.
+  \item \emph{$w \ne 0$.} If $w = 0$, then $f_1 \mid v$, so $v = 0$ by the degree bounds (here
+    $\deg a \le 2g + 1$ is used); then $a_1 \mid u$ and $d \mid u$, so $a \mid u$, and $u = 0$ by
+    the degree bound. So $w \ne 0$, and~$w$ may be taken monic.
+  \item \emph{The relation~(8)} $u^2f_1 = dv^2 - \lambda a_1w^2$ holds modulo~$f_1$, $a_1$ and~$d$
+    by the three congruences and $s^2 \equiv \lambda(a - a_1f_1) \bmod f$, hence
+    modulo~$f_1a_1d$, and all its terms have degree less than $\deg(f_1a_1d)$.
+  \item \emph{The function $Uy - V$.} Let $U = u$, $V = vd$ and $W = w$. By~(8),
+    $V^2 - U^2f = d(dv^2 - u^2f_1) = \lambda aW^2$, and $V \equiv Ub \bmod a$: modulo~$a_1$ by the
+    second congruence, and modulo~$d$ as~$d$ divides~$b$ and~$V$.
+  \item \emph{Descent.} We show by induction on $\deg W$ that $[a, b] \in 2J(K)$ whenever
+    $a \mid b^2 - f$ and $U, V, W \in K[x]$ satisfy $W \ne 0$, $V^2 - U^2f = \lambda aW^2$ and
+    $V \equiv Ub \bmod a$. If~$U$ is prime to~$W$, it is prime to~$aW^2$: a prime~$p$
+    dividing~$U$ and~$a$ divides~$V$, so $p^2 \mid \lambda aW^2$, and $p \mid W$ as~$a$ is
+    squarefree. Then~$U$, $V$, $\lambda$ and B\'ezout cofactors $e, e'$ with $eU + e'aW^2 = 1$
+    form a halving certificate for $(a, b)$ with half $(W, R)$, $R = -eV$, and
+    Theorem~\ref{thm:hv-generic} gives $[a, b] = 2[W, R]$. Otherwise let~$p$ be a common prime
+    factor of~$U$ and~$W$. Then $p^2 \mid V^2$, so $p \mid V$, and $(U/p, V/p, W/p)$ satisfies the
+    relation, with $a \mid p(V/p - (U/p)b)$. If $p \nmid a$ or $p \mid V/p - (U/p)b$, then
+    $V/p \equiv (U/p)b \bmod a$, and the induction hypothesis applies. Otherwise $p \mid a$, and
+    $p \mid V/p + (U/p)b$, as~$p$ divides $(V/p)^2 - (U/p)^2f$ and $b^2 - f$. Choose~$b'$ with
+    $b' \equiv b \bmod a/p$ and $b' \equiv -b \bmod p$; then $a \mid b'^2 - f$,
+    $V/p \equiv (U/p)b' \bmod a$, and $[a, b] = [a, b'] + 2[p, b]$ by Lemma~\ref{lem:hv-twist};
+    the induction hypothesis applies to $(a, b')$.
+\end{enumerate}
+
+\emph{Formalization.} The statement takes the hypothesis that~$m(a)$ is a square in~$L$ in place
+of the congruence for~$s$ (\texttt{AdjoinRoot.isSquare\_mk\_iff}), and it does not assume~$a$
+monic: for general~$a$, the factor $\operatorname{lc}(a)^{-1}$ of~$m(a)$ enters~$\lambda$, which
+becomes $(-c)^{\deg a}\operatorname{lc}(a)^{-1}$. Steps (1) to~(3) are
+\texttt{exists\_sq\_mul\_eq\_mul\_sq\_sub\_mul\_sq}: the solution space is a product of spaces of
+polynomials of bounded degree (\texttt{Polynomial.degreeLT}), the conditions are a $K$-linear map
+to $K[x]/(f_1) \times K[x]/(a_1) \times K[x]/(d)$, whose dimension is
+$\deg f_1 + \deg a_1 + \deg d$ (Mathlib's \texttt{AdjoinRoot.powerBasis}), and a linear map to a
+space of smaller dimension has a nonzero kernel
+(\texttt{Polynomial.exists\_ne\_zero\_forall\_mem\_degreeLT\_and\_dvd\_vecMul}). Step~(2) is a
+parity argument there: for $w = 0$, (8) reads $u^2f_1 = dv^2$, and as $\deg(df_1)$ is odd,
+$u = v = 0$ (\texttt{Polynomial.eq\_zero\_of\_mul\_sq\_eq\_mul\_sq}). Step~(5) is
+\texttt{exists\_mumfordClass\_eq\_sq\_of\_sq\_sub\_eq}, by strong induction on the degree of~$W$;
+it replaces the minimal solution and the factors $d_f$, $d_a$ of [Sto17], and needs only~(8) and
+the second congruence. The conclusion is that $[a, b]$ is a square in the multiplicative group
+\texttt{HypJac K f}.
+\end{proof}
+
+\begin{theorem}[The kernel of~$\mu$]
+\label{thm:ds-kernel}
+\lean{ChabautyColeman.HypJac.ker_descentMap}
+\leanok
+\uses{def:ds-mu}
+The kernel of~$\mu$ is~$2J(K)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-halving-exists, thm:ds-formula, lem:mumford-reduce, lem:hv-factor}
+$\mu(2Q) = \mu(Q)^2 = 1$. Conversely, let $\mu(P) = 1$, and let $P = [a, b]$ with a reduced pair
+(Lemma~\ref{lem:mumford-reduce}): $a$ is monic of degree at most~$g$. Write $a = a_0^2a'$
+with~$a'$ monic and squarefree. By Lemma~\ref{lem:hv-factor}\,(3), $P = 2[a_0, b] + [a', b]$, so
+$\mu([a', b]) = 1$, and by Theorem~\ref{thm:ds-formula} there is $s \in K[x]$ with
+$s(\theta)^2 = m(a') = (-c)^{\deg a'}\bigl(a'(\theta) - a'_1(\theta)f'_1(\theta)\bigr)$, that is,
+$s^2 \equiv (-c)^{\deg a'}(a' - a'_1f'_1) \bmod f$, where $a' = d'a'_1$ and $f = d'f'_1$ with
+$d' = \gcd(a', f)$. As $\deg a' \le g \le 2g + 1$ and $a' \mid b^2 - f$,
+Theorem~\ref{thm:ds-halving-exists} gives $[a', b] \in 2J(K)$, hence $P \in 2J(K)$.
+
+\emph{Formalization.} The kernel of \texttt{HypJac.descentMap f} is the range of
+\texttt{powMonoidHom 2}. The decomposition $a = a_0^2a'$ is Mathlib's
+\texttt{exists\_sq\_mul\_squarefree}; $a'$ need not be made monic, as the Lean form of
+Theorem~\ref{thm:ds-halving-exists} does not assume it. The steps are
+\texttt{exists\_mumfordClass\_eq\_sq\_of\_descentMap\_eq\_one} and its squarefree case
+\texttt{exists\_mumfordClass\_eq\_sq\_of\_squarefree\_of\_descentMap\_eq\_one}.
+\end{proof}
+
+\begin{corollary}[The injection of $J(K)/2J(K)$]
+\label{cor:ds-c0}
+\lean{ChabautyColeman.HypJac.ker_descentMap_le_sup}
+\leanok
+\uses{def:ds-mu}
+The map~$\mu$ induces an injective homomorphism $J(K)/2J(K) \to L^\square$. In particular,
+$\ker\mu \subseteq \Gamma + 2J(K)$ for every subgroup $\Gamma \subseteq J(K)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-kernel}
+$\ker\mu = 2J(K) \subseteq \Gamma + 2J(K)$, by Theorem~\ref{thm:ds-kernel}.
+
+\emph{Formalization.} The Lean statement is the second claim: the kernel of
+\texttt{HypJac.descentMap f} lies in the supremum of~$\Gamma$ and the range of
+\texttt{powMonoidHom 2}. Restricting the codomain of~$\mu$ to a subgroup that contains its image
+does not change the kernel.
+\end{proof}
+
+In the proof of Theorem~2.1 of [Sto17], the map $A(k) \to \Sel_p A$ to the $p$-Selmer group of an
+abelian variety~$A$ plays the role of~$\mu$, and the inclusion of Corollary~\ref{cor:ds-c0} for it
+follows from the injectivity of $A(k)/pA(k) \to \Sel_p A$. For odd-degree hyperelliptic curves,
+Algorithm~4.1 and Remark~4.2 of [Sto17] use~$\mu$ in this role, with $p = 2$.
+
+\section{Norm, \texorpdfstring{$2$}{2}-torsion, base change and rank}
+\label{sec:ds-basic}
+
+\begin{lemma}[Norms and resultants]
+\label{lem:ds-resultant}
+\lean{AdjoinRoot.leadingCoeff_pow_mul_norm_mk_eq_resultant}
+\leanok
+For every $p \in K[x]$, $c^{\deg p}N_{L/K}\bigl(p(\theta)\bigr) = \operatorname{Res}(f, p)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$L = K[x]/(c^{-1}f)$, and $c^{-1}f$ is monic, so the formula for monic moduli gives
+$N_{L/K}(p(\theta)) = \operatorname{Res}(c^{-1}f, p) = c^{-\deg p}\operatorname{Res}(f, p)$, by
+the homogeneity of the resultant in its first argument.
+
+\emph{Formalization.} The formula for monic moduli is \texttt{AdjoinRoot.norm\_mk\_eq\_resultant}.
+As~$f$ and $c^{-1}f$ are associated, the two quotients are isomorphic by Mathlib's
+\texttt{AdjoinRoot.algEquivOfAssociated}, but they are different types; the lemma transports the
+norm along this isomorphism (\texttt{Algebra.norm\_eq\_of\_algEquiv}) and compares the resultants
+by \texttt{Polynomial.resultant\_C\_mul\_left}. The Lean statement holds over every commutative
+ring, for~$f$ with invertible leading coefficient.
+\end{proof}
+
+\begin{theorem}[The norm condition]
+\label{thm:ds-norm}
+\lean{ChabautyColeman.HypJac.descentMap_mem_ker_norm}
+\leanok
+\uses{def:ds-mu}
+$N(\mu(P)) = 1$ for every $P \in J(K)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-formula, lem:ds-move, lem:ds-resultant}
+Let $P = [a, b]$ with~$a$ prime to~$f$ (Lemma~\ref{lem:ds-move}). By
+Lemma~\ref{lem:ds-resultant} and the symmetry of the resultant,
+\[ N_{L/K}\bigl(m(a)\bigr) = \bigl((-c)^{\deg a}\operatorname{lc}(a)^{-1}\bigr)^{2g+1}
+   c^{-\deg a}(-1)^{(2g+1)\deg a}\operatorname{Res}(a, f)\,. \]
+Over a splitting field of~$a$, $\operatorname{Res}(a, f) =
+\operatorname{lc}(a)^{2g+1}\prod_\alpha f(\alpha) = \operatorname{lc}(a)^{2g+1}\bigl(\prod_\alpha
+b(\alpha)\bigr)^2$, the products running over the roots~$\alpha$ of~$a$ with multiplicity, since
+$f(\alpha) = b(\alpha)^2$; and $\prod_\alpha b(\alpha) = \operatorname{lc}(a)^{-\deg
+b}\operatorname{Res}(a, b) \in K$. Collecting the factors, $N_{L/K}(m(a)) = \bigl(c^{g\deg
+a}\operatorname{lc}(a)^{-\deg b}\operatorname{Res}(a, b)\bigr)^2$.
+
+\emph{Formalization.} The statement is that~$\mu(P)$ lies in the kernel of the map
+\texttt{Units.ModPow.map (Algebra.norm K) 2} induced by the norm. The proof needs no splitting
+field: for $a \mid b^2 - f$, the resultant $\operatorname{Res}(a, f)$ is computed in an even
+degree from $f \equiv b^2 \bmod a$
+(\texttt{Polynomial.isSquare\_leadingCoeff\_pow\_mul\_resultant\_of\_dvd\_sq\_sub}), and
+\texttt{isSquare\_norm\_mumfordValue} collects the constants.
+\end{proof}
+
+\begin{theorem}[$2$-torsion]
+\label{thm:ds-two-torsion}
+\lean{ChabautyColeman.HypJac.sq_eq_one_iff, ChabautyColeman.mumfordClass_zero_eq_of_mul_eq,
+  ChabautyColeman.mumfordClass_zero_inj, ChabautyColeman.HypJac.card_ker_powMonoidHom_two}
+\leanok
+\uses{def:hv-class}
+\begin{enumerate}
+  \item A point $P \in J(K)$ satisfies $2P = 0$ if and only if $P = [h, 0]$ for a divisor~$h$
+    of~$f$.
+  \item $[h, 0] = [f/h, 0]$ for every nonzero divisor~$h$ of~$f$, and the points $[h, 0]$ with
+    $h \mid f$ monic and $\deg h \le g$ are pairwise distinct.
+  \item $J(K)[2]$ has~$2^{m-1}$ elements, where~$m$ is the number of irreducible factors of~$f$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:hv-class-basic, lem:mumford-reduce, lem:mumford-exists, lem:hv-reduce}
+(1) If $h \mid f$, then $2[h, 0] = 0$ by Lemma~\ref{lem:hv-class-basic}\,(2). Conversely, let
+$P = [u, v]$ with a reduced pair (Lemma~\ref{lem:mumford-reduce}). Then $(u, -v)$ is reduced as
+well, and $[u, -v] = -P$; so $2P = 0$ gives $v = -v$ by the uniqueness of reduced representatives
+(Lemma~\ref{lem:mumford-exists}), hence $v = 0$ and $u \mid -f$. (2) As
+$0^2 - f = (-1) \cdot h \cdot (f/h)$, Lemma~\ref{lem:hv-reduce} with $\lambda = -1$ gives
+$[h, 0] = [f/h, 0]$. A pair $(h, 0)$ with~$h$ monic and $\deg h \le g$ is reduced, so these points
+are distinct by Lemma~\ref{lem:mumford-exists}. (3) The~$2^m$ monic divisors~$h$ of~$f$ fall into
+pairs $\{h, c^{-1}f/h\}$, of which exactly one member has degree at most~$g$, as the degrees add
+up to $2g + 1$; by~(1) and~(2), the points of order dividing~$2$ are the $2^{m-1}$ distinct points
+$[h, 0]$ with $\deg h \le g$.
+
+\emph{Formalization.} Mathlib has no subgroup of $n$-torsion points of a multiplicative group, so
+$J(K)[2]$ is the kernel of the squaring map \texttt{powMonoidHom 2}, and~$m$ is the cardinality of
+the finite set \texttt{f.Factors} of monic irreducible factors. In~(3), a monic divisor of~$f$ is a
+product over a subset of \texttt{f.Factors} (\texttt{Polynomial.Factors.exists\_prod\_eq}), a subset
+and its complement give the pair $\{h, c^{-1}f/h\}$, and
+\texttt{Finset.natCard\_subtype\_eq\_two\_pow\_of\_compl\_iff\_not} counts the subsets with
+$2\deg h < \deg f$. That $[h, 0]$ has order dividing~$2$ is \texttt{mumfordClass\_zero\_sq}.
+In~(2), \texttt{mumfordClass\_zero\_eq\_of\_mul\_eq} takes the cofactor~$e$ with $he = f$ and is
+one Cantor step, and \texttt{mumfordClass\_zero\_inj} is the distinctness for monic~$h$ with
+$2\deg h < \deg f$, from \texttt{mumfordClass\_inj}, the form for classes of
+\texttt{mumfordIdeal\_reduced\_unique}, which also gives~(1).
+\end{proof}
+
+\begin{theorem}[Base change]
+\label{thm:ds-naturality}
+\lean{ChabautyColeman.HypJac.map_descentMap, ChabautyColeman.HypJac.map_comp_descentMap}
+\leanok
+\uses{def:ds-mu, def:basechange}
+Let $K \to K'$ be a field extension over which~$f$ stays squarefree (for instance, $K$ perfect),
+let $L' = K'[x]/(f) = L \otimes_K K'$, and let $\mu' \colon J(K') \to L'^\square$ be the map of
+Definition~\ref{def:ds-mu} over~$K'$. Then $\mu'(P_{K'}) = \mu(P)_{L'}$ for every $P \in J(K)$,
+where $P \mapsto P_{K'}$ is the map $J(K) \to J(K')$ of Definition~\ref{def:basechange} and
+$\xi \mapsto \xi_{L'}$ the map $L^\square \to L'^\square$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-formula}
+Let $P = [a, b]$ with~$a$ prime to~$f$. Then $P_{K'} = [a, b]$ over~$K'$, $a$ is prime to~$f$
+over~$K'$ by the same B\'ezout identity, and~$m(a)$ computed in~$L'$ is the image of~$m(a)$
+computed in~$L$.
+
+\emph{Formalization.} $L'$ is \texttt{AdjoinRoot (f.map (algebraMap K K'))}, the map $L \to L'$
+is \texttt{AdjoinRoot.map}, and on square classes \texttt{Units.ModPow.map}; the map on Jacobians
+is \texttt{HypJac.map}, and \texttt{HypJac.map\_mumfordClass} computes it on Mumford classes.
+\texttt{HypJac.map\_descentMap} is the pointwise statement and \texttt{HypJac.map\_comp\_descentMap}
+the square of homomorphisms; as~$m(a)$ commutes with every homomorphism of fields
+(\texttt{map\_mumfordValue}), the proof uses Theorem~\ref{thm:ds-formula} on any representative,
+not one prime to~$f$. The hypotheses are the instances
+\texttt{Fact (Squarefree (f.map (algebraMap K K')))}, which
+\texttt{instFactSquarefreeMapAlgebraMap} provides for a perfect field~$K$, and
+\texttt{NeZero (2 : K')}, which holds for every extension of~$K$.
+\end{proof}
+
+For a number field~$K$ and a place~$v$, with $K' = K_v$, the theorem says that the local descent
+map~$\mu_v$ takes the image of~$P$ in~$J(K_v)$ to the restriction of~$\mu(P)$ to $L \otimes_K
+K_v$. The map $J(K) \to J(K')$ is injective (Theorem~\ref{thm:basechange-inj}).
+
+\begin{theorem}[Rank]
+\label{thm:ds-rank}
+\lean{ChabautyColeman.HypJac.card_range_descentMap,
+  ChabautyColeman.HypJac.pow_rank_le_card_of_range_descentMap_le}
+\leanok
+\uses{def:ds-mu}
+Assume that~$J(K)$ is finitely generated, of rank~$\operatorname{rk} J(K)$. Then
+\[ \#\mu(J(K)) = 2^{\operatorname{rk} J(K)}\,\#J(K)[2]\,. \]
+Consequently $2^{\operatorname{rk} J(K)}\,\#J(K)[2] \le \#S$ for every finite subgroup
+$S \subseteq L^\square$ containing~$\mu(J(K))$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-kernel}
+$\mu(J(K)) \cong J(K)/2J(K)$ by Theorem~\ref{thm:ds-kernel}, and a finitely generated abelian
+group $G \cong \ZZ^n \times T$ with~$T$ finite has $\#G/2G = 2^n\,\#T/2T = 2^n\,\#G[2]$.
+
+\emph{Formalization.} The hypothesis is the instance \texttt{IsMulFG (HypJac K f)}, the rank is
+\texttt{Module.finrank} over~$\ZZ$ of the additive group \texttt{Additive (HypJac K f)}, and the
+count is \texttt{CommGroup.card\_modPow}. For finitely generated~$J(K)$ this rank is
+$\dim_{\QQ}(J(K) \otimes_{\ZZ} \QQ)$, the rank of Definition~\ref{def:rank-hyp} in the hypothesis of
+the main theorems; that definition assumes no finite generation, and the comparison of the two
+forms is not formalized.
+\end{proof}
+
+\section{Over a Dedekind domain}
+\label{sec:ds-dedekind}
+
+\begin{setting}
+\label{set:ds-dedekind}
+In Setting~\ref{set:ds-setting}, let~$K$ be a perfect field (Remark~\ref{rem:ds-perfect}), the
+fraction field of a Dedekind domain~$R$, and let~$\Sigma$ be a set of nonzero primes of~$R$. For
+a finite extension field~$F$ of~$K$ with integral closure~$B$ of~$R$ and $n \ge 1$, let
+$F(\Sigma, n) \subseteq F^\times/(F^\times)^n$ be the group of classes whose valuation is
+divisible by~$n$ at every prime of~$B$ not above~$\Sigma$ (the Selmer group of~$B$ relative to the
+primes above~$\Sigma$). For each monic irreducible factor~$p$ of~$f$, let~$B_p$ be the integral
+closure of~$R$ in $L_p = K[x]/(p)$.
+\end{setting}
+
+\begin{definition}[The group $A(\Sigma, 2)$]
+\label{def:ds-selmer}
+\lean{AdjoinRoot.selmerGroup, AdjoinRoot.finite_selmerGroup}
+\leanok
+Let $A(\Sigma, 2) \subseteq L^\square$ be the group of classes whose component in~$L_p^\square$
+lies in~$L_p(\Sigma, 2)$ for every~$p$, under $L^\square \cong \prod_p L_p^\square$. If~$\Sigma$
+is finite and each~$B_p$ has a finite class group and a finitely generated unit group (for
+instance if~$K$ is a number field), then $A(\Sigma, 2)$ is finite.
+\end{definition}
+
+\begin{proof}
+\leanok
+Each $L_p(\Sigma, 2)$ is finite, by the exact sequence
+$1 \to B_{p,\Sigma}^\times/2 \to L_p(\Sigma, 2) \to \Cl(B_{p,\Sigma})[2] \to 1$ for the
+ring~$B_{p,\Sigma}$ of $\Sigma$-integers and the $S$-unit theorem.
+
+\emph{Formalization.} \texttt{AdjoinRoot.selmerGroup} is defined for every exponent~$n$ and used
+with $n = 2$. It is the pullback along \texttt{AdjoinRoot.modPowEquivPiFactors} of the product,
+over \texttt{f.Factors}, of the Selmer groups \texttt{IsDedekindDomain.selmerGroupAbove} of the
+integral closures of~$R$ in the factors \texttt{AdjoinRoot p}, relative to the primes above~$\Sigma$
+(\texttt{IsDedekindDomain.HeightOneSpectrum.primesAbove}); \texttt{AdjoinRoot.mem\_selmerGroup\_iff}
+and \texttt{AdjoinRoot.mk\_mem\_selmerGroup\_iff} are the componentwise conditions. The
+separability of the factor fields is an instance family, which
+\texttt{AdjoinRoot.instIsSeparableFactors} provides for a perfect~$K$.
+\texttt{AdjoinRoot.finite\_selmerGroup} takes a finite~$\Sigma$ and instances for the finiteness of
+the class groups and the finite generation of the unit groups of the integral closures. Mathlib's
+\texttt{IsDedekindDomain.selmerGroup} is the case of the fraction field itself.
+\end{proof}
+
+\begin{remark}[Separability]
+\label{rem:ds-perfect}
+The integral closure of~$R$ in~$L_p$ is a Dedekind domain finite over~$R$ by Mathlib's results for
+finite \emph{separable} extensions, and Lemma~\ref{lem:ds-norm-selmer} assumes the extension
+separable, as Mathlib's relative norm \texttt{Algebra.intNorm} does; in the proof of
+Lemma~\ref{lem:ds-point-mumford} it is applied to $F[x]/(a)$ for a finite extension~$F$ of~$K$ and
+an irreducible~$a \in F[x]$. Both separability conditions hold if~$K$ is perfect (then so is~$F$),
+in particular in characteristic~$0$, which covers number fields and their completions. Over an
+imperfect~$K$, $f$ is assumed squarefree, not separable, and an irreducible~$a$ can be
+inseparable. So~$K$ is assumed perfect in this section and the next.
+\end{remark}
+
+\begin{lemma}[Norms map Selmer groups to Selmer groups]
+\label{lem:ds-norm-selmer}
+\lean{IsDedekindDomain.norm_mem_selmerGroup}
+\leanok
+Let $R \subseteq B$ be Dedekind domains with fraction fields $K \subseteq F$, where~$F/K$ is finite
+and separable and~$B$ is the integral closure of~$R$ in~$F$, let~$\Sigma$ be a set of nonzero
+primes of~$R$, and $n \ge 1$. If $x \in F^\times$ has valuation divisible by~$n$ at every prime
+of~$B$ not above~$\Sigma$, then~$N_{F/K}(x)$ has valuation divisible by~$n$ at every prime of~$R$
+not in~$\Sigma$. So~$N_{F/K}$ maps $F(\Sigma, n)$ into $K(\Sigma, n)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For a prime $v \notin \Sigma$, $v(N_{F/K}x) = \sum_{w \mid v} f(w \mid v)\,w(x)$, the sum over the
+primes~$w$ of~$B$ above~$v$ with their residue degrees: for $x \in B$, the ideal norm maps $xB$ to
+$N_{F/K}(x)R$ and each~$w$ to $v^{f(w \mid v)}$, and is multiplicative; in general write
+$x = y/z$ with $y, z \in B$.
+
+\emph{Formalization.} The map induced by the norm sends \texttt{selmerGroupAbove} into Mathlib's
+\texttt{IsDedekindDomain.selmerGroup}. The valuation formula is
+\texttt{IsDedekindDomain.toAdd\_valuationOfNeZero\_norm}, from \texttt{Ideal.multiplicity\_relNorm}
+(the multiplicity of~$v$ in the relative norm of an ideal is $\sum_{w \mid v} f(w \mid v)$ times
+that of~$w$), which rests on Mathlib's \texttt{Ideal.relNorm}, \texttt{Ideal.relNorm\_singleton}
+and \texttt{Ideal.relNorm\_eq\_pow\_of\_isMaximal}. The lemma is missing from Mathlib.
+\end{proof}
+
+\begin{lemma}[The point lemma]
+\label{lem:ds-point}
+\lean{AdjoinRoot.of_sub_root_mem_selmerGroup,
+  IsDedekindDomain.mem_selmerGroupAbove_of_sq_eq_aeval}
+\leanok
+\uses{def:ds-selmer}
+Assume that~$\Sigma$ contains every prime~$v$ of~$R$ at which a coefficient of~$f$ is not
+integral, $c$ is not a unit or $\operatorname{disc} f$ is not a unit. Let $x_0, y_0 \in K$ with
+$y_0^2 = f(x_0) \ne 0$. Then $x_0 - \theta$ is a unit of~$L$, and its class lies in
+$A(\Sigma, 2)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For each~$p$, $p(x_0) \ne 0$, so the component $x_0 - \theta_p$ is not zero. Let~$w$ be a prime
+of~$B_p$ above a prime $v \notin \Sigma$. As $c^{-1}f$ is monic with $v$-integral coefficients,
+$w(\theta_p) \ge 0$. If $w(x_0) < 0$, then $w(x_0 - \theta_p) = w(x_0)$ and
+$2w(y_0) = w(f(x_0)) = (2g + 1)w(x_0)$, as the leading term of~$f(x_0)$ dominates ($c$ is a
+$v$-unit); so~$w(x_0)$ is even. If $w(x_0) \ge 0$, write
+$f(x_0) = f(x_0) - f(\theta_p) = (x_0 - \theta_p)G$ with~$G$ integral at~$w$ and
+$G \equiv f'(\theta_p) \bmod (x_0 - \theta_p)$. As $\operatorname{disc} f$ and~$c$ are $v$-units,
+so is $N_{L/K}(f'(\theta))$, and~$f'(\theta_p)$ is a $w$-unit. So either $w(x_0 - \theta_p) = 0$,
+or $w(G) = 0$ and $w(x_0 - \theta_p) = w(f(x_0)) = 2w(y_0)$; in both cases $w(x_0 - \theta_p)$ is
+even.
+
+\emph{Formalization.} \texttt{AdjoinRoot.of\_sub\_root\_mem\_selmerGroup} is stated for the class
+of any unit with value $x_0 - \theta$ (\texttt{AdjoinRoot.isUnit\_of\_sub\_root} supplies one). The
+condition on~$\Sigma$ is that~$f$ has separable reduction at the primes not in~$\Sigma$
+(\texttt{Polynomial.HasSeparableReduction}: integral coefficients, a unit leading coefficient and a
+unit discriminant, Mathlib's \texttt{Polynomial.discr}). The valuation core is
+\texttt{Valuation.exists\_map\_sub\_eq\_sq}, for a polynomial of odd degree with a unit leading
+coefficient: for non-integral~$x_0$ the leading term dominates; otherwise a Taylor expansion over
+the integers (\texttt{Polynomial.exists\_mem\_eval\_eq\_add\_mul}) and the unit~$f'(\theta_p)$
+(\texttt{Valuation.map\_derivative\_eval\_eq\_one}, from a B\'ezout identity for the resultant
+of~$f$ and~$f'$ over the valuation ring, in place of the norm argument) give
+\texttt{Valuation.map\_sub\_eq\_one\_or\_eq\_map\_eval}. The local form
+\texttt{Polynomial.HasSeparableReduction.exists\_map\_sub\_eq\_sq} is applied over the extension
+field, to the image of~$f$, which keeps separable reduction
+(\texttt{Polynomial.HasSeparableReduction.map}); so~$x_0$ and~$y_0$ may lie in the extension field,
+as the proof of Lemma~\ref{lem:ds-point-mumford} needs, and
+\texttt{IsDedekindDomain.mem\_selmerGroupAbove\_of\_sq\_eq\_aeval} is the point lemma in a single
+field.
+\end{proof}
+
+\begin{lemma}[The point lemma for Mumford polynomials]
+\label{lem:ds-point-mumford}
+\lean{IsDedekindDomain.mem_selmerGroupAbove_of_dvd_sq_sub,
+  IsDedekindDomain.mem_selmerGroup_of_dvd_sq_sub}
+\leanok
+Let~$\Sigma$ be as in Lemma~\ref{lem:ds-point}, let~$F$ be a finite extension field of~$K$,
+$\theta \in F$ a root of~$f$, and $a, b \in F[x]$ with $a \mid b^2 - f$ and~$a$ prime to~$f$. Then
+$\operatorname{lc}(a)^{-1}a(\theta) \ne 0$, and its class lies in~$F(\Sigma, 2)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:ds-point, lem:ds-norm-selmer, lem:ds-resultant}
+As~$a$ is prime to~$f$ and $f(\theta) = 0$, $a(\theta) \ne 0$. If $a = a'a''$, then~$a'$
+and~$a''$ divide $b^2 - f$ and are prime to~$f$, and $\operatorname{lc}(a)^{-1}a(\theta)$ is the
+product of the values for~$a'$ and~$a''$; a constant~$a$ gives~$1$. So, by induction on the
+irreducible factors, we may assume that~$a$ is monic and irreducible. Let $F' = F[x]/(a)$, a
+finite extension field of~$F$, and let~$x_1 \in F'$ be the image of~$x$. Then
+$b(x_1)^2 = f(x_1)$, and $f(x_1) \ne 0$ as~$a$ is prime to~$f$. Let~$w$ be a prime of the integral
+closure of~$R$ in~$F'$ above a prime $v \notin \Sigma$. The proof of Lemma~\ref{lem:ds-point},
+with~$F'$, $\theta$, $x_1$ and~$b(x_1)$ in place of~$L_p$, $\theta_p$, $x_0$ and~$y_0$, shows that
+$w(x_1 - \theta)$ is even: it uses only that~$\theta$ is a root of~$f$ and that
+$y_0^2 = f(x_0) \ne 0$. So the class of $\theta - x_1$ lies in~$F'(\Sigma, 2)$, and by
+Lemma~\ref{lem:ds-norm-selmer}, for $F'/F$ and the primes of the integral closure of~$R$ in~$F$
+above~$\Sigma$, its norm lies in~$F(\Sigma, 2)$. As the characteristic polynomial of~$x_1$ over~$F$
+is~$a$, this norm is $N_{F'/F}(\theta - x_1) = a(\theta)$; equivalently, by
+Lemma~\ref{lem:ds-resultant} for~$a$ over~$F$, it is $\operatorname{Res}(a, \theta - x) =
+a(\theta)$.
+
+\emph{Formalization.} The general form is
+\texttt{IsDedekindDomain.mem\_selmerGroup\_of\_dvd\_sq\_sub}, over a Dedekind domain~$B$ with
+perfect fraction field (in the application the integral closure of~$R$ in~$L_p$), for a polynomial
+with separable reduction outside a set of primes of~$B$: the class of a unit~$u$ with
+$u = \operatorname{lc}(a)^{-1}a(\theta)$ lies in Mathlib's \texttt{IsDedekindDomain.selmerGroup}.
+The induction is \texttt{WfDvdMonoid.induction\_on\_irreducible}. The step for an irreducible~$a$,
+monic or not, works in $F' = \texttt{AdjoinRoot a}$ with the integral closure of~$B$ in~$F'$: the
+point lemma in a field and Lemma~\ref{lem:ds-norm-selmer} give
+\texttt{IsDedekindDomain.norm\_sub\_mem\_selmerGroup\_of\_sq\_eq\_aeval}, and
+\texttt{AdjoinRoot.leadingCoeff\_mul\_norm\_of\_sub\_root} computes
+$N_{F'/F}(\theta - x_1) = \operatorname{lc}(a)^{-1}a(\theta)$. The lemma as stated, with~$f$
+over~$K$ and~$\Sigma$, is \texttt{IsDedekindDomain.mem\_selmerGroupAbove\_of\_dvd\_sq\_sub}:
+separable reduction moves up to~$B$ by \texttt{Polynomial.HasSeparableReduction.map}.
+\end{proof}
+
+\begin{theorem}[The image of~$\mu$]
+\label{thm:ds-image-selmer}
+\lean{ChabautyColeman.HypJac.range_descentMap_le_selmerGroup}
+\leanok
+\uses{def:ds-mu, def:ds-selmer}
+If~$\Sigma$ is as in Lemma~\ref{lem:ds-point}, then $\mu(J(K)) \subseteq A(\Sigma, 2)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:ds-move, lem:ds-point-mumford}
+Let $P \in J(K)$. By Lemma~\ref{lem:ds-move}, $P = [a, b]$ with~$a$ prime to~$f$, and by
+Definition~\ref{def:ds-mu}, $\mu(P)$ is the class of
+$m(a) = (-c)^{\deg a}\operatorname{lc}(a)^{-1}a(\theta)$. Its component at~$p$ is
+$(-c)^{\deg a}\operatorname{lc}(a)^{-1}a(\theta_p)$. By Lemma~\ref{lem:ds-point-mumford} for
+$F = L_p$ and $\theta = \theta_p$ ($a$ stays prime to~$f$ in~$L_p[x]$), the class of
+$\operatorname{lc}(a)^{-1}a(\theta_p)$ lies in~$L_p(\Sigma, 2)$, and so does the class
+of~$(-c)^{\deg a}$, as~$c$ is a unit at every prime not in~$\Sigma$. So every component
+of~$\mu(P)$ lies in~$L_p(\Sigma, 2)$, that is, $\mu(P) \in A(\Sigma, 2)$.
+
+\emph{Formalization.} The proof works one component~$L_p$ at a time; only norms of field extensions
+$L_p[x]/(a')$ of~$L_p$ occur, in Lemma~\ref{lem:ds-point-mumford}. It combines
+\texttt{HypJac.exists\_isCoprime\_mumfordClass\_eq},
+\texttt{HypJac.descentMap\_mumfordClass\_of\_isCoprime} and
+\texttt{AdjoinRoot.mem\_selmerGroup\_iff} with \texttt{algHom\_mumfordValue\_mem\_selmerGroupAbove}:
+for a $K$-algebra homomorphism $\varphi \colon L \to F$ (here the projection to~$L_p$) the class of
+$\varphi(m(a))$ lies in~$F(\Sigma, 2)$, by Lemma~\ref{lem:ds-point-mumford} for the
+root~$\varphi(\theta)$ of~$f$ and
+\texttt{IsDedekindDomain.mem\_selmerGroupAbove\_of\_valuation\_eq\_one} for the constant. Each~$L_p$
+is perfect by \texttt{Algebra.IsAlgebraic.perfectField}.
+\end{proof}
+
+\section{Number fields}
+\label{sec:ds-number}
+
+\begin{setting}
+\label{set:ds-number}
+In Setting~\ref{set:ds-setting}, let~$K$ be a number field and $R = O_K$. For a place~$v$ of~$K$,
+let~$K_v$ be the completion, $L_v = K_v[x]/(f) = L \otimes_K K_v$,
+$\mu_v \colon J(K_v) \to L_v^\square$ the map of Definition~\ref{def:ds-mu} over~$K_v$ ($f$ stays
+squarefree, as~$K$ has characteristic~$0$), $r_v \colon J(K) \to J(K_v)$ the natural map and
+$\operatorname{res}_v \colon L^\square \to L_v^\square$ the restriction. Let~$\Sigma_f$ be the
+finite set of primes~$v$ of~$R$ at which a coefficient of~$f$ is not integral, $c$ is not a unit
+or $\operatorname{disc} f$ is not a unit.
+\end{setting}
+
+\begin{definition}[The $2$-Selmer group]
+\label{def:ds-sel2}
+\lean{ChabautyColeman.HypJac.selmerGroupTwo, ChabautyColeman.HypJac.localCondition}
+\leanok
+\uses{def:ds-mu}
+The $2$-Selmer group is
+\[ \Sel_2 = \{\xi \in L^\square : N(\xi) = 1 \text{ and } \operatorname{res}_v(\xi) \in
+   \mu_v(J(K_v)) \text{ for every place~$v$ of~$K$}\}\,. \]
+\end{definition}
+
+\begin{theorem}[Finiteness of the $2$-Selmer group]
+\label{thm:ds-sel2}
+\lean{ChabautyColeman.HypJac.range_descentMap_le_selmerGroupTwo,
+  ChabautyColeman.HypJac.selmerGroupTwo_le_selmerGroup,
+  ChabautyColeman.HypJac.selmerGroupTwo_le_ker_norm,
+  ChabautyColeman.HypJac.finite_selmerGroupTwo}
+\leanok
+\uses{def:ds-sel2, def:ds-selmer}
+\begin{enumerate}
+  \item $\mu(J(K)) \subseteq \Sel_2$.
+  \item $\Sel_2 \subseteq A(\Sigma_f, 2) \cap \ker N$.
+  \item $\Sel_2$ is finite.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-norm, thm:ds-naturality, thm:ds-image-selmer}
+(1) Theorem~\ref{thm:ds-norm}, and $\operatorname{res}_v(\mu(P)) = \mu_v(r_v(P))$ by
+Theorem~\ref{thm:ds-naturality}. (2) For a prime $v \notin \Sigma_f$,
+Theorem~\ref{thm:ds-image-selmer} over~$K_v$, with $R = O_v$ and $\Sigma = \emptyset$, shows
+that $\mu_v(J(K_v))$ consists of unramified classes; and a class in~$L^\square$ lies in
+$A(\Sigma_f, 2)$ if and only if its restriction is unramified at every prime $v \notin \Sigma_f$.
+(3) follows from~(2) and Definition~\ref{def:ds-selmer}.
+
+\emph{Formalization.} \texttt{HypJac.selmerGroupTwo} is defined for a Dedekind domain~$R$ whose
+fraction field~$K$ has characteristic~$0$ and a family of field extensions of~$K$ (for a number
+field, the completions at the infinite places): it is the intersection of $\ker N$, of the local
+conditions at the completions \texttt{v.adicCompletion K} at the primes~$v$ of~$R$, and of the
+local conditions at the members of the family. The local condition \texttt{HypJac.localCondition}
+at a field extension~$F$ of~$K$ is the preimage of the image of~$\mu_F$ under the restriction
+to~$F$. (2) is stated for every set~$\Sigma$ of primes outside which~$f$ has separable reduction
+(\texttt{Polynomial.HasSeparableReduction}), and of the equivalence in its proof only the
+implication from right to left is used:
+\texttt{AdjoinRoot.mem\_selmerGroup\_of\_forall\_adicCompletion}, for every squarefree~$f$ and every
+exponent. There~$O_v$ is the valuation ring of the completion, a discrete valuation ring, and~$f$
+has separable reduction at its prime because it has at~$v$. In~(3), $\Sigma_f$ is finite by
+\texttt{Polynomial.finite\_setOf\_not\_hasSeparableReduction}, as $\operatorname{disc} f \ne 0$, and
+\texttt{HypJac.finite\_selmerGroupTwo} takes the instances on class groups and unit groups of
+\texttt{AdjoinRoot.finite\_selmerGroup}.
+\end{proof}
+
+\begin{definition}[Cited structures]
+\label{def:ds-cited}
+\lean{ChabautyColeman.HypJac.MordellWeil, ChabautyColeman.HypJac.LocalStructure}
+\leanok
+\begin{description}
+  \item[\textmd{(MW)}] For a number field~$K$, the group~$J(K)$ is finitely generated (the
+    Mordell--Weil theorem: A.~Weil, \emph{L'arithm\'etique sur les courbes alg\'ebriques}, Acta
+    Math.~52 (1929), 281--315; M.~Hindry and J.~H.~Silverman, \emph{Diophantine geometry. An
+    introduction}, Springer, 2000, Theorem~C.0.1).
+  \item[\textmd{(Loc)}] For a finite extension~$K_v$ of~$\QQ_\ell$ with ring of
+    integers~$O_v$, there is an isomorphism of groups $J(K_v) \cong O_v^g \times T$ with~$T$
+    finite (A.~Mattuck, \emph{Abelian varieties over $p$-adic ground fields}, Ann.\ of Math.~(2)
+    62 (1955), 92--119; for $K_v = \QQ_2$ also B.~Poonen and M.~Stoll, \emph{Most odd degree
+    hyperelliptic curves have only one rational point}, Ann.\ of Math.~(2) 180 (2014),
+    1137--1166, Section~4).
+\end{description}
+\end{definition}
+
+Mattuck's isomorphism is one of topological groups. The statements below use only the group
+isomorphism, and no topology on~$J(K_v)$ is involved.
+
+\begin{remark}[Formalization]
+The two results are cited, not proved: each is a class or structure whose docstring gives the
+references. \texttt{HypJac.MordellWeil K f}, for a number field~$K$, is a class with the single
+field that \texttt{HypJac K f} is finitely generated (\texttt{IsMulFG}), which it provides as an
+instance. \texttt{HypJac.LocalStructure p F f g}, for a field~$F$ that is an algebra over the
+field~$\QQ_p$ of Mathlib, is a structure with values in \texttt{Prop}: $\deg f = 2g + 1$, and there
+is a finite group~$T$ with a group isomorphism from \texttt{HypJac F f} to the product of
+$(\ZZ_p^d)^g$ and~$T$, where $d = [F : \QQ_p]$. As a group, $O_v \cong \ZZ_p^d$; this form
+of~(Loc) avoids the integral closure of~$\ZZ_p$ in~$F$.
+\end{remark}
+
+\begin{lemma}[Consequences of (Loc)]
+\label{lem:ds-loc}
+\lean{ChabautyColeman.HypJac.LocalStructure.card_modPow_two,
+  ChabautyColeman.HypJac.LocalStructure.card_modPow_two_of_ne_two,
+  ChabautyColeman.HypJac.LocalStructure.mem_iInf_range_powMonoidHom_pow_iff}
+\leanok
+\uses{def:ds-cited, def:hypjac}
+Assume~(Loc) for a finite extension~$K_v$ of~$\QQ_\ell$.
+\begin{enumerate}
+  \item $\#J(K_v)/2J(K_v) = 2^{g[K_v : \QQ_2]}\,\#J(K_v)[2]$ if $\ell = 2$, and
+    $\#J(K_v)/2J(K_v) = \#J(K_v)[2]$ if~$\ell$ is odd.
+  \item $\bigcap_{n \ge 0} \ell^nJ(K_v)$ is the subgroup of elements of finite order prime
+    to~$\ell$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $J(K_v) \cong O_v^g \times T$. As a group, $O_v \cong \ZZ_\ell^{[K_v : \QQ_\ell]}$ is
+torsion-free, so $J(K_v)[2] \cong T[2]$, and $\#T/2T = \#T[2]$ as~$T$ is finite.
+(1) $\#O_v/2O_v$ is $2^{[K_v : \QQ_2]}$ if $\ell = 2$ and~$1$ if~$\ell$ is odd, as~$2$ is then a
+unit. (2) In every abelian group, an element of finite order~$m$ prime to~$\ell$ is an
+$\ell^n$-th multiple for every~$n$: if $k\ell^n \equiv 1 \bmod m$, then $x = \ell^n(kx)$.
+Conversely, $\bigcap_n \ell^nO_v = 0$, and the subgroups $\ell^nT$ of the finite group~$T$
+decrease and become constant, equal to the subgroup~$T_{\ell'}$ of elements of order prime
+to~$\ell$ (on the $\ell$-primary part of~$T$, multiplication by~$\ell^n$ is zero for large~$n$, and
+on~$T_{\ell'}$ it is bijective); as $\ell^n(O_v^g \times T) = \ell^nO_v^g \times \ell^nT$, the
+intersection is $0 \times T_{\ell'}$.
+
+\emph{Formalization.} With the prime~$\ell$ named~$p$, (1) is
+\texttt{HypJac.LocalStructure.card\_modPow\_two} for $p = 2$ and
+\texttt{HypJac.LocalStructure.card\_modPow\_two\_of\_ne\_two} for $p \ne 2$, about the cardinality
+of the quotient by the range of \texttt{powMonoidHom 2} and of its kernel; both go through the
+index of $2\ZZ_p$ in~$\ZZ_p$, which is~$2$ for $p = 2$ (\texttt{PadicInt.index\_range\_nsmul\_self})
+and~$1$ otherwise (\texttt{PadicInt.range\_nsmul\_eq\_top\_of\_not\_dvd}), and
+\texttt{AddSubgroup.index\_range\_nsmul\_prod\_of\_injective}. (2) says that an element lies in the
+intersection of the ranges of the maps \texttt{powMonoidHom (p\textasciicircum{}n)} if and only if
+its order is prime to~$p$: the order~$0$ of an element of infinite order is not prime to a prime.
+The implication from right to left holds in every commutative group
+(\texttt{CommGroup.mem\_range\_powMonoidHom\_of\_coprime}); for the other, Krull's intersection
+theorem gives $\bigcap_n p^n M = 0$ for every finitely generated $\ZZ_p$-module~$M$
+(\texttt{PadicInt.eq\_zero\_of\_forall\_mem\_range\_nsmul\_pow}), and
+\texttt{CommGroup.forall\_mem\_range\_powMonoidHom\_pow\_prod\_iff} treats the product with a finite
+group.
+\end{proof}
+
+\begin{lemma}[The case $\ell = 2$]
+\label{lem:ds-loc-two}
+\lean{ChabautyColeman.HypJac.LocalStructure.mem_iInf_range_powMonoidHom_two_pow_iff}
+\leanok
+\uses{lem:ds-loc, def:hypjac}
+Assume~(Loc) for a finite extension~$K_v$ of~$\QQ_2$. Then $\bigcap_{n \ge 0} 2^nJ(K_v)$ is the
+subgroup of elements of odd order.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Lemma~\ref{lem:ds-loc}\,(2) with $\ell = 2$.
+\end{proof}
+
+For odd~$\ell$, by contrast, $2$ is a unit of~$O_v$, and $\bigcap_n 2^nJ(K_v)$ contains a copy
+of~$O_v^g$, so it is not torsion. The proof of Theorem~\ref{thm:ds-e1} uses
+Lemma~\ref{lem:ds-loc-two} for $K_v = \QQ_2$.
+
+\begin{definition}[Relaxed Selmer groups]
+\label{def:ds-relaxed}
+\lean{ChabautyColeman.relaxedSelmerGroup, ChabautyColeman.range_descentMap_le_relaxedSelmerGroup,
+  ChabautyColeman.finite_relaxedSelmerGroup}
+\leanok
+\uses{def:ds-selmer, def:ds-mu, def:ds-sel2}
+For a finite set $\Sigma \supseteq \Sigma_f$ of primes and a set~$V$ of places of~$K$, let
+\[ S(\Sigma, V) = \{\xi \in A(\Sigma, 2) : N(\xi) = 1 \text{ and } \operatorname{res}_v(\xi)
+   \in \mu_v(J(K_v)) \text{ for } v \in V\}\,, \]
+with the local conditions of Definition~\ref{def:ds-sel2} at the places in~$V$ only. Then
+$S(\Sigma, V)$ is finite, and $\mu(J(K)) \subseteq S(\Sigma, V)$.
+\end{definition}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-image-selmer, thm:ds-norm, thm:ds-naturality}
+Definition~\ref{def:ds-selmer} for the finiteness, and Theorems~\ref{thm:ds-image-selmer},
+\ref{thm:ds-norm} and~\ref{thm:ds-naturality} for the inclusion.
+
+\emph{Formalization.} \texttt{relaxedSelmerGroup} takes the places of~$V$ as a family of field
+extensions of~$K$ (their completions), with the local conditions \texttt{HypJac.localCondition}
+of \texttt{HypJac.selmerGroupTwo}; as these are taken at arbitrary field extensions, for $K = \QQ$
+a condition at~$2$ can use Mathlib's field~$\QQ_2$ itself. The inclusion takes the hypothesis
+that~$f$ has separable reduction outside~$\Sigma$ (\texttt{Polynomial.HasSeparableReduction}), as
+Theorem~\ref{thm:ds-image-selmer} does; \texttt{finite\_relaxedSelmerGroup} is the finiteness for
+finite~$\Sigma$, with the instances on class groups and unit groups of
+\texttt{AdjoinRoot.finite\_selmerGroup}.
+\end{proof}
+
+For $K = \QQ$, $2 \in \Sigma$ and $V = (\Sigma \cup \{\infty\}) \setminus \{2\}$, $S(\Sigma, V)$ is
+the group~$S$ of Remark~4.2 of [Sto17], which leaves out the $2$-adic condition, with~$\Sigma$ in
+place of the set of bad primes for $2$-descent used there; $S(\Sigma, \emptyset) = A(\Sigma, 2) \cap
+\ker N$ is coarser, and $\Sel_2 = S(\Sigma, V)$ when~$V$ is the set of all places, by
+Theorem~\ref{thm:ds-sel2}\,(2). Each of them contains~$\Sel_2$, and so it can replace the
+$2$-Selmer group in the algorithm of Section~4 of [Sto17], by Remark~4.2 there.
+
+\begin{remark}[Local conditions are needed]
+\label{rem:ds-dimension}
+Let $K = \QQ$ and~$f$ irreducible, and let $(r_1, r_2)$ be the signature of the field~$L$, so that
+$r_1 + 2r_2 = 2g + 1$. The unramified classes include $O_L^\times/(O_L^\times)^2$, of dimension
+$r_1 + r_2$ (the roots of unity of~$L$ are~$\pm 1$, as $r_1 \ge 1$), on which the norm is onto
+$\{\pm 1\}$, as $N(-1) = -1$; so the unramified classes of norm~$1$ have dimension at least
+$r_1 + r_2 - 1$, whatever the class group of~$L$. At the real place,
+$J(\mathbb R) \cong (\mathbb R/\ZZ)^g \times (\ZZ/2)^k$ and
+$\#J(\mathbb R)[2] = 2^{r_1 + r_2 - 1}$ (Theorem~\ref{thm:ds-two-torsion} over~$\mathbb R$), so
+$k = r_1 + r_2 - 1 - g = (r_1 - 1)/2$ is the dimension of $\mu_\infty(J(\mathbb R))$
+(Theorem~\ref{thm:ds-kernel} over~$\mathbb R$), inside the space of dimension $r_1 - 1$ of sign
+vectors of norm~$1$. So the classes that are unramified everywhere, of norm~$1$ and satisfy the
+real condition form a space of dimension at least
+$r_1 + r_2 - 1 - (r_1 - 1)/2 = (r_1 - 1)/2 + r_2 = g$, and so does every group defined by these
+conditions with ramification allowed at some primes, such as $S(\Sigma, \{\infty\})$, which
+contains that space. As $J(\QQ)[2] = 0$, the rank bound of Theorem~\ref{thm:ds-rank-bound} from
+such a group is never below~$g$, and every example of rank less than~$g$ with irreducible~$f$
+needs a local condition at~$2$ or at an odd bad prime, hence the local image size of
+Lemma~\ref{lem:ds-loc}\,(1) and~(Loc).
+\end{remark}
+
+\begin{theorem}[The rank bound]
+\label{thm:ds-rank-bound}
+\lean{ChabautyColeman.HypJac.pow_rank_le_card_selmerGroupTwo,
+  ChabautyColeman.pow_rank_le_card_relaxedSelmerGroup}
+\leanok
+\uses{def:ds-cited, def:ds-sel2, def:ds-relaxed}
+Assume~(MW). Then $2^{\operatorname{rk} J(K)}\,\#J(K)[2] \le \#S$ for every finite subgroup
+$S \subseteq L^\square$ containing~$\mu(J(K))$, in particular for $S = \Sel_2$ and for the
+groups~$S(\Sigma, V)$ of Definition~\ref{def:ds-relaxed}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-rank, thm:ds-sel2, def:ds-relaxed}
+Theorem~\ref{thm:ds-rank}, with Theorem~\ref{thm:ds-sel2} and Definition~\ref{def:ds-relaxed} for
+the inclusions and the finiteness.
+
+\emph{Formalization.} Both statements take the instance \texttt{IsMulFG (HypJac K f)}, which the
+class \texttt{HypJac.MordellWeil} provides over a number field, and the instances of the
+finiteness statements; they are \texttt{HypJac.pow\_rank\_le\_card\_of\_range\_descentMap\_le} of
+Theorem~\ref{thm:ds-rank} applied to the inclusions.
+\end{proof}
+
+\section{Examples}
+\label{sec:ds-examples}
+
+\begin{remark}[E1: genus~$2$, $f$ split]
+\label{rem:ds-e1}
+The first example is the curve
+\[ C \colon y^2 = f(x) = x(x^2 - 1)(x^2 - 9) = x^5 - 10x^3 + 9x\,, \]
+with the roots $\alpha = -3, -1, 0, 1, 3$ and $\operatorname{disc} f = 2^{16} \cdot 3^6$, so
+$\Sigma_f = \{2, 3\}$. No smaller set is possible: among five integers, two are congruent
+modulo~$2$ and two modulo~$3$. Here $L = \QQ^5$, and $A(\Sigma_f, 2) \cap \ker N$ has dimension
+$4(\#\Sigma_f + 1) = 12$ over~$\FF_2$, whereas $\mu(J(\QQ)[2])$ has dimension~$4$. A local
+condition at one place cuts out at most $4$ dimensions (an odd prime) or~$6$ (the prime~$2$), so
+no single place suffices; the set $V = \{2, 3\}$ does: $S(\Sigma_f, V) = \mu(J(\QQ)[2])$
+(Proposition~\ref{prop:ds-e1-sel}). Theorem~\ref{thm:ds-e1} shows $J(\QQ) = J(\QQ)[2] \cong
+(\ZZ/2)^4$ and $C(\QQ) = \{\infty, (0, 0), (\pm 1, 0), (\pm 3, 0)\}$. Its proof needs neither~(MW)
+nor any $2$-adic analysis on~$C$: the descent and~(Loc) for~$\QQ_2$ and~$\QQ_3$ give
+$J(\QQ) = J(\QQ)[2] + T$ with~$T$ of odd order, and reduction at the good prime~$5$ kills~$T$.
+\end{remark}
+
+\begin{setting}
+\label{set:ds-e1}
+\lean{ChabautyColeman.DescentExample1.f, ChabautyColeman.DescentExample1.F,
+  ChabautyColeman.DescentExample1.S}
+\leanok
+Let $f = x^5 - 10x^3 + 9x \in \QQ[x]$, with the roots
+$\alpha_1, \dots, \alpha_5 = -3, -1, 0, 1, 3$, and $L = \QQ[T]/(f) \cong \QQ^5$,
+$\xi \mapsto (\xi(\alpha_i))_i$. Let $\Sigma = \{2, 3\}$, let~$V$ consist of~$\QQ_2$ and~$\QQ_3$,
+and $S = S(\Sigma, V)$ (Definition~\ref{def:ds-relaxed}). Let $\bar f = x^5 - x \in \FF_5[x]$ be
+the reduction of~$f$ modulo~$5$.
+\end{setting}
+
+\begin{remark}[Formalization]
+In the module \texttt{HyperellipticCurves.Descent.Example1}: \texttt{f} over~$\QQ$ and the
+integral model \texttt{F} for the reduction modulo~$5$ (\texttt{DescentExample1.map\_F}), the
+roots as a vector of integers, and~$\Sigma$ as~\texttt{S}, the primes $(2)$, $(3)$ of~$\ZZ$
+(\texttt{Rat.HeightOneSpectrum.primesEquiv}). The family~$V$ consists of the $p$-adic fields of
+Mathlib for $p = 2, 3$. $f$ has separable reduction outside~$\Sigma$
+(\texttt{DescentExample1.hasSeparableReduction\_of\_notMem}), as
+$\operatorname{disc} F = 2^{16} \cdot 3^6$ (\texttt{DescentExample1.discr\_F}, from Mathlib's
+\texttt{Polynomial.resultant\_deriv}: the product of the values $144, -16, 9, -16, 144$ of~$F'$ at
+the roots).
+\end{remark}
+
+\begin{lemma}[Square classes of local fields]
+\label{lem:ds-padic-squares}
+\lean{HenselianLocalRing.isSquare_iff_isSquare_residue, IsDiscreteValuationRing.modPowTwoEquiv,
+  PadicInt.isSquare_iff_toZModPow_three_eq_one, Padic.modPowTwoEquivZModEight,
+  Padic.modPowTwoEquiv_mk_of_eq_pow_mul}
+\leanok
+\uses{thm:hensel}
+\begin{enumerate}
+  \item Let~$O$ be a Henselian local ring in which~$2$ is a unit, with residue field~$k$. A unit
+    of~$O$ is a square if and only if its image in~$k$ is a square.
+  \item Let~$O$ moreover be a discrete valuation ring, with fraction field~$F$ and a
+    uniformizer~$\pi$. Then $\pi^n u \mapsto (n \bmod 2, \bar u)$, for $u \in O^\times$, induces
+    an isomorphism $F^\times/(F^\times)^2 \cong \ZZ/2 \times k^\times/(k^\times)^2$; for
+    finite~$k$, both have order~$4$. This covers the finite extensions of~$\QQ_p$ for odd~$p$,
+    among them~$\QQ_3$.
+  \item A unit~$u$ of~$\ZZ_2$ is a square if and only if $u \equiv 1 \bmod 8$, and
+    $2^n u \mapsto (n \bmod 2, u \bmod 8)$ induces an isomorphism
+    $\QQ_2^\times/(\QQ_2^\times)^2 \cong \ZZ/2 \times (\ZZ/8)^\times$, of order~$8$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The image of a square is a square. Conversely, if $\bar u = \bar a^2$, Hensel's lemma applies
+to $X^2 - u$ at~$a$, whose derivative~$2a$ is a unit. (2) $F^\times = \pi^{\ZZ} \times O^\times$,
+and $\pi^n u$ is a square if and only if~$n$ is even and~$u$ is a square, which is~(1). (3) The
+square of an odd integer is~$\equiv 1 \bmod 8$. Conversely, Hensel's lemma in the form for
+$\lvert g(a)\rvert < \lvert g'(a)\rvert^2$ applies to $g = X^2 - u$ at $a = 1$, as
+$\lvert 1 - u\rvert_2 \le 2^{-3} < \lvert 2\rvert_2^2$. The isomorphism follows as in~(2).
+
+\emph{Formalization.} (1) is proved from the defining property of \texttt{HenselianLocalRing}; a
+local ring that is adically complete at its maximal ideal, such as~$\ZZ_p$, is Henselian
+(\texttt{IsAdicComplete.henselianLocalRing}). (2) comes from
+$F^\times/(F^\times)^n \cong \ZZ/n \times O^\times/(O^\times)^n$ for every~$n$
+(\texttt{IsDiscreteValuationRing.modPowEquiv}, from \texttt{IsDiscreteValuationRing.unitsEquivProd})
+and $O^\times/(O^\times)^2 \cong k^\times/(k^\times)^2$ by~(1)
+(\texttt{HenselianLocalRing.modPowTwoEquiv}), stated with the classes \texttt{Units.ModPow}; the
+order~$4$ for finite~$k$ is not formalized, the examples compute with the isomorphism itself.
+For~$\QQ_p$, $p$ odd, the isomorphism is \texttt{Padic.modPowTwoEquiv}, with the uniformizer~$p$
+and the residue field $\ZZ/p$ (\texttt{PadicInt.residueField}); its value at~$p^n u$ for a unit~$u$
+of~$\ZZ_p$ is \texttt{Padic.modPowTwoEquiv\_mk\_of\_eq\_pow\_mul}. (3) comes from Mathlib's
+\texttt{hensels\_lemma}; the values of the isomorphisms on classes $p^n m$ with $m \in \ZZ$ are
+\texttt{Padic.modPowTwoEquivZModEight\_mk\_of\_val\_eq} and
+\texttt{Padic.modPowTwoEquiv\_mk\_of\_val\_eq}. Mathlib has none of these statements.
+\end{proof}
+
+\begin{lemma}[$A(\Sigma, 2)$ for split~$f$ over~$\QQ$]
+\label{lem:ds-e1-selmer}
+\lean{Rat.selmerGroup_eq_closure, AdjoinRoot.mem_selmerGroup_iff_of_splits}
+\leanok
+\uses{def:ds-selmer}
+\begin{enumerate}
+  \item For a finite set~$\Sigma$ of primes, $\QQ(\Sigma, n)$ is generated by the classes of~$-1$
+    and of the primes in~$\Sigma$.
+  \item If $f \in \QQ[x]$ is the product of distinct factors $x - \alpha_i$, a class
+    $\xi \in L^\times/(L^\times)^n$ lies in $A(\Sigma, n)$ if and only if every
+    component~$\xi(\alpha_i)$ lies in~$\QQ(\Sigma, n)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:ds-norm-selmer}
+(1) Unique factorization in~$\ZZ$, with $\ZZ^\times = \{\pm 1\}$. (2) The field factors of~$L$ are
+the $\QQ[x]/(x - \alpha_i) \cong \QQ$, with integral closure~$\ZZ$, and a class of~$\QQ$ lies
+in~$\QQ(\Sigma, n)$ if and only if its image in such a factor lies in its Selmer group: one
+direction is restriction, the other the norm (Lemma~\ref{lem:ds-norm-selmer}), here of degree~$1$.
+
+\emph{Formalization.} (1) is stated for a finite set of primes of~$\ZZ$, with Mathlib's
+\texttt{Rat.HeightOneSpectrum.natGenerator} (the prime number of a prime of~$\ZZ$), as an equality
+of subgroups; the proof adjoins the primes one at a time
+(\texttt{IsDedekindDomain.selmerGroup\_insert}) to $\ZZ^\times/(\ZZ^\times)^n$, which is all
+of~$\QQ(\emptyset, n)$ as~$\ZZ$ has trivial class group. (2) is stated for a field~$K$ with a
+Dedekind domain~$R$ (the field factors of $K[x]/(f)$ are copies of~$K$, the integral closure
+is~$R$, \texttt{IsDedekindDomain.map\_algebraMap\_mem\_selmerGroupAbove\_iff} for degree~$1$), and
+$f$ with at least $\deg f$ distinct roots. The components~$\xi(\alpha_i)$ are those of the
+isomorphism \texttt{AdjoinRoot.modPowEquivPiOfRoots} from $L^\times/(L^\times)^n$ to the product
+of copies of $K^\times/(K^\times)^n$, given by evaluation at the roots
+(\texttt{AdjoinRoot.equivPiOfRoots}, Lagrange interpolation); it commutes with base change
+(\texttt{AdjoinRoot.modPowEquivPiOfRoots\_map}).
+\end{proof}
+
+\begin{lemma}[The local images of E1]
+\label{lem:ds-e1-local}
+\lean{ChabautyColeman.DescentExample1.range_descentMap_three,
+  ChabautyColeman.DescentExample1.range_descentMap_two}
+\leanok
+\uses{lem:ds-loc, thm:ds-two-torsion, thm:ds-kernel, thm:ds-formula,
+  cor:ds-torsion-values, lem:ds-padic-squares}
+Assume~(Loc) for~$\QQ_2$ and~$\QQ_3$. Then $\mu_3(J(\QQ_3))$ is the group of order~$16$ generated
+by the images of the five points $(\alpha_j, 0)$, and $\mu_2(J(\QQ_2))$ is the group of order~$64$
+generated by these and the images of the points of~$C(\QQ_2)$ with $x = 4$ and $x = 1/5$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The group $\mu_v(J(\QQ_v)) \cong J(\QQ_v)/2J(\QQ_v)$ (Theorem~\ref{thm:ds-kernel} over~$\QQ_v$) has
+order $\#J(\QQ_v)[2] = 16$ for $v = 3$ and $2^2 \cdot 16 = 64$ for $v = 2$, by
+Lemma~\ref{lem:ds-loc}\,(1) and Theorem~\ref{thm:ds-two-torsion}, as~$f$ has five linear factors
+over~$\QQ_v$. The listed classes lie in it, the classes of $4 - \theta$ and $1/5 - \theta$ by
+Theorem~\ref{thm:ds-formula}: the two points over~$\QQ_2$ exist by
+Lemma~\ref{lem:ds-padic-squares}\,(3), as $f(4) = 2^2 \cdot 105$ and
+$f(1/5) = 2^8 \cdot 21/5^5$ with $105 \equiv 21 \cdot 5^5 \equiv 1 \bmod 8$. The isomorphisms of
+Lemma~\ref{lem:ds-padic-squares}\,(2) for~$\QQ_3$ and~(3) for~$\QQ_2$, applied to the five
+components of the values (Corollary~\ref{cor:ds-torsion-values} and
+Theorem~\ref{thm:ds-formula}), separate~$16$, resp.~$64$, products of the listed classes.
+
+\emph{Formalization.} The classes of $4 - \theta$ and $1/5 - \theta$ enter as units of
+$\QQ_2[T]/(f)$ with these values; they lie in the image by
+\texttt{HypJac.descentMap\_mumfordClass\_X\_sub\_C}, the value at a point $(x_0, y_0)$ with
+$f(x_0) \ne 0$. The components of the values $\mu((\alpha_j, 0))$ at the roots~$\alpha_i$ are
+$\operatorname{lc}(f)(\alpha_j - \alpha_i)$ for $i \ne j$ and $\operatorname{lc}(f) f'(\alpha_j)$
+for $i = j$ (Corollary~\ref{cor:ds-torsion-values}), written as products of~$-1$, $2$, $3$ with a
+table of exponents that \texttt{decide} checks against the integers. The order of the image is
+\texttt{HypJac.card\_range\_descentMap\_eq\_card\_quotient} with Lemma~\ref{lem:ds-loc}; the lower
+bound for the subgroup generated by the listed classes is
+\texttt{Subgroup.card\_closure\_range\_eq\_two\_pow} (elements of order dividing~$2$ of which no
+nonempty product is trivial generate a group of order~$2^k$), applied to the images in root
+coordinates, where \texttt{decide} checks the products. Four of the five points $(\alpha_j, 0)$
+suffice: the five values have product~$1$.
+\end{proof}
+
+\begin{proposition}[The relaxed Selmer group of~E1]
+\label{prop:ds-e1-sel}
+\lean{ChabautyColeman.DescentExample1.relaxedSelmerGroup_eq}
+\leanok
+\uses{def:ds-relaxed, lem:ds-e1-selmer, lem:ds-e1-local}
+Assume~(Loc) for~$\QQ_2$ and~$\QQ_3$. Then $S(\Sigma, V) = \mu(J(\QQ)[2])$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{cor:ds-torsion-values, thm:ds-naturality, lem:ds-padic-squares}
+The inclusion~$\supseteq$ is Definition~\ref{def:ds-relaxed}, as~$f$ has separable reduction
+outside~$\Sigma$. Let $\xi \in S(\Sigma, V)$. By Lemma~\ref{lem:ds-e1-selmer}, the components of
+the elements of~$A(\Sigma, 2)$ lie in the group generated by the classes of~$-1$, $2$ and~$3$,
+which stay independent in~$\QQ_2^\times/(\QQ_2^\times)^2$ (Lemma~\ref{lem:ds-padic-squares}\,(3));
+so the map from~$A(\Sigma, 2)$ to $L_2^\times/(L_2^\times)^2$, $L_2 = \QQ_2[T]/(f)$, is injective.
+The classes~$P$ and~$Q$ of~$A(\Sigma, 2)$ with components $(-1, -3, 1, 3, 1)$ and
+$(-3, -2, -3, 3, -6)$ map to the classes of $4 - \theta$ and $1/5 - \theta$, as the components
+agree in~$\QQ_2^\times/(\QQ_2^\times)^2$. By Lemma~\ref{lem:ds-e1-local} for~$\QQ_2$, as~$\mu$
+commutes with the map to~$\QQ_2$ (Theorem~\ref{thm:ds-naturality}), $\xi$ therefore lies in the
+group generated by~$P$, $Q$ and the values $\mu((\alpha_j, 0))$
+(Corollary~\ref{cor:ds-torsion-values}), which lie in~$A(\Sigma, 2)$: $\xi = wz$ with
+$w \in \mu(J(\QQ)[2])$ and $z \in \{1, P, Q, PQ\}$. Both~$\xi$ and~$w$ satisfy the local condition
+at~$\QQ_3$, hence so does~$z$. By Lemma~\ref{lem:ds-e1-local} for~$\QQ_3$, the image of~$z$ is
+then a product of the images of the values $\mu((\alpha_j, 0))$, which the isomorphism of
+Lemma~\ref{lem:ds-padic-squares}\,(2), applied to the five components, excludes for $z \ne 1$.
+So $\xi = w$.
+
+\emph{Formalization.} The classes of~$A(\Sigma, 2)$ and their images over~$\QQ_2$ and~$\QQ_3$ are
+compared in root coordinates (\texttt{AdjoinRoot.modPowEquivPiOfRoots} and its naturality
+\texttt{AdjoinRoot.modPowEquivPiOfRoots\_map}), every component a product of the classes of~$-1$,
+$2$, $3$ given by a table of exponents, and the last step is a check by \texttt{decide}. The
+elements of a subgroup generated by elements of order dividing~$2$ are the products over the finite
+sets of generators (\texttt{Subgroup.mem\_closure\_range\_iff\_of\_sq\_eq\_one}). The norm
+condition is not used.
+\end{proof}
+
+\begin{definition}[A cited input: reduction]
+\label{def:ds-red}
+\lean{ChabautyColeman.HypJac.TorsionReduction}
+\leanok
+\begin{description}
+  \item[\textmd{(Red)}] Let $F \in \ZZ[x]$ be monic of odd degree and squarefree, and~$p \ge 3$
+    a prime not dividing $\operatorname{disc} F$. Then reduction modulo~$p$ maps the torsion
+    subgroup of~$J(\QQ)$ injectively into~$\tilde J(\FF_p)$, the Jacobian of $y^2 = \bar F(x)$
+    (N.~M.~Katz, \emph{Galois properties of torsion points on abelian varieties}, Invent.\
+    Math.~62 (1981), 481--502, Appendix: the kernel of reduction is torsion-free, as
+    $e = 1 < p - 1$; for torsion of order prime to~$p$ also M.~Hindry and J.~H.~Silverman,
+    \emph{loc.\ cit.}, Theorem~C.1.4).
+\end{description}
+\end{definition}
+
+\begin{remark}[Formalization]
+\texttt{HypJac.TorsionReduction p F}, for $F \in \ZZ[x]$, is a structure with values in
+\texttt{Prop}, like~(Loc): there is a homomorphism from the Jacobian over~$\QQ$ of the image
+of~$F$ to the Jacobian over~$\ZZ/p$ of its reduction that is injective on the elements of finite
+order, in the form that an element of finite order in its kernel is trivial. The reduction map
+is not defined; the example uses only such a homomorphism, through
+\texttt{HypJac.TorsionReduction.pow\_eq\_one\_of\_isOfFinOrder}: an exponent of the group over
+$\ZZ/p$ kills every element of finite order of~$J(\QQ)$.
+\end{remark}
+
+\begin{lemma}[$\tilde J(\FF_5)$]
+\label{lem:ds-e1-five}
+\lean{ChabautyColeman.DescentExample1.exponent_hypJac_zmod_five,
+  ChabautyColeman.DescentExample1.sq_eq_one_of_eq_X_pow_five_sub_X}
+\leanok
+\uses{def:hypjac}
+The group $\tilde J(\FF_5)$ of $y^2 = \bar f(x) = x^5 - x$ has exponent~$2$; so it is
+$\tilde J(\FF_5)[2]$, of order~$16$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-two-torsion, lem:mumford-reduce}
+Every class has a reduced Mumford representative $(u, v)$: $u$ monic, $\deg v < \deg u \le 2$ and
+$u \mid v^2 - \bar f$ (Lemma~\ref{lem:mumford-reduce}). For $u = x - a$, $v^2 = \bar f(a) = 0$.
+For $u = x^2 + bx + c$ and $v = dx + e$, the remainder of $v^2 - \bar f$ modulo~$u$ has two
+coefficients, polynomials in $b, c, d, e$, which vanish over~$\FF_5$ only for $d = e = 0$
+(\texttt{decide} over the~$5^4$ tuples). So $v = 0$, and the class of $(u, 0)$ has order
+dividing~$2$. The order~$16$ is Theorem~\ref{thm:ds-two-torsion}.
+
+\emph{Formalization.} The statements are for any polynomial over $\ZZ/5$ equal to $x^5 - x$, so
+that they apply to the reduction of the integral model (\texttt{DescentExample1.map\_F\_zmod\_five},
+by \texttt{reduce\_mod\_char}). The form that Theorem~\ref{thm:ds-e1} consumes is
+\texttt{DescentExample1.sq\_eq\_one\_of\_eq\_X\_pow\_five\_sub\_X}; the order~$16$ is not stated.
+\end{proof}
+
+\begin{theorem}[E1]
+\label{thm:ds-e1}
+\lean{ChabautyColeman.DescentExample1.ker_powMonoidHom_two_eq_top,
+  ChabautyColeman.DescentExample1.card_hypJac, ChabautyColeman.DescentExample1.ratPoints_eq}
+\leanok
+\uses{def:ds-cited, def:ds-red, def:hypjac}
+Assume~(Loc) for~$\QQ_2$ and~$\QQ_3$ and~(Red) for $p = 5$. Then
+$J(\QQ) = J(\QQ)[2] \cong (\ZZ/2)^4$, and $C(\QQ) = \{\infty, (0, 0), (\pm 1, 0), (\pm 3, 0)\}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:ds-e1-sel, thm:ds-kernel, def:ds-relaxed, lem:ds-loc, lem:ds-loc-two,
+  thm:basechange-inj, lem:ds-e1-five, thm:ds-two-torsion, lem:mumford-exists}
+Write $J = J(\QQ)$ and $\Gamma = J[2]$, a group of order~$16$ by Theorem~\ref{thm:ds-two-torsion}.
+By Definition~\ref{def:ds-relaxed} and Proposition~\ref{prop:ds-e1-sel},
+$\mu(J) \subseteq \mu(\Gamma)$, and as $\ker\mu = 2J$ (Theorem~\ref{thm:ds-kernel}),
+$J = \Gamma + 2J$. Multiplying by~$2^n$ gives $2^nJ = 2^n\Gamma + 2^{n+1}J \subseteq \Gamma +
+2^{n+1}J$, so $J = \Gamma + 2^nJ$ for every~$n$, by induction. Let $a \in J$, and for each~$n$
+choose $\gamma_n \in \Gamma$ with $a - \gamma_n \in 2^nJ$. As~$\Gamma$ is finite, some
+$\gamma \in \Gamma$ equals~$\gamma_n$ for infinitely many~$n$; as the subgroups~$2^nJ$ decrease,
+$t = a - \gamma$ lies in $\bigcap_n 2^nJ$. Every element of $\bigcap_n 2^nJ$ has odd order: its
+image in~$J(\QQ_2)$ does, by Lemma~\ref{lem:ds-loc-two}, and $J \to J(\QQ_2)$ is injective
+(Theorem~\ref{thm:basechange-inj}). By~(Red) and Lemma~\ref{lem:ds-e1-five}, the image of~$t$
+in~$\tilde J(\FF_5)$ has odd order and order dividing~$2$, so it is~$0$, and $t = 0$. So
+$J = \Gamma$. Finally let $P = (x_0, y_0) \in C(\QQ)$. As $[P - \infty]$ has order dividing~$2$,
+$[P - \infty] = [(x_0, -y_0) - \infty]$; the reduced Mumford representatives $(x - x_0, y_0)$
+and $(x - x_0, -y_0)$ of these classes agree (Lemma~\ref{lem:mumford-exists}), so $y_0 = 0$ and
+$f(x_0) = 0$.
+
+\emph{Formalization.} In the module \texttt{HyperellipticCurves.Descent.Example1}. $C(\QQ)$ is
+stated for the affine points, $\{(x, y) \in \QQ^2 : y^2 = f(x)\} = \{(\alpha_i, 0)\}$. The
+hypotheses are \texttt{HypJac.LocalStructure} for~$\QQ_2$ and~$\QQ_3$ and
+\texttt{HypJac.TorsionReduction 5}; \texttt{HypJac.MordellWeil} does not occur.
+$J(\QQ) = J(\QQ)[2] \cong (\ZZ/2)^4$ is stated as \texttt{ker\_powMonoidHom\_two\_eq\_top}, the
+kernel of the squaring map is everything, with \texttt{card\_hypJac}, $\#J(\QQ) = 16$. The step
+from $\Gamma + 2J$ to $\Gamma + 2^nJ$ is \texttt{Subgroup.sup\_range\_powMonoidHom\_pow\_eq\_top},
+and the reduced representatives are compared by \texttt{mumfordClass\_inj}. The Lean concludes
+through the torsion of~$J(\QQ)$: by the argument with the finite group~$\Gamma$
+(\texttt{Subgroup.coprime\_orderOf\_mk\_of\_mem\_iInf\_sup\_range\_powMonoidHom\_pow}),
+$J(\QQ)/\Gamma$ is a torsion group, hence so is~$J(\QQ)$ (Mathlib's
+\texttt{IsMulTorsion.extension\_closed}), and by~(Red) and Lemma~\ref{lem:ds-e1-five} every element
+of~$J(\QQ)$ has order dividing~$2$.
+\end{proof}
+
+\begin{remark}[E2: rank~$1$]
+\label{rem:ds-e2}
+The second example is the curve
+\[ C \colon y^2 = f(x) = (x + 4)(x + 3)(x^3 - x + 1) = x^5 + 7x^4 + 11x^3 - 6x^2 - 5x + 12\,, \]
+with $\operatorname{disc} f = -23^3 \cdot 59^2$, so $\Sigma_f = \{23, 59\}$. Here
+$L = \QQ \times \QQ \times F$, where $F = \QQ[t]/(t^3 - t + 1)$ is the cubic field of
+discriminant~$-23$, of class number~$1$ and unit rank~$1$. The places $V = \{23, 59\}$ suffice for
+the descent: the prime~$2$ is not needed, and the components in~$\QQ_v$ of the local conditions
+suffice, apart from one class at~$23$ (Lemma~\ref{lem:ds-e2-local}).
+
+The group $J(\QQ)[2] \cong (\ZZ/2)^2$ (Theorem~\ref{thm:ds-two-torsion}) is the torsion subgroup
+of~$J(\QQ)$ (by a computation with Magma), and the class of $(-11/9, 1020/729) - \infty$ has
+infinite order (Lemma~\ref{lem:ds-e2-points}). Under~(MW) and~(Loc) for~$\QQ_{23}$ and~$\QQ_{59}$,
+$\operatorname{rk} J(\QQ) = 1$, and $\Sel_2 = S(\Sigma_f, V)$ has dimension~$3$, as it lies between
+$\mu(J(\QQ))$ and $S(\Sigma_f, V)$ (Theorem~\ref{thm:ds-e2}). The known rational points are
+$\infty$, $(-4, 0)$, $(-3, 0)$ and $(-11/9, \pm 1020/729)$. As $\operatorname{rk} J(\QQ) = 1 < g$,
+Theorem~\ref{thm:main} with $r = 1$ gives $\#C(\QQ) \le \#\bar C(\FF_p) + 2$ for the primes
+$p \ge 5$ of good reduction; this bound is at least~$8$ at every such prime (it is~$8$ for $p = 5$
+and $p = 7$, and for $p > 19$ the Weil bound gives more). So it does not determine~$C(\QQ)$; that
+needs further methods, such as the Selmer group Chabauty method of [Sto17], and is not formalized
+here.
+\end{remark}
+
+\begin{setting}
+\label{set:ds-e2}
+\lean{ChabautyColeman.DescentExample2.g, ChabautyColeman.DescentExample2.f,
+  ChabautyColeman.DescentExample2.S, ChabautyColeman.DescentExample2.P}
+\leanok
+Let $g = x^3 - x + 1$ and $f = (x + 4)(x + 3)g \in \QQ[x]$, let $F = \QQ[t]/(g)$, with ring of
+integers~$O_F$, and $L = \QQ[T]/(f) \cong \QQ \times \QQ \times F$,
+$\xi \mapsto (\xi(-4), \xi(-3), \xi(t))$; we write classes in $L^\times/(L^\times)^2$ as triples
+of their components. Let $\Sigma = \{23, 59\}$, let~$V$ consist of~$\QQ_{23}$ and~$\QQ_{59}$, and
+$S = S(\Sigma, V)$ (Definition~\ref{def:ds-relaxed}). Let $T_1, T_2, P \in J(\QQ)$ be the classes
+of $(-4, 0) - \infty$, $(-3, 0) - \infty$ and $(-11/9, 1020/729) - \infty$.
+\end{setting}
+
+\begin{remark}[Formalization]
+In the modules \texttt{HyperellipticCurves.Descent.Example2.Basic} (Setting~\ref{set:ds-e2} to
+Lemma~\ref{lem:ds-e2-padic}\,(1), and Lemma~\ref{lem:ds-e2-points}) and
+\texttt{HyperellipticCurves.Descent.Example2.Rank} (Lemma~\ref{lem:ds-e2-local},
+Proposition~\ref{prop:ds-e2-sel}, Theorem~\ref{thm:ds-e2}), as for~E1. $f$ has separable reduction
+outside~$\Sigma$, also at~$2$, where \texttt{Polynomial.HasSeparableReduction} asks nothing special:
+$\operatorname{disc} f = -23^3 \cdot 59^2$, from
+$\operatorname{disc}(pq) = \operatorname{disc}(p) \operatorname{disc}(q) \operatorname{Res}(p, q)^2$
+with $\operatorname{disc} g = -23$, $g(-4) = -59$ and $g(-3) = -23$. The classes are
+\texttt{mumfordClass} values, $P$ that of $(x + 11/9, 1020/729)$. The factors $x + 4$, $x + 3$, $g$
+of~$f$ are indexed by $\{0, 1, 2\}$ (\texttt{DescentExample2.factorsEquiv}).
+\end{remark}
+
+\begin{lemma}[The cubic field]
+\label{lem:ds-e2-field}
+\lean{ChabautyColeman.DescentExample2.subsingleton_classGroup,
+  ChabautyColeman.DescentExample2.card_modPow_two,
+  ChabautyColeman.DescentExample2.range_map_eq_closure,
+  ChabautyColeman.DescentExample2.selmerGroupAbove_eq_closure}
+\leanok
+\uses{def:ds-selmer}
+\begin{enumerate}
+  \item $O_F$ has trivial class group, and $O_F^\times/(O_F^\times)^2$ has order~$4$ and is
+    generated by the classes of~$-1$ and~$t$, a unit with $t^{-1} = 1 - t^2$.
+  \item The elements $t + 3$, $2t - 3$, $t + 4$, $5t + 6$ and $t^2 + 4t - 3$ of~$O_F$, of norms
+    $23$, $-23$, $59$, $-59$ and~$-59$, generate prime ideals, and these are the primes of~$O_F$
+    above~$23$ and~$59$:
+    \[ 23\,t^3 = -(t + 3)(2t - 3)^2\,, \qquad 59 = t^6\,(t + 4)(5t + 6)(t^2 + 4t - 3)\,. \]
+  \item $F(\Sigma, 2)$ is generated by the classes of~$-1$, $t$ and the five elements of~(2).
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:ds-e2-padic, lem:ds-padic-squares, lem:ds-resultant}
+(1) The power basis of~$t$ has discriminant $\operatorname{disc} g = -23$, so the field
+discriminant divides~$-23$ and is negative; the Minkowski bound gives class number~$1$, and
+Dirichlet's unit theorem gives unit rank~$1$, the signature being~$(1, 1)$. As the roots of unity
+are~$\pm 1$, $O_F^\times/(O_F^\times)^2$ has order~$2^{1 + 1}$. The classes of~$-1$, $t$ and~$-t$
+are nontrivial: under $t \mapsto r_1$, resp.~$r_2$, the roots of~$g$ in~$\QQ_{59}$ with
+$r_1 \equiv -4$ and $r_2 \equiv -13 \bmod 59$ (Lemma~\ref{lem:ds-e2-padic}), the images $-1$,
+$r_1$ and~$-r_2$ are units that are not squares modulo~$59$
+(Lemma~\ref{lem:ds-padic-squares}\,(2)). (2) The norm of $at + b$ is $b^3 - a^2b - a^3$
+(Lemma~\ref{lem:ds-resultant}), and an element of norm~$\pm p$, for a prime~$p$, generates a prime
+ideal of absolute norm~$p$. The norm of~$t^2 + 4t - 3$ follows from the identity for~$59$ by
+multiplicativity, as $N(t) = -1$. A prime of~$O_F$ above~$23$ contains $23t^3$, hence $t + 3$ or
+$2t - 3$, and so equals the prime ideal generated by it; likewise for~$59$. (3) As the class group
+is trivial, $F(\emptyset, 2)$ is the image of the units, given by~(1), and adding the primes
+of~(2) one at a time adds their generators.
+
+\emph{Formalization.} $O_F$ is the integral closure of~$\ZZ$ in the field factor \texttt{AdjoinRoot
+g} of~$L$. (1) uses general lemmas on number fields that are missing from Mathlib: for the class
+number, the Minkowski bound for cubic fields
+(\texttt{RingOfIntegers.isPrincipalIdealRing\_of\_finrank\_eq\_three\_of\_abs\_discr\_le}) with
+\texttt{NumberField.isPrincipalIdealRing\_integralClosure\_iff}, and for the unit rank
+\texttt{NumberField.Units.finrank\_eq\_one\_of\_finrank\_eq\_three\_of\_discr\_neg} with
+\texttt{NumberField.finrank\_additive\_units\_integralClosure}; the order~$4$ is
+\texttt{Units.card\_modPow\_two}. The classes of~$-1$, $t$, $-t$ are nonsquares by
+\texttt{Padic.isSquare\_iff\_modPowTwoCoords\_eq\_zero} after the evaluations $t \mapsto r_1, r_2$
+(\texttt{AdjoinRoot.lift}). (2) uses \texttt{NumberField.prime\_of\_abs\_norm\_eq} (an element of
+norm~$\pm p$ is prime); the norms of linear elements come from
+\texttt{AdjoinRoot.leadingCoeff\_mul\_norm\_of\_sub\_root}. (3) comes from
+\texttt{IsDedekindDomain.selmerGroup\_image\_eq\_range\_sup\_closure} and
+\texttt{IsDedekindDomain.selmerGroup\_range\_eq\_range\_sup\_closure}, the generalization of
+Lemma~\ref{lem:ds-e1-selmer}\,(1): for trivial class group and a finite set of primes with given
+generators, $K(\Sigma, n)$ is generated by the image of~$R^\times$ and the generators (by
+\texttt{IsDedekindDomain.selmerGroup\_insert} and
+\texttt{IsDedekindDomain.selmerGroup.fromUnit\_surjective}); \texttt{Rat.selmerGroup\_eq\_closure}
+is proved through them. The consumed form of~(3),
+\texttt{DescentExample2.selmerGroupAbove\_eq\_closure}, is for any polynomial equal to~$g$, so that
+it applies to the field factor of~$f$ at the factor~$g$.
+\end{proof}
+
+\begin{lemma}[$A(\Sigma, 2)$ of~E2]
+\label{lem:ds-e2-selmer}
+\lean{ChabautyColeman.DescentExample2.selmerGroup_le_closure,
+  ChabautyColeman.DescentExample2.card_selmerGroup_le}
+\leanok
+\uses{lem:ds-e1-selmer, lem:ds-e2-field}
+A class $\xi \in L^\times/(L^\times)^2$ lies in $A(\Sigma, 2)$ if and only if
+$\xi(-4), \xi(-3) \in \QQ(\Sigma, 2)$ and $\xi(t) \in F(\Sigma, 2)$. So $A(\Sigma, 2)$ is
+generated by the $13$ classes with two trivial components and the third one equal to~$-1$, $23$
+or~$59$ (at~$-4$ or~$-3$) or to one of the seven generators of Lemma~\ref{lem:ds-e2-field}\,(3)
+(in~$F$), and $\#A(\Sigma, 2) \le 2^{13}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{def:ds-selmer}
+The field factors of~$L$ are those of the three irreducible factors of~$f$, and $A(\Sigma, 2)$ is
+defined componentwise (Definition~\ref{def:ds-selmer}). For the two linear factors,
+Lemma~\ref{lem:ds-e1-selmer}\,(2) identifies the condition with
+$\xi(-4), \xi(-3) \in \QQ(\Sigma, 2)$, generated by~$-1$, $23$, $59$
+(Lemma~\ref{lem:ds-e1-selmer}\,(1)); for~$g$, Lemma~\ref{lem:ds-e2-field}\,(3).
+
+\emph{Formalization.} \texttt{Polynomial.Factors.equivOfProd} identifies the factors of a product
+of distinct monic irreducible polynomials with their index set, as
+\texttt{Polynomial.Factors.equivOfRoots} does for linear factors. The $13$ classes are the images,
+under the inverse of \texttt{AdjoinRoot.modPowEquivPiFactors}, of families with one nontrivial
+component. A subgroup generated by~$n$ elements of order dividing~$2$ has at most~$2^n$ elements
+(\texttt{Subgroup.card\_closure\_range\_le\_two\_pow}). Only the inclusion of $A(\Sigma, 2)$ in the
+subgroup generated by the $13$ classes is formalized, which is what
+Proposition~\ref{prop:ds-e2-sel} uses. The classes are given by data, the factor and the
+coefficients of the nontrivial component, so that their coordinates in
+Proposition~\ref{prop:ds-e2-sel} are computed by one lemma.
+\end{proof}
+
+\begin{lemma}[The local fields of E2]
+\label{lem:ds-e2-padic}
+\lean{PadicInt.exists_aeval_eq_zero_toZModPow_eq, Padic.not_isSquare_adjoinRoot_of_odd_valuation,
+  Padic.modPowTwoEquiv_mk_of_toZModPow_eq, Padic.modPowTwoEquivZModTwo_mk_of_toZModPow_two_eq,
+  ChabautyColeman.DescentExample2.exists_isRootData_fiftyNine,
+  ChabautyColeman.DescentExample2.exists_isRootData_twentyThree}
+\leanok
+\uses{lem:ds-padic-squares}
+\begin{enumerate}
+  \item $g$ has a root $r \in \ZZ_{23}$ with $r \equiv 181 \bmod 23^2$, and roots
+    $r_1, r_2, r_3 \in \ZZ_{59}$ with $r_1, r_2, r_3 \equiv 3182, 2406, 1374 \bmod 59^2$; so
+    $r \equiv -3 \bmod 23$ and $r_1, r_2, r_3 \equiv -4, -13, 17 \bmod 59$.
+  \item Over~$\QQ_{59}$, $f$ has the five distinct roots $-4, -3, r_1, r_2, r_3$.
+    Over~$\QQ_{23}$, $f = (x + 4)(x + 3)(x - r)h$ with $h = x^2 + rx + r^2 - 1$ irreducible: its
+    discriminant $4 - 3r^2 \equiv 5 \cdot 23 \bmod 23^2$ has odd valuation.
+  \item Let~$p$ be odd and $x \in \ZZ_p$ with $x \equiv p^n m \bmod p^{n+1}$ for an integer~$m$
+    prime to~$p$. Then~$x$ and $p^n m$ have the same class in $\QQ_p^\times/(\QQ_p^\times)^2$. In
+    particular, for $Q \in \ZZ[x]$ and a root~$\rho$ of~(1) with $\rho \equiv a \bmod p^2$, the
+    class of~$Q(\rho)$ is determined by $Q(a) \bmod p^2$ if $p^2 \nmid Q(a)$.
+  \item Let $E = \QQ_{23}[x]/(h)$, with~$\theta_h$ the class of~$x$, and let
+    $u, w \in \QQ_{23}$ with $u - wr/2 \in \ZZ_{23}^\times$ not a square modulo~$23$. Then
+    $u + w\theta_h$ is not a square in~$E$. In particular, $-\theta_h$ is not a square, as
+    $r/2 \equiv 10 \bmod 23$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Hensel's lemma, in the form with $\lvert \rho - a\rvert = \lvert g(a)\rvert$ for
+$\lvert g'(a)\rvert = 1$, as $g(a) \equiv 0 \bmod p^2$ and $p \nmid g'(a)$ for these~$a$. (2) The
+roots are distinct modulo~$59$ except $r_1 \equiv -4$, and $r_1 \ne -4$ as $g(-4) = -59$. A
+root~$x_0$ of~$h$ in~$\QQ_{23}$ would make $4 - 3r^2 = (2x_0 + r)^2$ a square. (3) $x/(p^n m)$ is
+a unit $\equiv 1 \bmod p$, hence a square (Lemma~\ref{lem:ds-padic-squares}\,(1)). (4) Let
+$s = 2\theta_h + r$, so that $s^2 = D = 4 - 3r^2$ and
+$u + w\theta_h = (u - wr/2) + (w/2)s$. If $u + w\theta_h = (\alpha + \beta s)^2$ with
+$\alpha, \beta \in \QQ_{23}$, then $u - wr/2 = \alpha^2 + D\beta^2$. The two terms have
+valuations of different parity, so~$\alpha^2$ is a unit and $D\beta^2 \in 23\ZZ_{23}$, and
+$u - wr/2 \equiv \alpha^2 \bmod 23$.
+
+\emph{Formalization.} (1) is Hensel's lemma with a congruence modulo~$p^k$
+(\texttt{PadicInt.exists\_aeval\_eq\_zero\_toZModPow\_eq}, from Mathlib's
+\texttt{hensels\_lemma}). (3) is the value of \texttt{Padic.modPowTwoEquiv} at $p^n u$ for a
+unit~$u$ of~$\ZZ_p$ with a given residue (\texttt{Padic.modPowTwoEquiv\_mk\_of\_eq\_pow\_mul}, which
+\texttt{Padic.modPowTwoEquiv\_mk\_of\_val\_eq} uses) and at $x \equiv p^n m \bmod p^k$, $n < k$
+(\texttt{Padic.modPowTwoEquiv\_mk\_of\_toZModPow\_eq}). (4) is stated for a monic quadratic
+over~$\QQ_p$, $p$ odd, whose discriminant has odd valuation
+(\texttt{Padic.not\_isSquare\_adjoinRoot\_of\_odd\_valuation}); the irreducibility in~(2) comes from
+\texttt{Polynomial.irreducible\_X\_sq\_add\_C\_mul\_X\_add\_C\_of\_not\_isSquare}. The example
+uses~(3) in the form \texttt{Padic.modPowTwoEquivZModTwo\_mk\_of\_toZModPow\_two\_eq}: the class
+of $c^2 y$, for $y \in \ZZ_p$ with residue $z \ne 0$ modulo~$p^2$, has the coordinates
+\texttt{Padic.modPowTwoCoords p z} in~$(\ZZ/2)^2$ (the valuation modulo~$2$, and whether the unit
+part is a nonsquare modulo~$p$), which \texttt{decide} computes. The roots enter only inside
+proofs, through \texttt{DescentExample2.exists\_isRootData\_fiftyNine} and
+\texttt{DescentExample2.exists\_isRootData\_twentyThree}; the lemmas on coordinates take a vector
+of roots with their residues modulo~$p^2$ (\texttt{DescentExample2.IsRootData}), and no main
+statement mentions them.
+\end{proof}
+
+\begin{lemma}[The local images of E2]
+\label{lem:ds-e2-local}
+\lean{ChabautyColeman.DescentExample2.range_descentMap_twentyThree,
+  ChabautyColeman.DescentExample2.range_descentMap_fiftyNine}
+\leanok
+\uses{lem:ds-loc, thm:ds-two-torsion, thm:ds-kernel, thm:ds-formula, cor:ds-torsion-values,
+  thm:ds-naturality, lem:ds-e2-padic}
+Assume~(Loc) for~$\QQ_{23}$ and~$\QQ_{59}$. Then $\mu_{59}(J(\QQ_{59}))$ is the group of
+order~$16$ generated by the images of~$T_1$, $T_2$ and of the points of~$C(\QQ_{59})$ with
+$x = -1/2$ and $x = 4/3$, and $\mu_{23}(J(\QQ_{23}))$ is the group of order~$8$ generated by the
+images of~$T_1$, $T_2$ and of the points of~$C(\QQ_{23})$ with $x = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:ds-padic-squares}
+As for Lemma~\ref{lem:ds-e1-local}: the orders are $\#J(\QQ_v)[2] = 2^4$ and~$2^3$
+(Lemma~\ref{lem:ds-loc}\,(1) and Theorem~\ref{thm:ds-two-torsion}), as~$f$ has five, resp.~four,
+irreducible factors over~$\QQ_v$ (Lemma~\ref{lem:ds-e2-padic}\,(2)). The points exist:
+$f(-1/2) = 385/32$ and $f(4/3) = 11440/243$ are units of~$\ZZ_{59}$ with residues $6^2$ and~$4^2$,
+and $f(0) = 12 \equiv 9^2 \bmod 23$. Their classes, and those of~$T_1$ and~$T_2$
+(Corollary~\ref{cor:ds-torsion-values}), are compared through their components at the roots
+of~$f$ in~$\QQ_v$, each mapped by Lemma~\ref{lem:ds-padic-squares}\,(2) to its valuation
+modulo~$2$ and the class of its residue, computed by Lemma~\ref{lem:ds-e2-padic}\,(3). At~$59$
+the four classes are independent. At~$23$ the classes of~$T_1$ and~$T_2$ are independent, and
+the class~$\delta$ of the point with $x = 0$ has trivial components at the roots $-4$, $-3$
+and~$r$, as $4$, $3$ and $-r \equiv 3$ are squares modulo~$23$; but its component $-\theta_h$
+in~$E$ is not a square (Lemma~\ref{lem:ds-e2-padic}\,(4)), so the three classes are independent.
+
+\emph{Formalization.} As in~E1, with three general lemmas:
+\texttt{HypJac.LocalStructure.range\_descentMap\_eq\_of\_le\_of\_card\_ge} (for odd~$v$, a subgroup
+of the local image of order at least $\#J(\QQ_v)[2]$ is all of it),
+\texttt{HypJac.mk\_mem\_range\_descentMap\_of\_isSquare} (the class of $x_0 - \theta$ lies in the
+local image if $f(x_0)$ is a square) and \texttt{Padic.isSquare\_iff\_modPowTwoCoords\_eq\_zero};
+the lower bounds come from \texttt{Subgroup.card\_closure\_range\_eq\_two\_pow\_of\_monoidHom}. The
+components at the roots are evaluations $L_v \to \QQ_v$ (\texttt{AdjoinRoot.liftAlgHom}), with the
+coordinates \texttt{DescentExample2.rootBits}, and, for~$E$, the map
+\texttt{AdjoinRoot.algHomOfDvd} to $\QQ_{23}[x]/(h)$; over~$\QQ_{23}$ no isomorphism of
+$L_v^\times/(L_v^\times)^2$ with a product is needed. The number of factors over~$\QQ_{23}$ comes
+from \texttt{Polynomial.Factors.card\_eq\_of\_associated\_prod}, over~$\QQ_{59}$ from
+\texttt{Polynomial.Factors.card\_eq\_of\_injective} as in~E1. Only components of odd valuation
+need the roots modulo~$p^2$: $-4 - r_1$ of~$\mu_{59}(T_1)$ and $-3 - r$ of~$\mu_{23}(T_2)$ here,
+and the generators of the primes of Lemma~\ref{lem:ds-e2-field}\,(2) at their own roots in
+Proposition~\ref{prop:ds-e2-sel}.
+\end{proof}
+
+\begin{proposition}[The relaxed Selmer group of~E2]
+\label{prop:ds-e2-sel}
+\lean{ChabautyColeman.DescentExample2.card_relaxedSelmerGroup_le}
+\leanok
+\uses{def:ds-relaxed, lem:ds-e2-selmer, lem:ds-e2-local}
+Assume~(Loc) for~$\QQ_{23}$ and~$\QQ_{59}$. Then $\#S(\Sigma, V) \le 8$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-naturality, lem:ds-e2-padic, lem:ds-padic-squares}
+Each root~$\rho$ of~$f$ in~$\QQ_v$, for $v = 23, 59$, gives a homomorphism
+$L^\times/(L^\times)^2 \to \QQ_v^\times/(\QQ_v^\times)^2 \to \FF_2^2$: the component at~$\rho$, then
+its valuation modulo~$2$ and whether its residue is a nonsquare. Together, the roots $-4$, $-3$,
+$r_1$, $r_2$, $r_3$ of~$f$ in~$\QQ_{59}$ and $-4$, $-3$, $r$ in~$\QQ_{23}$ give
+\[ \beta = (\beta_{59}, \beta_{23}) \colon L^\times/(L^\times)^2 \to \FF_2^{10} \times
+   \FF_2^6\,, \]
+with~$\beta_v$ factoring through~$\operatorname{res}_v$ (Theorem~\ref{thm:ds-naturality}). By
+Lemma~\ref{lem:ds-e2-local}, the images of the local images $\mu_v(J(\QQ_v))$ under~$\beta_{59}$
+and~$\beta_{23}$ have dimensions~$4$ and~$2$, as the class~$\delta$ of the point with $x = 0$ lies
+in the kernel of~$\beta_{23}$. So there are ten linearly independent linear forms on
+$\FF_2^{10} \times \FF_2^6$ vanishing on both, which give a homomorphism
+$\Theta \colon L^\times/(L^\times)^2 \to \FF_2^{10}$ with $S \subseteq \ker\Theta$. The forms can
+be chosen so that~$\Theta$ maps the ten generators $(-1, 1, 1)$, $(23, 1, 1)$, $(1, 23, 1)$,
+$(1, 59, 1)$ and $(1, 1, \varphi)$, $\varphi = t$, $t + 3$, $2t - 3$, $t + 4$, $5t + 6$,
+$t^2 + 4t - 3$, of~$A(\Sigma, 2)$ (Lemma~\ref{lem:ds-e2-selmer}) to the standard basis
+of~$\FF_2^{10}$. So $\Theta(A(\Sigma, 2)) = \FF_2^{10}$, and
+$\#S \le \#(A(\Sigma, 2) \cap \ker\Theta) = \#A(\Sigma, 2)/2^{10} \le 2^3$.
+
+\emph{Formalization.} The forms are a $16 \times 10$ matrix over~$\ZZ/2$, computed with Magma and
+checked in Lean by \texttt{decide}: it kills the values of~$\beta$ on the generators of the local
+images and maps the ten generators to the standard basis. The map~$\beta_v$ is
+\texttt{DescentExample2.globalBits}, with values in~$(\ZZ/2)^2$ per root
+(\texttt{Padic.modPowTwoEquivZModTwo}; the second coordinate is the quadratic character
+of~$\ZZ/p$, Mathlib's \texttt{quadraticChar}, through
+\texttt{FiniteField.modPowTwoEquivZModTwo}). The count runs in the subgroup~$B$ generated by the
+$13$ classes, which contains $A(\Sigma, 2)$ (\texttt{DescentExample2.selmerGroup\_le\_closure}), so
+the classes need not be shown to lie in~$A(\Sigma, 2)$: $\#(B \cap \ker\Theta) \cdot
+\#\Theta(B) = \#B \le 2^{13}$, by Mathlib's \texttt{Subgroup.relIndex\_mul\_card} and
+\texttt{Subgroup.relIndex\_ker}, and \texttt{Subgroup.card\_closure\_range\_le\_two\_pow}. The norm
+condition is not used, and the remaining three generators $(59, 1, 1)$, $(1, -1, 1)$,
+$(1, 1, -1)$ need no values.
+\end{proof}
+
+\begin{lemma}[$P$ has infinite order]
+\label{lem:ds-e2-points}
+\lean{ChabautyColeman.DescentExample2.not_isOfFinOrder_P,
+  ChabautyColeman.DescentExample2.card_closure_descentMap_eq}
+\leanok
+\uses{thm:ds-formula, cor:ds-torsion-values, thm:ds-naturality, thm:ds-two-torsion,
+  lem:ds-e2-padic}
+The classes $\mu(T_1)$, $\mu(T_2)$ and $\mu(P)$ generate a subgroup of order~$8$
+of~$L^\times/(L^\times)^2$, and~$P$ has infinite order.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:ds-padic-squares}
+The values are (Corollary~\ref{cor:ds-torsion-values} and Theorem~\ref{thm:ds-formula})
+\[ \mu(T_1) = (59, -1, -4 - t)\,, \qquad \mu(T_2) = (1, -23, -3 - t)\,, \qquad
+   \mu(P) = (25/9, 16/9, -11/9 - t)\,. \]
+Their images under the map~$\beta$ of the proof of Proposition~\ref{prop:ds-e2-sel} are
+independent: only $\mu(T_1)$ has odd valuation at the root~$-4$ in~$\QQ_{59}$; $\mu(P)$ has trivial
+components in~$\QQ_{23}$, unlike~$\mu(T_2)$; and the component $-11/9 - r_2$ of~$\mu(P)$ is a unit
+of~$\ZZ_{59}$ that is not a square modulo~$59$. If~$P$ had finite order,
+$B = J(\QQ)[2] + \langle P\rangle$ would be a finite group with $B[2] = J(\QQ)[2]$, of order~$4$
+(Theorem~\ref{thm:ds-two-torsion}, as~$f$ has three irreducible factors). As~$\mu$ kills~$2B$ and
+$\#(B/2B) = \#B[2]$ for a finite abelian group, $\#\mu(B) \le 4$, whereas~$\mu(B)$ contains the
+group of order~$8$ above.
+
+\emph{Formalization.} Neither~(MW) nor~(Loc) is used. The counting step is
+\texttt{Subgroup.card\_map\_le\_card\_inf\_ker\_powMonoidHom}: for a finite subgroup~$B$ of a
+commutative group~$G$ and a homomorphism~$\varphi$ to a group of exponent~$n$,
+$\#\varphi(B) \le \#(B \cap G[n])$, here with $n = 2$; a subgroup generated by finitely many
+elements of finite order is finite (\texttt{Subgroup.finite\_closure\_of\_isOfFinOrder}, from
+Mathlib's \texttt{CommGroup.finite\_of\_fg\_isMulTorsion}). The Lean takes for~$B$ the subgroup
+generated by~$T_1$, $T_2$ and~$P$ and bounds $\#B[2]$ by $\#J(\QQ)[2] = 4$, so it does not need
+$J(\QQ)[2] = \langle T_1, T_2\rangle$.
+\end{proof}
+
+\begin{theorem}[E2]
+\label{thm:ds-e2}
+\lean{ChabautyColeman.DescentExample2.finrank_hypJac,
+  ChabautyColeman.DescentExample2.relaxedSelmerGroup_eq}
+\leanok
+\uses{def:ds-cited, thm:ds-rank-bound, prop:ds-e2-sel, lem:ds-e2-points}
+Assume~(MW) and~(Loc) for~$\QQ_{23}$ and~$\QQ_{59}$. Then $\operatorname{rk} J(\QQ) = 1$, and
+$S(\Sigma, V) = \mu(J(\QQ)[2] + \langle P\rangle)$, of order~$8$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:ds-two-torsion, def:ds-relaxed}
+By Theorem~\ref{thm:ds-rank-bound} and Proposition~\ref{prop:ds-e2-sel},
+$2^{\operatorname{rk} J(\QQ)} \cdot 4 \le 8$, as $\#J(\QQ)[2] = 2^{3 - 1}$
+(Theorem~\ref{thm:ds-two-torsion}). By Lemma~\ref{lem:ds-e2-points}, $P$ has infinite order, so
+$\operatorname{rk} J(\QQ) \ge 1$, as $J(\QQ)$ is finitely generated. Finally
+$\mu(J(\QQ)[2] + \langle P\rangle) \subseteq S$ (Definition~\ref{def:ds-relaxed}) has order~$8$ by
+Lemma~\ref{lem:ds-e2-points}.
+
+\emph{Formalization.} The rank is \texttt{Module.finrank} over~$\ZZ$ of \texttt{Additive (HypJac
+$\QQ$ f)}; the hypotheses are the instance that \texttt{HypJac $\QQ$ f} is finitely generated (which
+\texttt{HypJac.MordellWeil} provides) and \texttt{HypJac.LocalStructure} for~$\QQ_{23}$
+and~$\QQ_{59}$; the statement on $S(\Sigma, V)$, \texttt{relaxedSelmerGroup\_eq}, needs~(Loc) only.
+The instances of Theorem~\ref{thm:ds-rank-bound} on the class groups and unit groups of the field
+factors are found for $K = \QQ$ in general, as the instances
+\texttt{NumberField.instFiniteClassGroupIntegralClosure} and
+\texttt{NumberField.instIsMulFGUnitsIntegralClosure}; $\operatorname{rk} J(\QQ) \ge 1$ comes through
+Mathlib's \texttt{Module.finrank\_eq\_zero\_iff\_isTorsion}. The order~$8$ of $S(\Sigma, V)$ is not
+part of the Lean statement; it is \texttt{DescentExample2.card\_closure\_descentMap\_eq} with the
+proof.
+\end{proof}
