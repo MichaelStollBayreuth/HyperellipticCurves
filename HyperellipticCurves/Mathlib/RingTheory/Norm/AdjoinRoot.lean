@@ -10,6 +10,7 @@ public import HyperellipticCurves.Mathlib.RingTheory.Polynomial.Resultant.Basic
 public import Mathlib.RingTheory.Norm.Defs
 
 import HyperellipticCurves.Mathlib.RingTheory.AdjoinRoot
+import HyperellipticCurves.Mathlib.RingTheory.Norm.Defs
 import Mathlib.RingTheory.Norm.Basic
 
 /-!
@@ -29,6 +30,10 @@ Taking determinants gives `N(mk g p) = Res(g, p)`.
   `AdjoinRoot.leadingCoeff_mul_norm_of_sub_root`: the same for an invertible leading coefficient.
 * `AdjoinRoot.isSquare_mul_norm_mk_of_dvd_sq_sub`: for `a ∣ b ^ 2 - f`, the norm of `a(θ)` is a
   square up to an explicit constant.
+* `AdjoinRoot.norm_eq_prod_norm_projFactor`: for squarefree `f` over a field, the norm on
+  `K[X] ⧸ (f)` is the product of the norms of the components in the field factors.
+* `AdjoinRoot.norm_projFactor_mk_C_sub_X`: the norm of the component of `x - T` at the factor
+  `p` is `p(x)`.
 
 The first two statements are vendored from EllipticCurves (`EllipticCurves/Mathlib/Basic.lean`),
 the others are new; upstreaming candidates for Mathlib.
@@ -116,5 +121,23 @@ theorem isSquare_mul_norm_mk_of_dvd_sq_sub {K : Type*} [Field K] {f a b : K[X]} 
   refine ⟨s, hs ▸ ?_⟩
   linear_combination ((-1) ^ (f.natDegree * a.natDegree) * a.leadingCoeff ^ f.natDegree) * hN +
     (a.leadingCoeff ^ f.natDegree * a.resultant f) * hsgn
+
+section Factors
+
+variable {K : Type*} [Field K] {f : K[X]}
+
+/-- The norm of an element of `K[X] ⧸ (f)` is the product of the norms of its components in the
+field factors, by `AdjoinRoot.equivPiFactors` and `Algebra.norm_pi`. -/
+theorem norm_eq_prod_norm_projFactor [Fintype f.Factors] (hsq : Squarefree f) (a : AdjoinRoot f) :
+    Algebra.norm K a = ∏ p : f.Factors, Algebra.norm K (projFactor hsq p a) := by
+  rw [← Algebra.norm_eq_of_algEquiv (equivPiFactors hsq) a, Algebra.norm_pi]
+  rfl
+
+theorem norm_projFactor_mk_C_sub_X (hsq : Squarefree f) (p : f.Factors) (x : K) :
+    Algebra.norm K (projFactor hsq p (mk f (C x - X))) = (p : K[X]).eval x := by
+  have hd : (C x - X).natDegree = 1 := by compute_degree!
+  rw [projFactor_mk, norm_mk_eq_resultant p.monic, hd, resultant_C_sub_X _ _ le_rfl]
+
+end Factors
 
 end AdjoinRoot

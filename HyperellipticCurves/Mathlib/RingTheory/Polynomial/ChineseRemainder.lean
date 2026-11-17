@@ -41,7 +41,10 @@ Selmer groups, of `AdjoinRoot f`: they are those of the factors.
 * `AdjoinRoot.projFactor_of`, `AdjoinRoot.projFactor_root`: `AdjoinRoot.projFactor` maps the
   constants and the root of `K[X] ⧸ (f)` to those of `K[X] ⧸ (p)`.
 * `AdjoinRoot.modPowEquivPiFactors_mk`: on the class of a unit, `AdjoinRoot.modPowEquivPiFactors`
-  is componentwise `AdjoinRoot.projFactor`.
+  is componentwise `AdjoinRoot.projFactor`; `AdjoinRoot.modPowEquivPiFactors_unit` for the unit of
+  an element.
+* `AdjoinRoot.modPow_mk_eq_one_iff_forall_factors`: the class of a unit is trivial exactly when
+  all its components are.
 * `AdjoinRoot.map_lift_modPowEquivPiFactors_symm_mulSingle`,
   `AdjoinRoot.map_lift_modPowEquivPiFactors_symm_mulSingle_of_ne`: evaluation at a root of the
   factor `p` of the class with component `c` at `p` and trivial components elsewhere: the image of
@@ -142,6 +145,19 @@ theorem modPowEquivPiFactors_mk (hsq : Squarefree f) (n : ℕ)
     modPowEquivPiFactors hsq n u p =
       (Units.map (projFactor hsq p).toMonoidHom u : Units.ModPow (AdjoinRoot (p : K[X])) n) :=
   rfl
+
+theorem modPowEquivPiFactors_unit (hsq : Squarefree f) (n : ℕ) {a : AdjoinRoot f}
+    (ha : IsUnit a) (p : f.Factors) :
+    modPowEquivPiFactors hsq n ha.unit p =
+      ((ha.map (projFactor hsq p)).unit : Units.ModPow (AdjoinRoot (p : K[X])) n) :=
+  (modPowEquivPiFactors_mk ..).trans (congrArg _ (Units.ext rfl))
+
+theorem modPow_mk_eq_one_iff_forall_factors (hsq : Squarefree f) (n : ℕ) (u : (AdjoinRoot f)ˣ) :
+    (u : Units.ModPow (AdjoinRoot f) n) = 1 ↔ ∀ p : f.Factors,
+      (Units.map (projFactor hsq p).toMonoidHom u : Units.ModPow (AdjoinRoot (p : K[X])) n) =
+        1 := by
+  rw [← (modPowEquivPiFactors hsq n).map_eq_one_iff, funext_iff]
+  simp
 
 end AdjoinRoot
 

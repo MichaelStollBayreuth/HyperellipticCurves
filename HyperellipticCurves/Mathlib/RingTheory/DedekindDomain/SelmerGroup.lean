@@ -72,8 +72,9 @@ finite product of fields, transported along a decomposition of `Aˣ/(Aˣ)ⁿ`.
   finitely generated `Rˣ`.
 * `IsDedekindDomain.ker_toSClassGroup`: exactness of the fundamental sequence in the middle.
 * `IsDedekindDomain.finite_selmerGroup`: **`K⟮S, n⟯` is finite** if `Cl(R)` is finite, `Rˣ` is
-  finitely generated, `S` is finite and `n ≠ 0`; and `IsDedekindDomain.finite_selmerGroupOfEquiv`
-  for products.
+  finitely generated, `S` is finite and `n ≠ 0`; `IsDedekindDomain.finite_selmerGroupAbove` for
+  the primes above `S` in an extension and `IsDedekindDomain.finite_selmerGroupOfEquiv` for
+  products.
 
 ## Implementation notes
 
@@ -434,6 +435,15 @@ theorem finite_selmerGroup [Finite (ClassGroup R)] [IsMulFG Rˣ] (hS : S.Finite)
   have : Finite (selmerGroup (K := K) (S := S) (n := n) ⧸ (toSClassGroup K S n).ker) :=
     .of_injective _ (QuotientGroup.kerLift_injective (toSClassGroup K S n))
   exact Finite.of_subgroup_quotient (toSClassGroup K S n).ker
+
+variable {S} in
+/-- The Selmer group of `L = Frac B` relative to the primes above a finite set `S` of primes of
+`R` is finite, if `Cl(B)` is finite and `Bˣ` is finitely generated. -/
+theorem finite_selmerGroupAbove (B : Type*) [CommRing B] [IsDedekindDomain B] [Algebra R B]
+    [Algebra.IsIntegral R B] [Module.IsTorsionFree R B] [Finite (ClassGroup B)] [IsMulFG Bˣ]
+    (L : Type*) [Field L] [Algebra B L] [IsFractionRing B L] (hS : S.Finite) [NeZero n] :
+    Finite (selmerGroupAbove R B L S n) :=
+  finite_selmerGroup B L _ n (HeightOneSpectrum.primesAbove_finite R B hS)
 
 /-!
 ### Selmer groups of finite products of fields

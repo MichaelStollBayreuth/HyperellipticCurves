@@ -227,9 +227,11 @@ public import HyperellipticCurves.Mathlib.GroupTheory.Finiteness
 public import HyperellipticCurves.Mathlib.GroupTheory.IndexNSmul
 public import HyperellipticCurves.Mathlib.GroupTheory.QuotientGroup.UnitsModPow
 public import HyperellipticCurves.Mathlib.GroupTheory.Torsion
+public import HyperellipticCurves.Mathlib.LinearAlgebra.Determinant
 public import HyperellipticCurves.Mathlib.LinearAlgebra.Dimension.Torsion.Finite
 public import HyperellipticCurves.Mathlib.LinearAlgebra.Dual.Lemmas
 public import HyperellipticCurves.Mathlib.LinearAlgebra.Lagrange
+public import HyperellipticCurves.Mathlib.LinearAlgebra.Matrix.Block
 public import HyperellipticCurves.Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic
 public import HyperellipticCurves.Mathlib.NumberTheory.NumberField.ClassNumber
 public import HyperellipticCurves.Mathlib.NumberTheory.NumberField.Discriminant.Basic
@@ -287,6 +289,7 @@ public import HyperellipticCurves.Mathlib.RingTheory.MvPowerSeries.Rename
 public import HyperellipticCurves.Mathlib.RingTheory.MvPowerSeries.Substitution
 public import HyperellipticCurves.Mathlib.RingTheory.Nakayama
 public import HyperellipticCurves.Mathlib.RingTheory.Norm.AdjoinRoot
+public import HyperellipticCurves.Mathlib.RingTheory.Norm.Defs
 public import HyperellipticCurves.Mathlib.RingTheory.Polynomial.Basic
 public import HyperellipticCurves.Mathlib.RingTheory.Polynomial.ChineseRemainder
 public import HyperellipticCurves.Mathlib.RingTheory.Polynomial.Content

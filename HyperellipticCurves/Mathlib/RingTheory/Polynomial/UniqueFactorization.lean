@@ -30,6 +30,7 @@ import Mathlib.RingTheory.PrincipalIdealDomain
 * `Polynomial.Factors.mem_normalizedFactors_iff`: for `f ≠ 0`, the elements of
   `normalizedFactors f` are exactly the monic irreducible factors of `f`.
 * `Polynomial.Factors.finite`: `f.Factors` is finite for `f ≠ 0`.
+* `Polynomial.Factors.nonempty`: `f.Factors` is nonempty if `f` is not a unit.
 * `Polynomial.Factors.isCoprime`: distinct factors are coprime.
 * `Polynomial.Factors.associated_prod`: a squarefree `f` is associated to the product of its
   monic irreducible factors.
@@ -96,6 +97,10 @@ theorem finite (hf : f ≠ 0) : Finite f.Factors := by
   exact .of_injective _
     (Subtype.impEmbedding _ (· ∈ normalizedFactors f)
       fun p hp ↦ (mem_normalizedFactors_iff hf).mpr hp).injective
+
+theorem nonempty (hu : ¬IsUnit f) : Nonempty f.Factors :=
+  let ⟨p, hp⟩ := f.exists_monic_irreducible_factor hu
+  ⟨⟨p, hp⟩⟩
 
 theorem eq_of_dvd {p q : f.Factors} (h : (p : K[X]) ∣ q) : p = q :=
   Subtype.ext <| eq_of_monic_of_associated p.monic q.monic <|
