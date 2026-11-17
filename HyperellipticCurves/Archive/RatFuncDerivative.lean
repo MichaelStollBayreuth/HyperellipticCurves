@@ -5,17 +5,19 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.Archive.ForMathlib.RatFunc
-public import HyperellipticCurves.ForMathlib.FractionRingDerivative
+public import HyperellipticCurves.Archive.Mathlib.FieldTheory.RatFunc.Degree
+public import HyperellipticCurves.Mathlib.RingTheory.Derivation.FractionRing
+public import HyperellipticCurves.Mathlib.RingTheory.Localization.FractionRing
 public import Mathlib.FieldTheory.RatFunc.Basic
+public import Mathlib.RingTheory.Derivation.MapCoeffs
 
 /-!
 # The formal derivative of rational functions
 
 The formal derivative on `K(x)` (`RatFunc.derivative`), the quotient-rule extension
 `IsFractionRing.deriv` of `Polynomial.derivative`
-(`HyperellipticCurves.ForMathlib.FractionRingDerivative`), together with the facts making it a
-derivation extending the polynomial derivative:
+(`HyperellipticCurves.Mathlib.RingTheory.Derivation.FractionRing`), together with the facts
+making it a derivation extending the polynomial derivative:
 
 * `RatFunc.derivative_div`: the quotient rule holds for *every* fraction representation;
 * `RatFunc.derivative_algebraMap`: it extends `Polynomial.derivative`;

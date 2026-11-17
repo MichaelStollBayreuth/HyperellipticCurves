@@ -5,7 +5,8 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.LocalRing
+public import HyperellipticCurves.Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
+public import HyperellipticCurves.Mathlib.RingTheory.LocalRing.ResidueField.Defs
 public import HyperellipticCurves.Series.FormalGroupLaw
 
 /-!

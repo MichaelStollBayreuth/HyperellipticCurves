@@ -9,8 +9,11 @@ public import HyperellipticCurves.Log.Cantor.CantorPipeline
 public import HyperellipticCurves.RedJ.Hom
 public import HyperellipticCurves.RedJ.Stability
 
-import HyperellipticCurves.ForMathlib.LocalRing
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.BigOperators
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Degree.Lemmas
+import HyperellipticCurves.Mathlib.FieldTheory.Separable
+import HyperellipticCurves.Mathlib.LinearAlgebra.Lagrange
+import HyperellipticCurves.Mathlib.RingTheory.LocalRing.ResidueField.Defs
 import Mathlib.Algebra.Polynomial.Lifts
 
 /-!

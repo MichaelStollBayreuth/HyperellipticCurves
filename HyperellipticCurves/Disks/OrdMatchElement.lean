@@ -8,7 +8,7 @@ module
 public import HyperellipticCurves.Curve.PointValuation
 public import HyperellipticCurves.Disks.FuncExpansion
 
-import HyperellipticCurves.ForMathlib.PowerSeries
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Order
 
 /-!
 # Element-level order matching (generic chart), unconditional

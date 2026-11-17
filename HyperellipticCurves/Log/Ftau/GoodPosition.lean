@@ -9,7 +9,7 @@ public import HyperellipticCurves.Disks.CurvePoint
 public import Mathlib.FieldTheory.IsAlgClosed.Basic
 public import Mathlib.RingTheory.Coprime.Basic
 
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Degree.Domain
 
 /-!
 # Good position and abundance of residue points (blueprint `def:goodpos`, `lem:many-points`)

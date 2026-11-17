@@ -6,13 +6,14 @@ Authors: Michael Stoll
 module
 
 public import HyperellipticCurves.Curve.TraceDiff
-public import HyperellipticCurves.ForMathlib.LocalRing
-public import HyperellipticCurves.ForMathlib.MvPowerSeriesPDeriv
 public import HyperellipticCurves.Log.Fold.FtauFoldBasic
+public import HyperellipticCurves.Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
+public import HyperellipticCurves.Mathlib.RingTheory.LocalRing.ResidueField.Defs
+public import HyperellipticCurves.Mathlib.RingTheory.MvPowerSeries.Substitution
 public import HyperellipticCurves.Series.FormalGroupLaw.Basic
 
-import HyperellipticCurves.ForMathlib.Units
 import HyperellipticCurves.Log.Trace.TraceFtau
+import HyperellipticCurves.Mathlib.Algebra.Ring.Units
 
 /-!
 # The fold-side inputs of the trace assembly

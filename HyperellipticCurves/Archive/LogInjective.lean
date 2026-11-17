@@ -8,7 +8,7 @@ module
 public import HyperellipticCurves.Archive.ExpConverge
 public import HyperellipticCurves.Log.Analytic.Lam
 
-import HyperellipticCurves.ForMathlib.PadicValNat
+import HyperellipticCurves.Mathlib.NumberTheory.Padics.PadicVal.Defs
 
 /-!
 # Injectivity of the formal and abelian logarithms

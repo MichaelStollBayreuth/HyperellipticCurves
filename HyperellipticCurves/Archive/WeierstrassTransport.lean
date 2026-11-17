@@ -6,11 +6,12 @@ Authors: Michael Stoll
 module
 
 public import HyperellipticCurves.Archive.DiskExpand
-public import HyperellipticCurves.Archive.ForMathlib.QuadraticAlgebra
+public import HyperellipticCurves.Archive.Mathlib.Algebra.QuadraticAlgebra.Basic
 public import HyperellipticCurves.Curve.TraceMatrix
 public import HyperellipticCurves.Log.Charts.WeierstrassChart
 
-import HyperellipticCurves.ForMathlib.PowerSeries
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Basic
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Derivative
 
 /-!
 # Weierstrass-disk expansion transport (the `hW`-identification at a Weierstrass centre)

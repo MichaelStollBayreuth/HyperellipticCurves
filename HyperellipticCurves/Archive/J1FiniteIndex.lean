@@ -10,8 +10,7 @@ public import HyperellipticCurves.Archive.StableSplitting
 public import HyperellipticCurves.RedJ.J1
 public import Mathlib.GroupTheory.Index
 
-import HyperellipticCurves.Archive.ForMathlib.Polynomial
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Archive.Mathlib.Algebra.Polynomial.Degree.Operations
 
 /-!
 # The kernel of reduction has finite index (`thm:J1-index`)

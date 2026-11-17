@@ -8,8 +8,8 @@ module
 public import HyperellipticCurves.Disks.OmegaExpansion
 public import HyperellipticCurves.Disks.OrdMatch
 
-import HyperellipticCurves.ForMathlib.Polynomial
-import HyperellipticCurves.ForMathlib.PowerSeries
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Taylor
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Basic
 
 /-!
 # Expansion of a function on a residue disk

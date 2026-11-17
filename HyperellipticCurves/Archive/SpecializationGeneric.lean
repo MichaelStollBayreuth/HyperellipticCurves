@@ -12,8 +12,7 @@ public import HyperellipticCurves.Disks.FuncExpansion
 public import HyperellipticCurves.Disks.OrdMatchElement
 public import HyperellipticCurves.Specialization.CpZeros
 
-import HyperellipticCurves.Archive.ForMathlib.Polynomial
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Archive.Mathlib.FieldTheory.IsAlgClosed.Basic
 
 /-!
 # Specialization of a principal divisor (chart form, generic chart)

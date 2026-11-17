@@ -9,10 +9,10 @@ public import HyperellipticCurves.Count.Main
 public import HyperellipticCurves.Count.NumberFieldFactor
 public import Mathlib.RingTheory.Ideal.Norm.AbsNorm
 
-import HyperellipticCurves.ForMathlib.Ideal
-import HyperellipticCurves.ForMathlib.Resultant
-import HyperellipticCurves.ForMathlib.SetCard
-import HyperellipticCurves.ForMathlib.Squarefree
+import HyperellipticCurves.Mathlib.Algebra.Squarefree.Basic
+import HyperellipticCurves.Mathlib.Data.Set.Card
+import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.Ideal.Lemmas
+import HyperellipticCurves.Mathlib.RingTheory.Polynomial.Resultant.Basic
 import Mathlib.Algebra.Algebra.ZMod
 import Mathlib.Algebra.CharP.Quotient
 import Mathlib.LinearAlgebra.FreeModule.IdealQuotient

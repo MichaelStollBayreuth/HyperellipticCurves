@@ -9,8 +9,8 @@ public import Mathlib.Algebra.Polynomial.Monic
 public import Mathlib.RingTheory.Ideal.Maps
 public import Mathlib.RingTheory.MvPowerSeries.Basic
 
-import HyperellipticCurves.ForMathlib.AdicComplete
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Eval.Coeff
+import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.Basic
 import Mathlib.RingTheory.AdicCompletion.Completeness
 import Mathlib.RingTheory.AdjoinRoot
 import Mathlib.RingTheory.Henselian

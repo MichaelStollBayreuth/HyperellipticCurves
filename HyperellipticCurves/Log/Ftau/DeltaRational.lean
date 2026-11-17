@@ -11,8 +11,6 @@ public import HyperellipticCurves.Log.Cantor.GenericPipeline
 public import HyperellipticCurves.Log.Ftau.FtauAssoc
 public import HyperellipticCurves.Log.Ftau.FtauCerts
 
-import HyperellipticCurves.ForMathlib.Resultant
-
 /-!
 # The three-block family ring for `F_τ` (towards `lem:delta-rational`)
 

@@ -9,7 +9,8 @@ public import HyperellipticCurves.Log.Cantor.ReduceCommutes
 public import HyperellipticCurves.Log.Fold.FtauFoldBasic
 public import HyperellipticCurves.Log.Ftau.FtauAssoc
 
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Coeff
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Monic
 
 /-!
 # Chart membership: the polydisk parametrizes the kernel of the reduction

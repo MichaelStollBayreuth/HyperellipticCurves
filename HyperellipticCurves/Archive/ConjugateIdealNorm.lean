@@ -8,7 +8,7 @@ module
 public import HyperellipticCurves.Curve.MumfordReduction
 public import Mathlib.RingTheory.Ideal.Norm.RelNorm
 
-import HyperellipticCurves.Archive.ForMathlib.Squarefree
+import HyperellipticCurves.Archive.Mathlib.Algebra.Squarefree.Basic
 
 /-!
 # The conjugate ideal and the norm: ι inverts the Jacobian

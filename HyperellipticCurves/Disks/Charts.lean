@@ -10,7 +10,7 @@ public import HyperellipticCurves.Series.HenselRoot
 public import HyperellipticCurves.Series.PSeries
 public import HyperellipticCurves.Series.SqrtSeries
 
-import HyperellipticCurves.ForMathlib.LocalRing
+import HyperellipticCurves.Mathlib.RingTheory.LocalRing.ResidueField.Defs
 
 /-!
 # Disk parametrizations: the generic and Weierstrass charts

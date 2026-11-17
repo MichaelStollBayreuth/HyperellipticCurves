@@ -8,8 +8,8 @@ module
 public import HyperellipticCurves.Disks.FuncExpansion
 public import HyperellipticCurves.Series.HenselRoot
 
-import HyperellipticCurves.Archive.ForMathlib.PowerSeries
-import HyperellipticCurves.ForMathlib.PowerSeries
+import HyperellipticCurves.Archive.Mathlib.RingTheory.PowerSeries.Basic
+import HyperellipticCurves.Archive.Mathlib.RingTheory.PowerSeries.Order
 
 /-!
 # Evenness of the Weierstrass series and the individual Weierstrass order

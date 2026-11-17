@@ -9,7 +9,7 @@ public import HyperellipticCurves.Curve.PointValuation
 public import HyperellipticCurves.Disks.CurvePoint
 public import Mathlib.FieldTheory.IsAlgClosed.Basic
 
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Roots
 
 /-!
 # The degree of the canonical divisor, and the total vanishing budget

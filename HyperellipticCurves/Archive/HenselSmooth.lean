@@ -5,7 +5,6 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.MvPowerSeriesPDeriv
 public import HyperellipticCurves.Series.MvPSeries
 public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 

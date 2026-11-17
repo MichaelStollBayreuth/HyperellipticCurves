@@ -8,7 +8,9 @@ module
 public import HyperellipticCurves.Log.Ftau.TauGeneric
 public import HyperellipticCurves.Log.Witness.DiskPencil
 
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Basic
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.RingDivision
+import HyperellipticCurves.Mathlib.FieldTheory.IsAlgClosed.Basic
 
 /-!
 # The per-disk witness (`lem:global-generic`, per-disk half)

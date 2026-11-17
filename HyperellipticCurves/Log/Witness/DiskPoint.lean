@@ -8,7 +8,7 @@ module
 public import HyperellipticCurves.Log.Charts.PhiChart
 public import HyperellipticCurves.Log.Witness.DiskWitness
 
-import HyperellipticCurves.ForMathlib.PowerSeries
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Inverse
 import HyperellipticCurves.Series.HenselRoot
 
 /-!

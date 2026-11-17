@@ -9,7 +9,7 @@ public import HyperellipticCurves.Disks.FuncExpansion
 public import HyperellipticCurves.Log.Cantor.PipelineCerts
 public import Mathlib.RingTheory.LocalRing.ResidueField.Defs
 
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.RingDivision
 import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 import Mathlib.RingTheory.PowerSeries.Inverse
 

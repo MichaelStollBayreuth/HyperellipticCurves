@@ -5,8 +5,16 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.Derivation
-public import HyperellipticCurves.ForMathlib.Polynomial
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.Eval.Coeff
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.Monic
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.Reverse
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.RingDivision
+public import HyperellipticCurves.Mathlib.FieldTheory.Separable
+public import HyperellipticCurves.Mathlib.LinearAlgebra.Lagrange
+public import HyperellipticCurves.Mathlib.RingTheory.Derivation.MapCoeffs
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Degree.Domain
 
 /-!
 # The trace-form differential of a Mumford datum

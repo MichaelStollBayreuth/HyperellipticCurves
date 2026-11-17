@@ -7,7 +7,7 @@ module
 
 public import HyperellipticCurves.Log.Cantor.CantorPipeline
 
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Monic
 
 /-!
 # Genericity of a Cantor step: characterizations and the coprime composition

@@ -10,8 +10,8 @@ public import HyperellipticCurves.Log.Ftau.DeltaRational
 public import Mathlib.RingTheory.Localization.Away.Basic
 
 import HyperellipticCurves.Curve.TraceMatrix
-import HyperellipticCurves.ForMathlib.Resultant
 import HyperellipticCurves.Log.Fold.FoldTrace
+import HyperellipticCurves.Mathlib.RingTheory.Polynomial.Resultant.Basic
 
 /-!
 # Rational invariant differentials at the fold (the denominator layer)

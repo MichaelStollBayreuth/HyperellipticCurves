@@ -8,8 +8,6 @@ module
 public import HyperellipticCurves.Disks.CanonDeg
 public import HyperellipticCurves.Series.ZeroCount
 
-import HyperellipticCurves.ForMathlib.Polynomial
-
 /-!
 # Zeros of the disk expansion over an algebraically closed complete field
 

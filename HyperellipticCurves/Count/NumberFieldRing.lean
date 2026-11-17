@@ -8,9 +8,10 @@ module
 public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 public import Mathlib.RingTheory.WittVector.Complete
 
-import HyperellipticCurves.ForMathlib.AdicComplete
-import HyperellipticCurves.ForMathlib.Ideal
-import HyperellipticCurves.ForMathlib.Idempotents
+import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.Basic
+import HyperellipticCurves.Mathlib.RingTheory.Ideal.Operations
+import HyperellipticCurves.Mathlib.RingTheory.Ideal.Quotient.Operations
+import HyperellipticCurves.Mathlib.RingTheory.Idempotents
 import Mathlib.Algebra.Algebra.ZMod
 import Mathlib.FieldTheory.PrimitiveElement
 

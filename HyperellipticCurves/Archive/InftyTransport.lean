@@ -5,9 +5,9 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.Archive.ForMathlib.QuadraticAlgebra
-public import HyperellipticCurves.Archive.ForMathlib.RatFunc
 public import HyperellipticCurves.Archive.GlobalChart
+public import HyperellipticCurves.Archive.Mathlib.Algebra.QuadraticAlgebra.Basic
+public import HyperellipticCurves.Archive.Mathlib.FieldTheory.RatFunc.Degree
 public import HyperellipticCurves.Archive.SecondKind
 public import HyperellipticCurves.Disks.ChartsInf
 public import HyperellipticCurves.Series.SqrtSeries

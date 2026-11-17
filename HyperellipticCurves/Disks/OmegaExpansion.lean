@@ -11,7 +11,7 @@ public import Mathlib.RingTheory.AdicCompletion.Completeness
 public import Mathlib.RingTheory.Henselian
 public import Mathlib.RingTheory.PowerSeries.Inverse
 
-import HyperellipticCurves.ForMathlib.PowerSeries
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Basic
 
 /-!
 # Expansions of differentials on disks and their antiderivatives

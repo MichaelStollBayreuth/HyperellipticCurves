@@ -5,13 +5,13 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.AdicTopology
-public import HyperellipticCurves.ForMathlib.UniformGroup
+public import HyperellipticCurves.Mathlib.Topology.Algebra.Nonarchimedean.AdicTopology
 public import Mathlib.RingTheory.DedekindDomain.AdicValuation
 public import Mathlib.RingTheory.Valuation.Discrete.IsDiscreteValuationRing
 public import Mathlib.Topology.Algebra.Nonarchimedean.Basic
 
-import HyperellipticCurves.ForMathlib.AdicValuation
+import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation
+import HyperellipticCurves.Mathlib.Topology.Algebra.IsUniformGroup.Basic
 import Mathlib.GroupTheory.ArchimedeanDensely
 import Mathlib.RingTheory.Valuation.Integers
 import Mathlib.Topology.Algebra.Group.Basic

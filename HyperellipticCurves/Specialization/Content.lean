@@ -8,7 +8,7 @@ module
 public import Mathlib.Algebra.Order.GroupWithZero.Finset
 public import Mathlib.RingTheory.DedekindDomain.AdicValuation
 
-import HyperellipticCurves.ForMathlib.GroupWithZero
+import HyperellipticCurves.Mathlib.Algebra.Order.GroupWithZero.Finset
 
 /-!
 # The valuation-content of a polynomial

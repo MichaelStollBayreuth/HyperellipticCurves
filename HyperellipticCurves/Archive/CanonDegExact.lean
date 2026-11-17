@@ -7,8 +7,8 @@ module
 
 public import HyperellipticCurves.Disks.CanonDeg
 
-import HyperellipticCurves.Archive.ForMathlib.Polynomial
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Archive.Mathlib.FieldTheory.IsAlgClosed.Basic
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Roots
 
 /-!
 # The exact canonical degree

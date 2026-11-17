@@ -9,7 +9,7 @@ public import HyperellipticCurves.Log.Analytic.Lam
 public import HyperellipticCurves.Log.Analytic.OmegaPrime
 public import HyperellipticCurves.Series.ScaledLogEval
 
-import HyperellipticCurves.ForMathlib.PadicValNat
+import HyperellipticCurves.Mathlib.NumberTheory.Padics.PadicVal.Defs
 import Mathlib.Topology.Algebra.InfiniteSum.Nonarchimedean
 
 /-!

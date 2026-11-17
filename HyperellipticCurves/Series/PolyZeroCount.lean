@@ -8,8 +8,8 @@ module
 public import HyperellipticCurves.Specialization.CpZeros
 
 import HyperellipticCurves.Disks.Charts
-import HyperellipticCurves.ForMathlib.Polynomial
-import HyperellipticCurves.ForMathlib.WeierstrassPreparation
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.RingDivision
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.WeierstrassPreparation
 
 /-!
 # Zero-counting for split polynomials over a complete DVR

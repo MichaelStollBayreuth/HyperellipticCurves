@@ -5,13 +5,13 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.AdicTopology
+public import HyperellipticCurves.Mathlib.Topology.Algebra.Nonarchimedean.AdicTopology
 public import Mathlib.RingTheory.AdicCompletion.Basic
 public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
 public import Mathlib.RingTheory.PowerSeries.Derivative
 public import Mathlib.RingTheory.PowerSeries.Evaluation
 
-import HyperellipticCurves.ForMathlib.PadicInt
+import HyperellipticCurves.Mathlib.NumberTheory.Padics.PadicIntegers
 import Mathlib.RingTheory.AdicCompletion.Topology
 import Mathlib.RingTheory.MvPowerSeries.LinearTopology
 import Mathlib.RingTheory.PowerSeries.WeierstrassPreparation

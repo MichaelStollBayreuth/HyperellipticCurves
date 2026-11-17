@@ -5,7 +5,8 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.MvPowerSeriesPDeriv
+public import HyperellipticCurves.Mathlib.RingTheory.MvPowerSeries.Derivative
+public import HyperellipticCurves.Mathlib.RingTheory.MvPowerSeries.Substitution
 public import HyperellipticCurves.Series.PSeries
 public import Mathlib.RingTheory.MvPowerSeries.Evaluation
 public import Mathlib.RingTheory.MvPowerSeries.Substitution
@@ -33,7 +34,7 @@ homomorphisms `MvPowerSeries.aeval_unique`), and the evaluated family is itself 
 legitimate evaluation point (`ChabautyColeman.MvPSeries.hasEval_eval`).
 
 The chain rule for formal partial derivatives under substitution is `MvPowerSeries.pderiv_subst`
-(`HyperellipticCurves.ForMathlib.MvPowerSeriesPDeriv`).
+(`HyperellipticCurves.Mathlib.RingTheory.MvPowerSeries.Derivative`).
 
 For power series whose coefficients *decay* (tend to `0` cofinitely), evaluation
 converges at *any* family of points of `O` — not only those in the maximal ideal —

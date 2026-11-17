@@ -8,7 +8,7 @@ module
 public import HyperellipticCurves.Log.Witness.TupleSeed
 public import Mathlib.RingTheory.LaurentSeries
 
-import HyperellipticCurves.ForMathlib.PowerSeriesField
+import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.Completeness
 import HyperellipticCurves.Series.HenselRoot
 
 /-!

@@ -6,8 +6,10 @@ Authors: Michael Stoll
 module
 
 public import HyperellipticCurves.Curve.HypRing
-public import HyperellipticCurves.ForMathlib.Invertible
-public import HyperellipticCurves.ForMathlib.Resultant
+public import HyperellipticCurves.Mathlib.RingTheory.LocalRing.ResidueField.Defs
+public import HyperellipticCurves.Mathlib.RingTheory.Localization.Defs
+public import HyperellipticCurves.Mathlib.RingTheory.Polynomial.Resultant.Basic
+public import Mathlib.Algebra.CharP.Invertible
 public import Mathlib.FieldTheory.Perfect
 
 /-!
@@ -38,7 +40,8 @@ The invertibility of `2` is an instance parameter of the type, `[Invertible (2 :
 structure field cannot serve as an instance (its head would not mention the curve), whereas the
 parameter is found by instance search wherever a curve is in scope, and `Invertible.toNeZero`
 turns it into `NeZero (2 : R)` over a nontrivial ring. Invertibility descends to quotients and
-residue fields by the instances of `HyperellipticCurves.ForMathlib.Invertible`.
+residue fields by the instances `Ideal.Quotient.invertibleTwo` and
+`IsLocalRing.ResidueField.invertibleTwo`.
 
 The genus is part of the data. The discriminant condition at the fixed degree `2g + 2` is a
 polynomial in the coefficients of `f` and commutes with every ring homomorphism, which is what

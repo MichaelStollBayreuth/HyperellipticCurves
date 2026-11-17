@@ -6,13 +6,12 @@ Authors: Michael Stoll
 module
 
 public import HyperellipticCurves.Count.Annihilator
-public import HyperellipticCurves.Curve.Basic
 public import HyperellipticCurves.Count.DiskCount
+public import HyperellipticCurves.Curve.Basic
 public import HyperellipticCurves.Log.Ftau.TauExists
 
 import HyperellipticCurves.Count.DiskAssembled
-import HyperellipticCurves.ForMathlib.Resultant
-import HyperellipticCurves.ForMathlib.SetCard
+import HyperellipticCurves.Mathlib.Data.Set.Card
 import Mathlib.RingTheory.AdicCompletion.Topology
 
 /-!

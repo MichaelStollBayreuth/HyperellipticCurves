@@ -6,13 +6,14 @@ Authors: Michael Stoll
 module
 
 public import HyperellipticCurves.Disks.OmegaExpansion
-public import HyperellipticCurves.ForMathlib.PowerSeries
 public import HyperellipticCurves.Log.Charts.DiskTransport
 public import HyperellipticCurves.Log.Trace.TraceAvoid
 public import HyperellipticCurves.Log.Trace.TraceDisk
+public import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Basic
+public import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Derivative
 
-import HyperellipticCurves.ForMathlib.Units
 import HyperellipticCurves.Log.Fold.FoldTrace
+import HyperellipticCurves.Mathlib.Algebra.Ring.Units
 
 /-!
 # The trace-form identity, per residue disk

@@ -9,10 +9,11 @@ public import HyperellipticCurves.Archive.WeierstrassEven
 public import HyperellipticCurves.Disks.FuncExpansion
 public import HyperellipticCurves.Disks.OmegaExpansionInf
 
-import HyperellipticCurves.Archive.ForMathlib.PowerSeries
-import HyperellipticCurves.ForMathlib.AdicComplete
-import HyperellipticCurves.ForMathlib.Polynomial
-import HyperellipticCurves.ForMathlib.PowerSeries
+import HyperellipticCurves.Archive.Mathlib.RingTheory.PowerSeries.Basic
+import HyperellipticCurves.Archive.Mathlib.RingTheory.PowerSeries.Order
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Reverse
+import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.Basic
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Basic
 
 /-!
 # The infinity-disk function expansion and its order

@@ -9,7 +9,6 @@ public import HyperellipticCurves.Log.Cantor.CantorPipeline
 public import HyperellipticCurves.Log.Ftau.Chart
 public import Mathlib.RingTheory.MvPowerSeries.Rename
 
-import HyperellipticCurves.ForMathlib.Polynomial
 import Mathlib.RingTheory.MvPowerSeries.Inverse
 
 /-!

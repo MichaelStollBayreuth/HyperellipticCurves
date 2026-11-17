@@ -5,8 +5,8 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.Archive.ForMathlib.QuadraticAlgebra
 public import HyperellipticCurves.Archive.GlobalChart
+public import HyperellipticCurves.Archive.Mathlib.Algebra.QuadraticAlgebra.Basic
 public import HyperellipticCurves.Log.Analytic.OmegaPrime
 public import HyperellipticCurves.Log.Charts.DiskTransport
 public import HyperellipticCurves.Log.Charts.PhiChart

@@ -8,7 +8,7 @@ module
 public import HyperellipticCurves.Disks.Charts
 public import HyperellipticCurves.Specialization.Pointwise
 
-import HyperellipticCurves.ForMathlib.Multiplicity
+import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.Ideal.Basic
 import Mathlib.RingTheory.DedekindDomain.Factorization
 
 /-!

@@ -7,7 +7,7 @@ module
 
 public import HyperellipticCurves.Disks.OrdPoint
 
-import HyperellipticCurves.ForMathlib.PolynomialDegreeLT
+import HyperellipticCurves.Mathlib.RingTheory.Polynomial.DegreeLT
 
 /-!
 # The vanishing budget of a space of differentials

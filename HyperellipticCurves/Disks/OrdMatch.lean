@@ -9,7 +9,8 @@ public import HyperellipticCurves.Disks.OmegaExpansion
 public import HyperellipticCurves.Disks.OmegaExpansionInf
 public import HyperellipticCurves.Series.Strassmann
 
-import HyperellipticCurves.ForMathlib.PowerSeries
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Basic
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Order
 
 /-!
 # Order matching: the order of a reduced disk expansion

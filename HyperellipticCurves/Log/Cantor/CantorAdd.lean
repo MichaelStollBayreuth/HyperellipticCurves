@@ -8,7 +8,7 @@ module
 public import HyperellipticCurves.Curve.MumfordReduction
 public import Mathlib.RingTheory.LocalRing.ResidueField.Defs
 
-import HyperellipticCurves.ForMathlib.Nakayama
+import HyperellipticCurves.Mathlib.RingTheory.Nakayama
 import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 
 /-!

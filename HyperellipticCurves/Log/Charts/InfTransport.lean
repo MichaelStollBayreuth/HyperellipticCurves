@@ -5,8 +5,13 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.Polynomial
-public import HyperellipticCurves.ForMathlib.PowerSeries
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.Monic
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.Reverse
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.RingDivision
+public import HyperellipticCurves.Mathlib.FieldTheory.Separable
+public import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Basic
+public import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Derivative
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
 public import Mathlib.RingTheory.Localization.FractionRing
 
 /-!

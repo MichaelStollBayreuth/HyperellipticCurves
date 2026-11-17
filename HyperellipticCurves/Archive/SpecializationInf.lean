@@ -10,7 +10,7 @@ public import HyperellipticCurves.Archive.SpecializationGeneric
 public import HyperellipticCurves.Curve.InftyPlace
 public import HyperellipticCurves.Disks.OrdMatchIntrinsic
 
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Div
 
 /-!
 # Specialization of a principal divisor (chart form, infinity chart)

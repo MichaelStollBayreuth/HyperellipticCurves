@@ -9,7 +9,8 @@ public import HyperellipticCurves.Log.Fold.FoldUniversal
 public import Mathlib.Algebra.BigOperators.Fin
 public import Mathlib.RingTheory.LaurentSeries
 
-import HyperellipticCurves.ForMathlib.HahnSeries
+import HyperellipticCurves.Mathlib.RingTheory.HahnSeries.Addition
+import HyperellipticCurves.Mathlib.RingTheory.HahnSeries.Multiplication
 import Mathlib.Tactic.Ring
 
 /-!

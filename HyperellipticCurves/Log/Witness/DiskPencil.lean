@@ -7,8 +7,8 @@ module
 
 public import HyperellipticCurves.Log.Cantor.CantorPipeline
 
-import HyperellipticCurves.ForMathlib.Polynomial
 import HyperellipticCurves.Log.Ftau.GoodPosition
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.RingDivision
 
 /-!
 # The pencil of square roots through a disk centre (`lem:global-generic`, per-disk half)

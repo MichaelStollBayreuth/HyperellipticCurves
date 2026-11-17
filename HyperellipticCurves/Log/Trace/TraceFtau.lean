@@ -5,10 +5,10 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.MvPowerSeriesPDeriv
 public import HyperellipticCurves.Log.Ftau.FtauAssoc
 public import HyperellipticCurves.Log.Ftau.FtauBasic
 public import HyperellipticCurves.Log.Trace.TracePipeline
+public import HyperellipticCurves.Mathlib.RingTheory.MvPowerSeries.Substitution
 public import Mathlib.RingTheory.MvPowerSeries.NoZeroDivisors
 
 /-!

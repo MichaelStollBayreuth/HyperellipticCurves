@@ -55,7 +55,8 @@ status:
     preparation, Strassmann's theorem, formal group laws and their logarithms) is in
     HyperellipticCurves/Series/, residue disks and the vanishing budget of a space of
     differentials (Stoll's Theorem 6.4) in HyperellipticCurves/Disks/. Supporting material in
-    Mathlib generality is in HyperellipticCurves/ForMathlib/ as upstreaming candidates.
+    Mathlib generality is in HyperellipticCurves/Mathlib/, a tree mirroring Mathlib's file
+    structure, as upstreaming candidates.
     Statements that are formalized but not needed for the main theorems are kept in
     HyperellipticCurves/Archive/. A LaTeX blueprint with a dependency graph and the generated
     API documentation are published at
@@ -205,7 +206,7 @@ alignment:
       lean: "disk_count_le"
       module: "HyperellipticCurves.Count.DiskBound"
       status: "proved"
-      note: "at most 1 + m points in a residue disk on which the integral of ω is constant, for m the index of a unit coefficient of the expansion of ω and p > m + e + 1; the ramification bound enters only through IsLocalRing.IsUniformizer.exists_pow_eq (HyperellipticCurves.ForMathlib.LocalRing)"
+      note: "at most 1 + m points in a residue disk on which the integral of ω is constant, for m the index of a unit coefficient of the expansion of ω and p > m + e + 1; the ramification bound enters only through IsLocalRing.IsUniformizer.exists_pow_eq (HyperellipticCurves.Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic)"
     - source: "Stoll 2006, Theorem 6.4 (N(Λ, C/K) ≤ 2 codim Λ)"
       lean: "sum_ordSpace_le, exists_ordPoint_eq_ordSpace, ordSpace"
       module: "HyperellipticCurves.Disks.OrdSpace"

@@ -7,7 +7,7 @@ module
 
 public import HyperellipticCurves.Curve.HypBaseChangeEmult
 
-import HyperellipticCurves.ForMathlib.Multiplicity
+import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.Ideal.Basic
 import Mathlib.RingTheory.DedekindDomain.Factorization
 
 /-!

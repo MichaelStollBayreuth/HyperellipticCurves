@@ -74,12 +74,15 @@ The Lean sources are in [`HyperellipticCurves`](HyperellipticCurves) (namespace
   (`Analytic`);
 - [`Count`](HyperellipticCurves/Count): the annihilating differentials, the bound per residue
   disk, the main theorems, and their instantiations over number fields and over `ℚ`;
-- [`ForMathlib`](HyperellipticCurves/ForMathlib): auxiliary declarations missing from Mathlib,
-  stated in their natural generality; these are candidates for upstreaming;
+- [`Mathlib`](HyperellipticCurves/Mathlib): auxiliary declarations missing from Mathlib, stated
+  in their natural generality; these are candidates for upstreaming. The folder mirrors Mathlib's
+  file structure: `Mathlib/X/Y.lean` holds the declarations whose eventual home is the Mathlib
+  file `Mathlib/X/Y.lean`;
 - [`Archive`](HyperellipticCurves/Archive): statements that are formalized and built with the
   library but that the main theorems do not depend on — among them base-change injectivity of
   the Jacobian, the finite index of the kernel of reduction, and the formal exponential; the
-  blueprint marks each of them.
+  blueprint marks each of them. The auxiliary declarations that only the Archive uses are in the
+  mirror tree [`Archive/Mathlib`](HyperellipticCurves/Archive/Mathlib).
 
 [`formalization.yaml`](formalization.yaml) is the project's self-report in the
 [mathlib-initiative](https://github.com/mathlib-initiative/formalization.yaml) format; it

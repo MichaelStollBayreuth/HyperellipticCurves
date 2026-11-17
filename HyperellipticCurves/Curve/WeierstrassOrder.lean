@@ -7,7 +7,7 @@ module
 
 public import HyperellipticCurves.Curve.PointValuation
 
-import HyperellipticCurves.ForMathlib.Multiplicity
+import HyperellipticCurves.Mathlib.RingTheory.Ideal.Maps
 
 /-!
 # Intrinsic order of a function element at a Weierstrass point (individual)

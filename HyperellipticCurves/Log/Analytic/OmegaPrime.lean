@@ -9,7 +9,7 @@ public import HyperellipticCurves.Disks.OmegaExpansion
 public import HyperellipticCurves.Series.FormalGroupLaw.Log
 public import HyperellipticCurves.Series.LogIso
 
-import HyperellipticCurves.ForMathlib.MvPowerSeriesPDeriv
+import HyperellipticCurves.Mathlib.RingTheory.MvPowerSeries.Derivative
 
 /-!
 # The pullback of the invariant differential along a formal path (`thm:omega-prime-global`)

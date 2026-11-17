@@ -18,12 +18,6 @@ public import HyperellipticCurves.Archive.Equivariance
 public import HyperellipticCurves.Archive.ExpConverge
 public import HyperellipticCurves.Archive.ExpInj
 public import HyperellipticCurves.Archive.FoldRational
-public import HyperellipticCurves.Archive.ForMathlib.MvPowerSeriesComp
-public import HyperellipticCurves.Archive.ForMathlib.Polynomial
-public import HyperellipticCurves.Archive.ForMathlib.PowerSeries
-public import HyperellipticCurves.Archive.ForMathlib.QuadraticAlgebra
-public import HyperellipticCurves.Archive.ForMathlib.RatFunc
-public import HyperellipticCurves.Archive.ForMathlib.Squarefree
 public import HyperellipticCurves.Archive.FormalGroupExp
 public import HyperellipticCurves.Archive.FormalGroupPoints
 public import HyperellipticCurves.Archive.FuncExpansionInf
@@ -35,6 +29,15 @@ public import HyperellipticCurves.Archive.InftyExpand
 public import HyperellipticCurves.Archive.InftyTransport
 public import HyperellipticCurves.Archive.J1FiniteIndex
 public import HyperellipticCurves.Archive.LogInjective
+public import HyperellipticCurves.Archive.Mathlib.Algebra.Polynomial.Degree.Operations
+public import HyperellipticCurves.Archive.Mathlib.Algebra.QuadraticAlgebra.Basic
+public import HyperellipticCurves.Archive.Mathlib.Algebra.QuadraticAlgebra.Defs
+public import HyperellipticCurves.Archive.Mathlib.Algebra.Squarefree.Basic
+public import HyperellipticCurves.Archive.Mathlib.FieldTheory.IsAlgClosed.Basic
+public import HyperellipticCurves.Archive.Mathlib.FieldTheory.RatFunc.Degree
+public import HyperellipticCurves.Archive.Mathlib.RingTheory.MvPowerSeries.CompositionalInverse
+public import HyperellipticCurves.Archive.Mathlib.RingTheory.PowerSeries.Basic
+public import HyperellipticCurves.Archive.Mathlib.RingTheory.PowerSeries.Order
 public import HyperellipticCurves.Archive.OmegaRegular
 public import HyperellipticCurves.Archive.RatFuncDerivative
 public import HyperellipticCurves.Archive.RationalValues
@@ -122,12 +125,15 @@ depend. Some blueprint nodes are realized only here.
   of a splitting field under a compatible automorphism is
   `HyperellipticCurves.Archive.StableSplitting`.
 
-Under `HyperellipticCurves.Archive.ForMathlib` sits the general-purpose material that only the
-Archive depends on, so that `HyperellipticCurves.ForMathlib` contains exactly what the main
-results need: compositional inverses of multivariate formal substitutions (`MvPowerSeriesComp`),
-the implication `n² ∣ f·b²` with `f` squarefree ⟹ `n ∣ b` (`Squarefree`), the degree-bound
-predicate `RatFunc.IntDegreeLE` (`RatFunc`), the ring-homomorphism form of the universal
-property of a quadratic algebra together with componentwise sums (`QuadraticAlgebra`),
-`PowerSeries.rescale` against the base ring (`PowerSeries`), and two polynomial facts
-(`Polynomial`). Every one of them is a Mathlib gap in its own right.
+Under `HyperellipticCurves.Archive.Mathlib`, a tree mirroring Mathlib's file structure, sits the
+general-purpose material that only the Archive depends on, so that `HyperellipticCurves.Mathlib`
+contains exactly what the main results need: compositional inverses of multivariate formal
+substitutions (`MvPowerSeries.invSubst`), the implication `n² ∣ f·b²` with `f` squarefree ⟹
+`n ∣ b` (`Squarefree.dvd_of_sq_dvd_mul_sq`), the degree-bound predicate `RatFunc.IntDegreeLE`,
+the ring-homomorphism form of the universal property of a quadratic algebra
+(`QuadraticAlgebra.liftRingHom`) together with componentwise sums (`QuadraticAlgebra.re_sum`,
+`QuadraticAlgebra.im_sum`), `PowerSeries.rescale` against the base ring
+(`ChabautyColeman.rescale_aeval`, `ChabautyColeman.order_rescale_of_isUnit`), and two polynomial
+facts (`Polynomial.finite_setOf_natDegree_le_of_coeff_mem`,
+`ChabautyColeman.finsum_rootMultiplicity`). Every one of them is a Mathlib gap in its own right.
 -/

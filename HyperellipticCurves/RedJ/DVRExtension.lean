@@ -5,12 +5,17 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.AdicComplete
+public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
+public import Mathlib.RingTheory.AdicCompletion.LocalRing
+public import Mathlib.RingTheory.Artinian.Instances
 public import Mathlib.RingTheory.Artinian.Ring
 public import Mathlib.RingTheory.DedekindDomain.IntegralClosure
 public import Mathlib.RingTheory.DiscreteValuationRing.Basic
+public import Mathlib.RingTheory.Idempotents
 
-import Mathlib.RingTheory.Artinian.Instances
+import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.AsTensorProduct
+import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.Basic
+import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.LocalRing
 import Mathlib.RingTheory.DiscreteValuationRing.TFAE
 
 /-!

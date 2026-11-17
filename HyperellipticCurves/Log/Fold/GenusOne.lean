@@ -5,8 +5,8 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.Resultant
 public import HyperellipticCurves.Log.Fold.FoldWitness
+public import HyperellipticCurves.Mathlib.RingTheory.Polynomial.Resultant.Basic
 
 import HyperellipticCurves.Log.Ftau.GoodPosition
 

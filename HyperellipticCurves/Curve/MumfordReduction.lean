@@ -7,7 +7,7 @@ module
 
 public import HyperellipticCurves.Curve.Jacobian
 
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Degree.Lemmas
 
 /-!
 # Cantor reduction: existence of reduced Mumford representatives

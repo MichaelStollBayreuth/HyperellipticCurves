@@ -6,14 +6,16 @@ Authors: Michael Stoll
 module
 
 public import HyperellipticCurves.Count.NumberFieldRing
-public import HyperellipticCurves.ForMathlib.LocalRing
+public import HyperellipticCurves.Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 public import Mathlib.RingTheory.DiscreteValuationRing.Basic
+public import Mathlib.RingTheory.LocalRing.ResidueField.Defs
 public import Mathlib.Topology.Algebra.Nonarchimedean.AdicTopology
 
-import HyperellipticCurves.ForMathlib.AdicComplete
-import HyperellipticCurves.ForMathlib.AdicTopology
-import HyperellipticCurves.ForMathlib.IsAlgClosed
-import HyperellipticCurves.ForMathlib.WittVector
+import HyperellipticCurves.Mathlib.FieldTheory.IsAlgClosed.Basic
+import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.Basic
+import HyperellipticCurves.Mathlib.RingTheory.WittVector.DiscreteValuationRing
+import HyperellipticCurves.Mathlib.Topology.Algebra.Nonarchimedean.AdicTopology
+import Mathlib.RingTheory.AdicCompletion.LocalRing
 import Mathlib.RingTheory.AdicCompletion.Topology
 
 /-!

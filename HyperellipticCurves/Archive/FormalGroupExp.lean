@@ -5,7 +5,7 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.Archive.ForMathlib.MvPowerSeriesComp
+public import HyperellipticCurves.Archive.Mathlib.RingTheory.MvPowerSeries.CompositionalInverse
 public import HyperellipticCurves.Series.FormalGroupLaw.Log
 
 /-!

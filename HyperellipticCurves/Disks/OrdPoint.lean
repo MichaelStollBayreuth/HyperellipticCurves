@@ -7,8 +7,8 @@ module
 
 public import HyperellipticCurves.Disks.CanonDeg
 
-import HyperellipticCurves.ForMathlib.Finprod
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.BigOperators.Finprod
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Roots
 
 /-!
 # The order of `ω̄` at a point of the residue curve, and the total budget

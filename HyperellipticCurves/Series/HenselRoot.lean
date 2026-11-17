@@ -8,7 +8,7 @@ module
 public import HyperellipticCurves.Series.PSeries
 public import Mathlib.RingTheory.Henselian
 
-import HyperellipticCurves.ForMathlib.LocalRing
+import HyperellipticCurves.Mathlib.RingTheory.LocalRing.ResidueField.Defs
 import Mathlib.Algebra.Polynomial.Div
 import Mathlib.Algebra.Polynomial.Identities
 

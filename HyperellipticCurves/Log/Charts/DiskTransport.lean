@@ -5,10 +5,16 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.FractionRingDerivative
-public import HyperellipticCurves.ForMathlib.Polynomial
 public import HyperellipticCurves.Log.Analytic.OmegaPrime
 public import HyperellipticCurves.Log.Charts.PhiChart
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.Monic
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.Reverse
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.RingDivision
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.Taylor
+public import HyperellipticCurves.Mathlib.FieldTheory.Separable
+public import HyperellipticCurves.Mathlib.RingTheory.Derivation.FractionRing
+public import HyperellipticCurves.Mathlib.RingTheory.Localization.FractionRing
+public import Mathlib.RingTheory.Derivation.MapCoeffs
 
 /-!
 # Taylor expansion and the `z`-derivative on `Frac(K⟦z⟧)`

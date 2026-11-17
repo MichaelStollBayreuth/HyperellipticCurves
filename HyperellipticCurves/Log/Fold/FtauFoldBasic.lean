@@ -10,7 +10,7 @@ public import HyperellipticCurves.Log.Fold.FtauFold
 public import HyperellipticCurves.Log.Ftau.FtauAssoc
 public import HyperellipticCurves.Log.Ftau.FtauBasic
 
-import HyperellipticCurves.ForMathlib.Units
+import HyperellipticCurves.Mathlib.Algebra.Ring.Units
 import HyperellipticCurves.Series.Interpolation
 
 /-!

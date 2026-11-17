@@ -5,7 +5,7 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.Archive.ForMathlib.RatFunc
+public import HyperellipticCurves.Archive.Mathlib.FieldTheory.RatFunc.Degree
 public import HyperellipticCurves.Curve.InftyPlace
 public import HyperellipticCurves.Disks.CurvePoint
 public import HyperellipticCurves.RedJ.RedIdealPrincipal

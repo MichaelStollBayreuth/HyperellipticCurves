@@ -7,8 +7,9 @@ module
 
 public import HyperellipticCurves.Disks.OmegaExpansion
 
-import HyperellipticCurves.ForMathlib.AdicComplete
-import HyperellipticCurves.ForMathlib.PowerSeries
+import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.Basic
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Basic
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.Order
 
 /-!
 # The infinity-disk expansion of a differential

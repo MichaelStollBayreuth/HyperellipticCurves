@@ -6,11 +6,13 @@ Authors: Michael Stoll
 module
 
 public import HyperellipticCurves.Curve.HypRing
-public import HyperellipticCurves.ForMathlib.Separable
+public import HyperellipticCurves.Mathlib.RingTheory.Polynomial.GaussLemma
+public import Mathlib.FieldTheory.Separable
 public import Mathlib.RingTheory.DedekindDomain.Basic
 public import Mathlib.RingTheory.IntegralClosure.IsIntegral.Defs
 public import Mathlib.RingTheory.IntegralClosure.IsIntegralClosure.Defs
 
+import HyperellipticCurves.Mathlib.FieldTheory.Separable
 import Mathlib.RingTheory.DedekindDomain.IntegralClosure
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
 import Mathlib.RingTheory.Polynomial.RationalRoot
@@ -27,7 +29,7 @@ degree 2 — a Dedekind domain (`ChabautyColeman.HypRing.instIsDedekindDomain`);
 over `K[x]` with basis `(1, y)` is definitional in the `QuadraticAlgebra` implementation.
 
 The key computational inputs are `RatFunc.exists_algebraMap_eq_of_sq_mul_squarefree`
-and `Algebra.IsSeparable.of_finrank_le_two` from `HyperellipticCurves.ForMathlib`.
+and `Algebra.IsSeparable.of_finrank_le_two` from `HyperellipticCurves.Mathlib`.
 
 Blueprint nodes: `lem:integral-char`, `thm:hypring-dedekind`.
 -/

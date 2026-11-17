@@ -5,9 +5,13 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.QuadraticAlgebra
-public import HyperellipticCurves.ForMathlib.RatFunc
+public import HyperellipticCurves.Mathlib.Algebra.QuadraticAlgebra.Basic
+public import HyperellipticCurves.Mathlib.Algebra.QuadraticAlgebra.Defs
+public import HyperellipticCurves.Mathlib.Algebra.QuadraticAlgebra.NormDeterminant
+public import HyperellipticCurves.Mathlib.FieldTheory.RatFunc.Basic
+public import Mathlib.FieldTheory.RatFunc.Degree
 
+import HyperellipticCurves.Mathlib.FieldTheory.RatFunc.Degree
 import Mathlib.FieldTheory.KummerPolynomial
 
 /-!

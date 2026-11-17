@@ -9,9 +9,9 @@ public import HyperellipticCurves.Log.Fold.FtauFold
 public import HyperellipticCurves.Log.Ftau.GoodPosition
 public import HyperellipticCurves.Specialization.Pointwise
 
-import HyperellipticCurves.ForMathlib.LocalRing
 import HyperellipticCurves.Log.Fold.CenterFold
 import HyperellipticCurves.Log.Fold.FoldTrace
+import HyperellipticCurves.Mathlib.RingTheory.LocalRing.ResidueField.Defs
 
 /-!
 # Existence of the `τ`-datum (blueprint `lem:tau-exists`)

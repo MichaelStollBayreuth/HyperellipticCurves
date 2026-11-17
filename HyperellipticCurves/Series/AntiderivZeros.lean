@@ -5,10 +5,11 @@ Authors: Michael Stoll
 -/
 module
 
-public import HyperellipticCurves.ForMathlib.LocalRing
+public import HyperellipticCurves.Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
+public import HyperellipticCurves.Mathlib.RingTheory.LocalRing.ResidueField.Defs
 public import HyperellipticCurves.Series.Strassmann
 
-import HyperellipticCurves.ForMathlib.PadicValNat
+import HyperellipticCurves.Mathlib.NumberTheory.Padics.PadicVal.Defs
 
 /-!
 # Zeros of antiderivatives of power series

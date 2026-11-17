@@ -10,11 +10,11 @@ public import HyperellipticCurves.Disks.Charts
 public import HyperellipticCurves.Disks.OrdMatchElement
 public import HyperellipticCurves.Series.PolyZeroCount
 
-import HyperellipticCurves.ForMathlib.ENat
-import HyperellipticCurves.ForMathlib.Finprod
-import HyperellipticCurves.ForMathlib.Multiplicity
-import HyperellipticCurves.ForMathlib.Polynomial
-import HyperellipticCurves.ForMathlib.WeierstrassPreparation
+import HyperellipticCurves.Mathlib.Algebra.BigOperators.Finprod
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Taylor
+import HyperellipticCurves.Mathlib.Data.ENat.Basic
+import HyperellipticCurves.Mathlib.RingTheory.Ideal.Maps
+import HyperellipticCurves.Mathlib.RingTheory.PowerSeries.WeierstrassPreparation
 import HyperellipticCurves.Specialization.CpZeros
 
 /-!

@@ -6,8 +6,11 @@ Authors: Michael Stoll
 module
 
 public import HyperellipticCurves.Disks.OmegaExpansionInf
-public import HyperellipticCurves.ForMathlib.Polynomial
 public import HyperellipticCurves.Log.Charts.PhiChart
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.Monic
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.Reverse
+public import HyperellipticCurves.Mathlib.Algebra.Polynomial.RingDivision
+public import HyperellipticCurves.Mathlib.FieldTheory.Separable
 
 import Mathlib.RingTheory.PowerSeries.Inverse
 

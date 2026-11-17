@@ -7,7 +7,7 @@ module
 
 public import HyperellipticCurves.Specialization.DiskPointSum
 
-import HyperellipticCurves.ForMathlib.LocalRing
+import HyperellipticCurves.Mathlib.RingTheory.LocalRing.ResidueField.Defs
 import Mathlib.FieldTheory.Perfect
 
 /-!

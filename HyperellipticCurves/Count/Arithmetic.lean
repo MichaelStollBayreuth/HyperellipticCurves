@@ -7,7 +7,7 @@ module
 
 public import HyperellipticCurves.Count.NumberField
 
-import HyperellipticCurves.ForMathlib.Squarefree
+import HyperellipticCurves.Mathlib.Algebra.Squarefree.Basic
 
 /-!
 # The classical arithmetic case: `ℚ` coefficients and a prime `p`

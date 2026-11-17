@@ -9,9 +9,9 @@ public import HyperellipticCurves.Curve.Basic
 public import HyperellipticCurves.Curve.TraceMatrix
 public import HyperellipticCurves.Log.Analytic.Lambda
 
-import HyperellipticCurves.ForMathlib.DualAnnihilator
-import HyperellipticCurves.ForMathlib.PolynomialDegreeLT
-import HyperellipticCurves.ForMathlib.RankBaseChange
+import HyperellipticCurves.Mathlib.LinearAlgebra.Dual.Lemmas
+import HyperellipticCurves.Mathlib.RingTheory.Flat.Basic
+import HyperellipticCurves.Mathlib.RingTheory.Polynomial.DegreeLT
 import Mathlib.RingTheory.Flat.TorsionFree
 
 /-!

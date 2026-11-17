@@ -6,9 +6,10 @@ Authors: Michael Stoll
 module
 
 public import HyperellipticCurves.Archive.DiskExpand
-public import HyperellipticCurves.Archive.ForMathlib.QuadraticAlgebra
-public import HyperellipticCurves.Archive.ForMathlib.RatFunc
 public import HyperellipticCurves.Archive.SecondKind
+
+import HyperellipticCurves.Archive.Mathlib.Algebra.QuadraticAlgebra.Defs
+import HyperellipticCurves.Archive.Mathlib.FieldTheory.RatFunc.Degree
 
 /-!
 # Regularity of `ω′` (blueprint `thm:omega-prime-global` clause (c))

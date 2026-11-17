@@ -9,7 +9,7 @@ public import HyperellipticCurves.Archive.RatFuncDerivative
 public import HyperellipticCurves.Curve.HypRing
 public import Mathlib.RingTheory.Derivation.Basic
 
-import HyperellipticCurves.ForMathlib.RatFunc
+import HyperellipticCurves.Mathlib.FieldTheory.RatFunc.Basic
 import Mathlib.Tactic.FieldSimp
 
 /-!

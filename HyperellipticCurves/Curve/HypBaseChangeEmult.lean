@@ -9,7 +9,6 @@ public import HyperellipticCurves.Curve.BaseChange
 public import HyperellipticCurves.Curve.PointValuation
 public import HyperellipticCurves.Specialization.FiberSum
 
-import HyperellipticCurves.ForMathlib.Multiplicity
 import Mathlib.RingTheory.DedekindDomain.Factorization
 import Mathlib.RingTheory.Ideal.GoingUp
 

@@ -10,7 +10,7 @@ public import HyperellipticCurves.Curve.PointValuation
 public import HyperellipticCurves.Disks.OrdMatch
 public import HyperellipticCurves.Disks.OrdPoint
 
-import HyperellipticCurves.ForMathlib.Polynomial
+import HyperellipticCurves.Mathlib.Algebra.Polynomial.Div
 
 /-!
 # Order matching: reduced expansion order = intrinsic order
