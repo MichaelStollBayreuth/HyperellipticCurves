@@ -111,19 +111,19 @@ instance instIsIntegralClosure [NeZero (2 : K)] [Fact (Squarefree f)] :
 
 end HypRing
 
-instance HypField.instIsSeparable [NeZero (2 : K)] [Fact (Odd f.natDegree)] :
+instance HypField.instIsSeparable [NeZero (2 : K)] [Fact (¬IsSquare f)] :
     Algebra.IsSeparable (RatFunc K) (HypField K f) :=
   .of_finrank_le_two _ _ two_ne_zero (QuadraticAlgebra.finrank_eq_two _ _).le
 
-/-- The coordinate ring of an odd-degree hyperelliptic curve `y² = f(x)` with
-squarefree `f` over a field of characteristic ≠ 2 is a Dedekind domain. -/
-instance HypRing.instIsDedekindDomain [NeZero (2 : K)] [Fact (Odd f.natDegree)]
+/-- The coordinate ring of a hyperelliptic curve `y² = f(x)` with squarefree `f`, not a
+square, over a field of characteristic ≠ 2 is a Dedekind domain. -/
+instance HypRing.instIsDedekindDomain [NeZero (2 : K)] [Fact (¬IsSquare f)]
     [Fact (Squarefree f)] : IsDedekindDomain (HypRing K f) :=
   IsIntegralClosure.isDedekindDomain K[X] (RatFunc K) (HypField K f) _
 
 /-- The function field `F_K` is the fraction field of the coordinate ring `A_K` (the integral
 closure of `K[x]` in `F_K`). -/
-instance HypRing.instIsFractionRing [NeZero (2 : K)] [Fact (Odd f.natDegree)]
+instance HypRing.instIsFractionRing [NeZero (2 : K)] [Fact (¬IsSquare f)]
     [Fact (Squarefree f)] : IsFractionRing (HypRing K f) (HypField K f) :=
   IsIntegralClosure.isFractionRing_of_finite_extension K[X] (RatFunc K) (HypField K f) (HypRing K f)
 

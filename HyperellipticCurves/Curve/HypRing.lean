@@ -12,16 +12,18 @@ public import HyperellipticCurves.Mathlib.FieldTheory.RatFunc.Basic
 public import Mathlib.FieldTheory.RatFunc.Degree
 
 import HyperellipticCurves.Mathlib.FieldTheory.RatFunc.Degree
+import HyperellipticCurves.Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.FieldTheory.KummerPolynomial
 
 /-!
-# Coordinate ring and function field of an odd-degree hyperelliptic curve
+# Coordinate ring and function field of a hyperelliptic curve
 
 For a commutative ring `R` and `f : R[X]` we define `ChabautyColeman.HypRing R f`, the
 affine coordinate ring `R[x][Y]/(Y² - f)` of the curve `y² = f(x)`, and for a field `K`
 `ChabautyColeman.HypField K f`, the corresponding object `K(x)[Y]/(Y² - f)` over the
-rational function field (an actual field once `Y² - f` is irreducible, which holds for
-`f` of odd degree; see `lem:hyp-irred` in the blueprint).
+rational function field (an actual field once `Y² - f` is irreducible, which holds when `f`
+is not a square in `K[x]`, for example for `f` of odd degree; see `lem:hyp-irred` in the
+blueprint).
 
 Both are implemented via `QuadraticAlgebra ⬝ f 0`, the free rank-2 algebra with basis
 `(1, ω)` and `ω² = f`: this makes the basis `(1, y)` definitional and gives the
@@ -47,17 +49,20 @@ abbrev HypRing (R : Type*) [CommRing R] (f : R[X]) : Type _ :=
 
 /-- The algebra `K(x)[Y]/(Y² - f)` associated to the hyperelliptic curve `y² = f(x)`
 over the field `K`; it is the function field of the curve once `Y² - f` is irreducible
-over `K(x)`, e.g. for `f` of odd degree. -/
+over `K(x)`, that is, once `f` is not a square in `K[x]`. -/
 abbrev HypField (K : Type*) [Field K] (f : K[X]) : Type _ :=
   QuadraticAlgebra (RatFunc K) (algebraMap K[X] (RatFunc K) f) 0
 
-/-! ### Irreducibility of `Y² - f` for `f` of odd degree (blueprint node `lem:hyp-irred`)
+/-! ### Irreducibility of `Y² - f` (blueprint node `lem:hyp-irred`)
 
-For `f` of odd degree, `f` is not a square in `K(x)`, so `Y² - f` is irreducible over
-`K(x)`. Consequently `HypField K f` is a field (this is Mathlib's
-`QuadraticAlgebra` field instance, available under `Fact (Odd f.natDegree)` via
-`instFactHypField` below), quadratic over `K(x)` (`QuadraticAlgebra.finrank_eq_two`),
-and `HypRing K f` is a domain, embedding into `HypField K f` via `HypRing.toHypField`.
+For `f` not a square in `K[x]` (for example of odd degree), `f` is not a square in `K(x)`
+either, as `K[x]` is integrally closed, so `Y² - f` is irreducible over `K(x)`. Consequently
+`HypField K f` is a field (this is Mathlib's `QuadraticAlgebra` field instance, available under
+`Fact (¬IsSquare f)` via `instFactHypField` below), quadratic over `K(x)`
+(`QuadraticAlgebra.finrank_eq_two`), and `HypRing K f` is a domain, embedding into
+`HypField K f` via `HypRing.toHypField`. For `f` of odd degree the hypothesis
+`Fact (¬IsSquare f)` comes from `Fact (Odd f.natDegree)` by the instance
+`ChabautyColeman.instFactNotIsSquareOfOdd`.
 -/
 
 section HypIrred
@@ -68,19 +73,24 @@ theorem not_isSquare_algebraMap_ratFunc (hf : Odd f.natDegree) :
     ¬IsSquare (algebraMap K[X] (RatFunc K) f) :=
   RatFunc.not_isSquare_of_odd_intDegree (by rwa [RatFunc.intDegree_polynomial, Int.odd_coe_nat])
 
-/-- For `f : K[X]` of odd degree, the polynomial `Y² - f` is irreducible over `K(x)`. -/
-theorem irreducible_Ysq_sub_f (hf : Odd f.natDegree) :
-    Irreducible (X ^ 2 - C (algebraMap K[X] (RatFunc K) f) : (RatFunc K)[X]) :=
-  X_pow_sub_C_irreducible_of_prime Nat.prime_two
-    fun r hr ↦ not_isSquare_algebraMap_ratFunc f hf ⟨r, by rw [← hr, sq]⟩
+/-- A polynomial of odd degree is not a square, so every declaration assuming
+`Fact (¬IsSquare f)` applies to `f` of odd degree. -/
+instance instFactNotIsSquareOfOdd [hf : Fact (Odd f.natDegree)] : Fact (¬IsSquare f) :=
+  ⟨fun h ↦ not_isSquare_algebraMap_ratFunc f hf.out (h.map _)⟩
 
-/-- For `f` of odd degree, the defining quadratic of `HypField K f` has no root in `K(x)`;
+/-- For `f : K[X]` not a square, the polynomial `Y² - f` is irreducible over `K(x)`. -/
+theorem irreducible_Ysq_sub_f (hf : ¬IsSquare f) :
+    Irreducible (X ^ 2 - C (algebraMap K[X] (RatFunc K) f) : (RatFunc K)[X]) :=
+  X_pow_sub_C_irreducible_of_prime Nat.prime_two fun r hr ↦
+    hf (IsIntegrallyClosed.isSquare_algebraMap_iff.mp ⟨r, by rw [← hr, sq]⟩)
+
+/-- For `f` not a square, the defining quadratic of `HypField K f` has no root in `K(x)`;
 this `Fact` feeds the generic `Field (QuadraticAlgebra K a b)` instance from Mathlib,
-so `Field (HypField K f)` is available whenever `Fact (Odd f.natDegree)` is. -/
-instance instFactHypField [hf : Fact (Odd f.natDegree)] :
+so `Field (HypField K f)` is available whenever `Fact (¬IsSquare f)` is. -/
+instance instFactHypField [hf : Fact (¬IsSquare f)] :
     Fact (∀ r : RatFunc K, r ^ 2 ≠ algebraMap K[X] (RatFunc K) f + 0 * r) :=
-  ⟨fun r hr ↦ not_isSquare_algebraMap_ratFunc f hf.out
-    ⟨r, by rw [← sq, hr, zero_mul, add_zero]⟩⟩
+  ⟨fun r hr ↦ hf.out (IsIntegrallyClosed.isSquare_algebraMap_iff.mp
+    ⟨r, by rw [← sq, hr, zero_mul, add_zero]⟩)⟩
 
 namespace HypRing
 
@@ -101,8 +111,8 @@ theorem im_toHypField (z : HypRing K f) :
 theorem toHypField_injective : Function.Injective (toHypField f) :=
   mapRingHomTo_injective (RatFunc.algebraMap_injective K) rfl (map_zero _)
 
-/-- The coordinate ring of `y² = f(x)` over a field is a domain for `f` of odd degree. -/
-instance instIsDomain [Fact (Odd f.natDegree)] : IsDomain (HypRing K f) :=
+/-- The coordinate ring of `y² = f(x)` over a field is a domain for `f` not a square. -/
+instance instIsDomain [Fact (¬IsSquare f)] : IsDomain (HypRing K f) :=
   (toHypField_injective f).isDomain (toHypField f).toRingHom
 
 end HypRing
@@ -317,7 +327,7 @@ theorem exists_toHypField_mul_eq (ξ : HypField K f) :
 
 /-- Common-denominator form of `ChabautyColeman.HypRing.exists_toHypField_mul_eq`: a
 finite family of function-field elements admits a single clearing denominator. -/
-theorem exists_toHypField_mul_eq_finite [Fact (Odd f.natDegree)] {ι : Type*} [Finite ι]
+theorem exists_toHypField_mul_eq_finite [Fact (¬IsSquare f)] {ι : Type*} [Finite ι]
     (ξ : ι → HypField K f) :
     ∃ (s : HypRing K f) (w : ι → HypRing K f), toHypField f s ≠ 0
       ∧ ∀ i, toHypField f s * ξ i = toHypField f (w i) := by

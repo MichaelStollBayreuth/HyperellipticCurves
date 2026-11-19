@@ -346,7 +346,7 @@ ideal-closedness under multiplication by `y` yields `u ∣ v² - f`.
 
 section SemiReduction
 
-variable [Fact (Odd f.natDegree)]
+variable [Fact (¬IsSquare f)]
 
 /-- Structure theorem (semi-reduction): every nonzero ideal of the coordinate ring is a
 polynomial multiple of a Mumford ideal. -/

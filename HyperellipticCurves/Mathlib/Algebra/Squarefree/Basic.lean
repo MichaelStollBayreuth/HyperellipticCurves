@@ -14,6 +14,7 @@ public import Mathlib.Algebra.Squarefree.Basic
 
 * `MulEquiv.squarefree_iff`: an element is squarefree if and only if its image under a
   multiplicative equivalence is, with `Squarefree.map` the direction used in practice.
+* `Squarefree.isUnit_of_isSquare`: a squarefree square is a unit.
 * `Squarefree.dvd_of_dvd_of_dvd_sq_sub`: `d ∣ f` and `d ∣ b ^ 2 - f` give `d ∣ b`.
 * `Squarefree.isRelPrime_of_dvd_of_mul_dvd_sq_sub`: `d ∣ f` and `d * e ∣ b ^ 2 - f` give
   `IsRelPrime d e`.
@@ -33,6 +34,12 @@ theorem MulEquiv.squarefree_iff {M N F : Type*} [Monoid M] [Monoid N] [EquivLike
   simp [Squarefree, (EquivLike.surjective f).forall, ← map_mul, map_dvd_iff, -isUnit_map_iff]
 
 alias ⟨_, Squarefree.map⟩ := MulEquiv.squarefree_iff
+
+/-- `x = r * r` makes `r`, and with it `x`, a unit. -/
+theorem Squarefree.isUnit_of_isSquare {R : Type*} [Monoid R] {x : R} (hx : Squarefree x)
+    (h : IsSquare x) : IsUnit x := by
+  obtain ⟨r, rfl⟩ := h
+  exact (hx r dvd_rfl).mul (hx r dvd_rfl)
 
 variable {R : Type*} [CommRing R] [DecompositionMonoid R] {f d b : R}
 

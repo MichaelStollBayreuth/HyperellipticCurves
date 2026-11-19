@@ -35,7 +35,7 @@ namespace ChabautyColeman
 /-- Nullstellensatz for the coordinate ring: over an algebraically closed field, every nonzero
 prime ideal of `HypRing κ f` is a point ideal `(x - x₀, y - y₀)`. -/
 theorem exists_pointIdeal_eq_of_isPrime {κ : Type*} [Field κ] [IsAlgClosed κ] {f : κ[X]}
-    [NeZero (2 : κ)] [Fact (Odd f.natDegree)] [Fact (Squarefree f)]
+    [NeZero (2 : κ)] [Fact (¬IsSquare f)] [Fact (Squarefree f)]
     {𝔭 : Ideal (HypRing κ f)} (hp : 𝔭.IsPrime) (hp0 : 𝔭 ≠ ⊥) :
     ∃ (x₀ y₀ : κ) (_ : y₀ ^ 2 = f.eval x₀), 𝔭 = pointIdeal f x₀ y₀ := by
   have hmax : 𝔭.IsMaximal := hp.isMaximal hp0

@@ -38,7 +38,7 @@ theorem map_star_pointIdeal_zero {x₀ : K} :
     AlgEquiv.coe_toRingEquiv, starAlgEquiv_apply, star_algebraMap, HypRing.star_y]
   exact Ideal.span_pair_neg _ _
 
-variable [NeZero (2 : K)] [Fact (Odd f.natDegree)] [Fact (Squarefree f)]
+variable [NeZero (2 : K)] [Fact (¬IsSquare f)] [Fact (Squarefree f)]
 
 /-- **Intrinsic order of a function element (Weierstrass chart), individual.** At a Weierstrass
 point the intrinsic order of `z` equals `rootMult` of the norm — the two branches contribute

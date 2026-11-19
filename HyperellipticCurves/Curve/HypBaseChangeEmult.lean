@@ -142,8 +142,8 @@ theorem isIntegral_baseChangeTo (z : HypRing L g) :
   rw [HypRing.eq_algebraMap_re_add_im g z]
   exact (hAM z.re).add ((hAM z.im).mul hyint)
 
-variable [NeZero (2 : K)] [Fact (Odd f.natDegree)] [Fact (Squarefree f)]
-  [NeZero (2 : L)] [Fact (Odd g.natDegree)] [Fact (Squarefree g)]
+variable [NeZero (2 : K)] [Fact (¬IsSquare f)] [Fact (Squarefree f)]
+  [NeZero (2 : L)] [Fact (¬IsSquare g)] [Fact (Squarefree g)]
 
 /-- Every nonzero prime divisor of the extension of `I` divides the extension of a nonzero
 prime divisor of `I`. -/

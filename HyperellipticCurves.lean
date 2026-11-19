@@ -279,6 +279,7 @@ public import HyperellipticCurves.Mathlib.RingTheory.Ideal.Quotient.Basic
 public import HyperellipticCurves.Mathlib.RingTheory.Ideal.Quotient.Defs
 public import HyperellipticCurves.Mathlib.RingTheory.Ideal.Quotient.Operations
 public import HyperellipticCurves.Mathlib.RingTheory.Idempotents
+public import HyperellipticCurves.Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 public import HyperellipticCurves.Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 public import HyperellipticCurves.Mathlib.RingTheory.LocalRing.ResidueField.Basic
 public import HyperellipticCurves.Mathlib.RingTheory.LocalRing.ResidueField.Defs

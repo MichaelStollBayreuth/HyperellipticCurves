@@ -29,8 +29,8 @@ $\deg f \le n+1$ (\texttt{Polynomial.discrOfDegree\_add\_two}), proved by expand
 modified Sylvester matrix along its normalized last row. The invertibility of $2$ is a parameter
 of the type (\texttt{[Invertible (2 : R)]}); the genus is part of the data, so base change needs
 no hypothesis. The coordinate ring, function field and Jacobian below are still indexed by the
-polynomial $f$; a curve supplies their hypotheses (odd degree, squarefreeness over a field)
-through instances.
+polynomial $f$; a curve supplies their hypotheses (odd degree, squarefreeness and the
+non-square property over a field) through instances.
 \end{remark}
 
 \begin{definition}[Coordinate ring and function field]
@@ -46,6 +46,8 @@ $\F{K} := K(x)[Y]/(Y^2 - f_K)$. The hyperelliptic involution $\iota$ is the $K[x
 \begin{lemma}[Irreducibility]
 \label{lem:hyp-irred}
 \lean{ChabautyColeman.irreducible_Ysq_sub_f, ChabautyColeman.not_isSquare_algebraMap_ratFunc,
+  ChabautyColeman.instFactNotIsSquareOfOdd, IsIntegrallyClosed.isSquare_algebraMap_iff,
+  HyperellipticCurve.instFactNotIsSquareF, Squarefree.isUnit_of_isSquare,
   ChabautyColeman.instFactHypField, QuadraticAlgebra.finrank_eq_two,
   ChabautyColeman.HypRing.toHypField, ChabautyColeman.HypRing.toHypField_injective,
   ChabautyColeman.HypRing.instIsDomain}
@@ -60,7 +62,10 @@ below.)
 \leanok
 A root would give $f_K = r^2$ with $0 \ne r \in K(x)$; comparing degrees,
 $\deg f = 2\deg r$ is even, contradicting $\deg f = 2g+1$. \emph{Formalization.} The
-parity argument is run directly on \texttt{RatFunc.intDegree}, avoiding integral closure.
+statements assume only that~$f_K$ is not a square in~$K[x]$: as $K[x]$ is integrally closed,
+$f_K$ is then not a square in~$K(x)$ either. One instance derives this hypothesis from the odd
+degree, by the parity argument on \texttt{RatFunc.intDegree}, and another one from a curve over
+a field, whose polynomial is squarefree of positive degree.
 \end{proof}
 
 \begin{lemma}[Norm form]

@@ -12,6 +12,8 @@ public import HyperellipticCurves.Mathlib.RingTheory.Polynomial.Resultant.Basic
 public import Mathlib.Algebra.CharP.Invertible
 public import Mathlib.FieldTheory.Perfect
 
+import HyperellipticCurves.Mathlib.Algebra.Squarefree.Basic
+
 /-!
 # Hyperelliptic curves `y² = f(x)`
 
@@ -52,10 +54,10 @@ a theorem (`HyperellipticCurve.natDegree_eq_or_eq`), and so is the nonconstancy 
 Unlike Mathlib's `WeierstrassCurve`, where nonsingularity is the separate class
 `WeierstrassCurve.IsElliptic`, the unit discriminant is a field of the structure, so every
 `HyperellipticCurve` is nonsingular and no further hypothesis is needed for the coordinate-ring
-instances. The instances `Fact (Odd C.f.natDegree)` (for `[C.IsOdd]`) and `Fact (Squarefree C.f)`
-(over a field) connect the curve to the development indexed by the polynomial: every declaration
-guarded by these `Fact`s, such as the domain and Dedekind-domain instances of
-`ChabautyColeman.HypRing`, applies to `C.f`.
+instances. The instances `Fact (Odd C.f.natDegree)` (for `[C.IsOdd]`), `Fact (Squarefree C.f)`
+and `Fact (¬IsSquare C.f)` (over a field) connect the curve to the development indexed by the
+polynomial: every declaration guarded by these `Fact`s, such as the domain and Dedekind-domain
+instances of `ChabautyColeman.HypRing`, applies to `C.f`.
 -/
 
 @[expose] public section
@@ -234,6 +236,12 @@ theorem squarefree_f : Squarefree C.f := C.separable_f.squarefree
 field. -/
 instance instFactSquarefreeF : Fact (Squarefree C.f) := ⟨C.squarefree_f⟩
 
+/-- The polynomial of a curve over a field is squarefree of positive degree, hence not a square:
+every declaration assuming `Fact (¬IsSquare f)`, such as the domain and field instances of
+`ChabautyColeman.HypRing` and `ChabautyColeman.HypField`, applies to it, in either parity. -/
+instance instFactNotIsSquareF : Fact (¬IsSquare C.f) :=
+  ⟨fun h ↦ not_isUnit_of_natDegree_pos _ C.natDegree_pos (C.squarefree_f.isUnit_of_isSquare h)⟩
+
 /-- The curve `y² = f(x)` of a nonconstant squarefree polynomial over a perfect field. -/
 def ofSquarefree [PerfectField K] {f : K[X]} (hf : Squarefree f) (hd : 0 < f.natDegree) :
     HyperellipticCurve K :=
@@ -255,6 +263,12 @@ spelling `C.f.map φ` of the polynomial-indexed development. -/
 instance instFactSquarefreeMap {K : Type*} [Field K] [Invertible (2 : K)] (φ : R →+* K) :
     Fact (Squarefree (C.f.map φ)) :=
   (C.map φ).instFactSquarefreeF
+
+/-- The non-square `Fact` for the image of the polynomial of a curve in a field, in the spelling
+`C.f.map φ` of the polynomial-indexed development. -/
+instance instFactNotIsSquareMap {K : Type*} [Field K] [Invertible (2 : K)] (φ : R →+* K) :
+    Fact (¬IsSquare (C.f.map φ)) :=
+  (C.map φ).instFactNotIsSquareF
 
 end HyperellipticCurve
 

@@ -130,14 +130,14 @@ theorem pointIdeal_isPrime {x₀ y₀ : K} (h : y₀ ^ 2 = f.eval x₀) :
   (pointIdeal_isMaximal h).isPrime
 
 /-- The height-one prime of the Dedekind domain `A_K` corresponding to a curve point `(x₀, y₀)`. -/
-noncomputable def pointSpectrum [NeZero (2 : K)] [Fact (Odd f.natDegree)] [Fact (Squarefree f)]
+noncomputable def pointSpectrum [NeZero (2 : K)] [Fact (¬IsSquare f)] [Fact (Squarefree f)]
     {x₀ y₀ : K} (h : y₀ ^ 2 = f.eval x₀) :
     IsDedekindDomain.HeightOneSpectrum (HypRing K f) where
   asIdeal := pointIdeal f x₀ y₀
   isPrime := pointIdeal_isPrime h
   ne_bot := pointIdeal_ne_bot f x₀ y₀
 
-@[simp] theorem pointSpectrum_asIdeal [NeZero (2 : K)] [Fact (Odd f.natDegree)]
+@[simp] theorem pointSpectrum_asIdeal [NeZero (2 : K)] [Fact (¬IsSquare f)]
     [Fact (Squarefree f)] {x₀ y₀ : K} (h : y₀ ^ 2 = f.eval x₀) :
     (pointSpectrum h).asIdeal = pointIdeal f x₀ y₀ :=
   rfl
@@ -170,7 +170,7 @@ theorem pointIdeal_eq_pointIdeal_iff {x₀ y₀ x₁ y₁ : K} (h₀ : y₀ ^ 2 
 
 /-! ### The intrinsic order of a function at a point = root multiplicity -/
 
-variable [NeZero (2 : K)] [Fact (Odd f.natDegree)] [Fact (Squarefree f)]
+variable [NeZero (2 : K)] [Fact (¬IsSquare f)] [Fact (Squarefree f)]
 
 /-- A function nonvanishing at the point has multiplicity `0` there (`P = ker evalHom`). -/
 theorem emultiplicity_pointIdeal_eq_zero {x₀ y₀ : K} (hb : y₀ ^ 2 = f.eval x₀) {g : K[X]}
