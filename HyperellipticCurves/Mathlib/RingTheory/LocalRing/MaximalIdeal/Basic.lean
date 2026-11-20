@@ -6,13 +6,15 @@ Authors: Michael Stoll
 module
 
 -- Beyond the sibling `Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic`, for the statements:
--- `padicValNat` (from `Mathlib.NumberTheory.Padics.PadicVal.Defs`) and `FractionRing` (from
--- `Mathlib.RingTheory.Localization.FractionRing`).
-public import Mathlib.NumberTheory.Padics.PadicVal.Defs
+-- `Nat.Prime` (from `Mathlib.Data.Nat.Prime.Defs`), `FractionRing` (from
+-- `Mathlib.RingTheory.Localization.FractionRing`) and `multiplicity` (from
+-- `Mathlib.RingTheory.Multiplicity`).
+public import Mathlib.Data.Nat.Prime.Defs
 public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 public import Mathlib.RingTheory.Localization.FractionRing
+public import Mathlib.RingTheory.Multiplicity
 
--- For the proofs only: `pow_padicValNat_dvd` and `Nat.pow_dvd_iff_le_padicValNat`, from
+-- For the proofs only: `Nat.pow_dvd_iff_le_multiplicity` and `Nat.multiplicity_le_self`, through
 -- `Mathlib.NumberTheory.Padics.PadicVal.Basic`.
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 
@@ -69,8 +71,7 @@ theorem isUnit_natCast_of_not_dvd (hp : p.Prime) (hpmem : (p : O) ∈ maximalIde
 the prime `p`, the prime-to-`p` part of `n ≠ 0` is a unit. -/
 theorem exists_units_natCast_eq (hp : p.Prime) (hpmem : (p : O) ∈ maximalIdeal O) {n : ℕ}
     (hn : n ≠ 0) :
-    ∃ u : Oˣ, (n : O) = (p : O) ^ padicValNat p n * u := by
-  rw [Nat.padicValNat_def]
+    ∃ u : Oˣ, (n : O) = (p : O) ^ multiplicity p n * u := by
   set v := multiplicity p n
   obtain ⟨c, hc⟩ : p ^ v ∣ n := pow_multiplicity_dvd p n
   have hnd : ¬ p ∣ c := fun hd ↦ by
@@ -88,7 +89,7 @@ theorem natCast_dvd_pow_self (hp : p.Prime) (hpmem : (p : O) ∈ maximalIdeal O)
     (n : O) ∣ (p : O) ^ n := by
   obtain ⟨u, hu⟩ := exists_units_natCast_eq hp hpmem hn
   rw [hu, u.isUnit.mul_right_dvd]
-  exact pow_dvd_pow _ (Nat.padicValNat_def.trans_le (Nat.multiplicity_le_self n))
+  exact pow_dvd_pow _ (Nat.multiplicity_le_self n)
 
 /-! ### Uniformizers -/
 
@@ -146,7 +147,7 @@ theorem exists_pow_eq {v k : ℕ} (hk : e * v ≤ k) :
   rw [← mul_assoc, ← mul_pow, ← ht, ← pow_mul, ← pow_add, Nat.add_sub_cancel' hk]
 
 /-- A nonzero natural number divides `π ^ k` as soon as `e·v_p(n) ≤ k`. -/
-theorem natCast_dvd_pow {n : ℕ} (hn : n ≠ 0) {k : ℕ} (hk : e * padicValNat p n ≤ k) :
+theorem natCast_dvd_pow {n : ℕ} (hn : n ≠ 0) {k : ℕ} (hk : e * multiplicity p n ≤ k) :
     (n : O) ∣ π ^ k := by
   obtain ⟨u, hu⟩ := exists_units_natCast_eq h.prime h.natCast_mem hn
   obtain ⟨c, -, hc⟩ := h.exists_pow_eq hk

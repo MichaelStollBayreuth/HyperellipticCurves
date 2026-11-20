@@ -112,7 +112,7 @@ multiplicity, and $\sum_{\bar c} \mathrm{mult}_{\bar c}(q) \le \deg q = N$.
 
 \begin{lemma}[An index-valuation inequality]
 \label{lem:padic-index}
-\lean{Nat.add_mul_padicValNat_lt, Nat.mul_padicValNat_le}
+\lean{Nat.add_mul_multiplicity_lt, Nat.mul_multiplicity_le_of_lt}
 \leanok
 Let $p > m + e + 1$ and $k + 1 > m + 1$. Then $(k+1) - e\,v_p(k+1) > m + 1$. (No primality
 of $p$ is needed; in Lean the inequality is stated without natural subtraction, as
@@ -131,7 +131,7 @@ $c\,j \le c^j$ for $c \ge 2$ and the last because $(m+2)(j-1) \ge 0$.
   ChabautyColeman.PSeries.antideriv_zeros_finite,
   ChabautyColeman.PSeries.pow_dvd_coeff_antideriv,
   IsLocalRing.IsUniformizer.exists_pow_eq,
-  Nat.tendsto_sub_mul_padicValNat_atTop}
+  Nat.tendsto_sub_mul_multiplicity_atTop}
 \leanok
 \uses{thm:strassmann, lem:padic-index}
 Let $\mathfrak m = (\pi)$ with $v(p) \le e$, let

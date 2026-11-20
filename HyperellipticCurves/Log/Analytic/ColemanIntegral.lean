@@ -131,18 +131,18 @@ theorem summable_logSubstFamily (Φ : FormalGroupLaw O ι) (hram : IsUniformizer
   rw [hbfg]
   have hmem_scaledLog (d : ι →₀ ℕ) :
       coeff d (Φ.scaledLog hram hpe f hfp i)
-        ∈ maximalIdeal O ^ (d.degree - e * padicValNat p d.degree) := by
+        ∈ maximalIdeal O ^ (d.degree - e * multiplicity p d.degree) := by
     obtain ⟨c, hcmem, hc⟩ := Φ.coeff_log_map_scale hram hpe f hfp i d
     rwa [hfinj ((Φ.coeff_scaledLog_map hram hpe hfp i d).trans hc)]
   set ex : (ι →₀ ℕ) × ℕ → ℕ :=
-    fun dk ↦ max dk.2 dk.1.degree - e * padicValNat p dk.1.degree with hex
+    fun dk ↦ max dk.2 dk.1.degree - e * multiplicity p dk.1.degree with hex
   have hgmem : ∀ dk, g dk ∈ maximalIdeal O ^ ex dk := by
     intro ⟨d, k⟩
     by_cases hk : d.degree ≤ k
-    · have hvle := Nat.mul_padicValNat_le hpe d.degree
+    · have hvle := Nat.mul_multiplicity_le_of_lt hpe d.degree
       have h1 : coeff d (Φ.scaledLog hram hpe f hfp i)
           * PowerSeries.coeff k (ηd d) * w ^ k
-          ∈ maximalIdeal O ^ (d.degree - e * padicValNat p d.degree) :=
+          ∈ maximalIdeal O ^ (d.degree - e * multiplicity p d.degree) :=
         Ideal.mul_mem_right _ _ (Ideal.mul_mem_right _ _ (hmem_scaledLog d))
       have h2 : π ^ (k - d.degree) ∈ maximalIdeal O ^ (k - d.degree) :=
         hram.mem_pow_iff.mpr dvd_rfl
@@ -157,9 +157,9 @@ theorem summable_logSubstFamily (Φ : FormalGroupLaw O ι) (hram : IsUniformizer
   have hetendsto : Tendsto ex cofinite atTop := by
     rw [tendsto_atTop]
     intro N
-    have hsub : Tendsto (fun d : ι →₀ ℕ ↦ d.degree - e * padicValNat p d.degree) cofinite atTop :=
-      (Nat.tendsto_sub_mul_padicValNat_atTop hpe).comp Finsupp.tendsto_degree_cofinite
-    have hDa : {d : ι →₀ ℕ | d.degree - e * padicValNat p d.degree < N}.Finite := by
+    have hsub : Tendsto (fun d : ι →₀ ℕ ↦ d.degree - e * multiplicity p d.degree) cofinite atTop :=
+      (Nat.tendsto_sub_mul_multiplicity_atTop hpe).comp Finsupp.tendsto_degree_cofinite
+    have hDa : {d : ι →₀ ℕ | d.degree - e * multiplicity p d.degree < N}.Finite := by
       have h := hsub.eventually_ge_atTop N
       rw [Filter.eventually_cofinite] at h
       simpa only [not_le] using h
@@ -168,7 +168,7 @@ theorem summable_logSubstFamily (Φ : FormalGroupLaw O ι) (hram : IsUniformizer
       (hDa.toFinset ×ˢ Finset.range (N + hDa.toFinset.sup fun d ↦ d.degree)).finite_toSet ?_
     intro ⟨d, k⟩ hdk
     simp only [Set.mem_ofPred_eq, not_le, hex] at hdk
-    have hvle := Nat.mul_padicValNat_le hpe d.degree
+    have hvle := Nat.mul_multiplicity_le_of_lt hpe d.degree
     have hdD : d ∈ hDa.toFinset := by rw [Set.Finite.mem_toFinset, Set.mem_ofPred_eq]; lia
     have hdeg_le : d.degree ≤ hDa.toFinset.sup fun d ↦ d.degree := Finset.le_sup hdD
     simp only [Finset.coe_product, Set.mem_prod, Finset.mem_coe, Finset.mem_range]

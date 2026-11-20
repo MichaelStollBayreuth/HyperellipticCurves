@@ -32,7 +32,7 @@ loses nothing.)
 
 The coefficient of `H` in degree `k + 1` is divisible by `π^(k+1-e·v_p(k+1))`
 (`ChabautyColeman.PSeries.pow_dvd_coeff_antideriv`); by the index-valuation inequality
-(`Nat.add_mul_padicValNat_lt`) these exponents exceed `m + 1` beyond degree `m + 1`, while
+(`Nat.add_mul_multiplicity_lt`) these exponents exceed `m + 1` beyond degree `m + 1`, while
 in degree `m + 1` the valuation is exactly `m + 1`. Dividing by the minimal power of `π`
 therefore yields a series with unit content and top unit index at most `m + 1`, to which
 Strassmann's theorem applies.
@@ -82,7 +82,8 @@ theorem exists_substituted_antideriv (W : O⟦X⟧) :
     ∃ H : O⟦X⟧, constantCoeff H = 0 ∧
       ∀ k : ℕ, ((k : O) + 1) * coeff (k + 1) H = π ^ (k + 1) * coeff k W := by
   have hdvd (k : ℕ) : ((k : O) + 1) ∣ π ^ (k + 1) * coeff k W := by
-    have hev : e * padicValNat p (k + 1) ≤ k + 1 := by lia [Nat.mul_padicValNat_le hpe (k + 1)]
+    have hev : e * multiplicity p (k + 1) ≤ k + 1 := by
+      lia [Nat.mul_multiplicity_le_of_lt hpe (k + 1)]
     have hcast : ((k : O) + 1) = ((k + 1 : ℕ) : O) := by push_cast; ring
     exact hcast ▸ (hram.natCast_dvd_pow k.succ_ne_zero hev).mul_right _
   choose c hc using hdvd
@@ -113,11 +114,11 @@ include hpe in
 /-- The key divisibility: the substituted antiderivative coefficient at index `k + 1`
 is divisible by `π^(k + 1 - e·v_p(k + 1))`. -/
 lemma pow_dvd_coeff_antideriv (k : ℕ) :
-    π ^ (k + 1 - e * padicValNat p (k + 1)) ∣ coeff (k + 1) H := by
+    π ^ (k + 1 - e * multiplicity p (k + 1)) ∣ coeff (k + 1) H := by
   obtain ⟨u, hu⟩ := exists_units_natCast_eq hram.prime hram.natCast_mem k.succ_ne_zero
-  set v := padicValNat p (k + 1)
+  set v := multiplicity p (k + 1)
   obtain ⟨c, hcmem, hc⟩ := hram.exists_pow_eq (v := v) (k := k + 1)
-    (by lia [Nat.mul_padicValNat_le hpe (k + 1)])
+    (by lia [Nat.mul_multiplicity_le_of_lt hpe (k + 1)])
   have h1 : ((k : O) + 1) = (p : O) ^ v * u := by rw [← hu]; push_cast; ring
   have hpne : (p : O) ^ v ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.mpr hram.prime.ne_zero)
   have hcancel : (u : O) * coeff (k + 1) H = c * coeff k w :=
@@ -139,7 +140,7 @@ lemma tendsto_coeff_antideriv : Tendsto (fun k ↦ coeff k H) atTop (𝓝 0) := 
   obtain ⟨k', rfl⟩ : ∃ k', k = k' + 1 := ⟨k - 1, by lia⟩
   rw [SetLike.mem_coe, hram.mem_pow_iff]
   refine (pow_dvd_pow _ ?_).trans (pow_dvd_coeff_antideriv hram hpe hH k')
-  lia [Nat.add_mul_padicValNat_le hpe (B := M) (n := k' + 1) (by lia)]
+  lia [Nat.add_mul_multiplicity_le hpe (B := M) (n := k' + 1) (by lia)]
 
 omit hH [CharZero O] in
 /-- Coefficient decay descends along division by `π ^ s`. -/
@@ -189,7 +190,7 @@ private lemma exists_normalized (hpm : m + e + 1 < p) (hmu : IsUnit (coeff m w))
   have hbig (k : ℕ) (hk : m + 1 < k) : π ^ (s + 1) ∣ coeff k H := by
     obtain ⟨k', rfl⟩ : ∃ k', k = k' + 1 := ⟨k - 1, by lia⟩
     refine (pow_dvd_pow _ ?_).trans (pow_dvd_coeff_antideriv hram hpe hH k')
-    lia [Nat.add_mul_padicValNat_lt (m := m) (e := e) (k := k') hpm (by lia)]
+    lia [Nat.add_mul_multiplicity_lt (m := m) (e := e) (k := k') hpm (by lia)]
   obtain ⟨i₀, hi₀⟩ : P s := Nat.find_spec hPex
   have hi₀m : i₀ ≤ m + 1 := by
     by_contra hgt

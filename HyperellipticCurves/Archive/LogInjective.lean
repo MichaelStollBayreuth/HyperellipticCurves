@@ -125,8 +125,8 @@ theorem log_injective (hram : IsUniformizer (p : O) p 1) (hpe : 1 + 1 < p)
     · obtain ⟨c, hcmem, hc⟩ := Φ.coeff_log_map_scale hram hpe f hfp i d
       have hpos : 0 < d.degree :=
         Nat.pos_of_ne_zero fun h ↦ hd0 ((Finsupp.degree_eq_zero_iff d).mp h)
-      have hvp : 1 ≤ d.degree - 1 * padicValNat p d.degree := by
-        lia [Nat.mul_padicValNat_le hpe (p := p) d.degree]
+      have hvp : 1 ≤ d.degree - 1 * multiplicity p d.degree := by
+        lia [Nat.mul_multiplicity_le_of_lt hpe (p := p) d.degree]
       rw [hf ((hHL_scale i d).trans hc)]
       exact (dvd_pow_self _ (by lia)).trans (hram.mem_pow_iff.mp hcmem)
   choose c hc using fun i d ↦ hdvd i d

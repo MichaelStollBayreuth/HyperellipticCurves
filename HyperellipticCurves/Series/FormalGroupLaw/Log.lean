@@ -209,8 +209,8 @@ over a local ring of residue characteristic `p`: multiplying the degree-`d` coef
 denominators are powers of `p`, with exponent `v_p(deg d)`. -/
 theorem coeff_log_map_padic (hp : p.Prime) (hpmem : (p : O) ∈ maximalIdeal O)
     (f : O →+* K) (hfp : f (p : O) ≠ 0) (i : ι) (d : ι →₀ ℕ) :
-    ∃ c : O, f (p : O) ^ (padicValNat p d.degree)
-      * MvPowerSeries.coeff d ((Φ.map f).log i) = f c := by
+    ∃ c : O, f (p : O) ^ multiplicity p d.degree *
+      MvPowerSeries.coeff d ((Φ.map f).log i) = f c := by
   rw [Φ.coeff_log_map f]
   set k := d.degree
   set cd := MvPowerSeries.coeff d (∑ j, Φ.diffMatrix⁻¹ i j * MvPowerSeries.X j)
@@ -218,7 +218,7 @@ theorem coeff_log_map_padic (hp : p.Prime) (hpmem : (p : O) ∈ maximalIdeal O)
   · exact ⟨0, by simp [hk0]⟩
   obtain ⟨u, hu⟩ := exists_units_natCast_eq hp hpmem hkpos.ne'
   refine ⟨(↑u⁻¹ : O) * cd, ?_⟩
-  have hkK : (k : K) = f (p : O) ^ padicValNat p k * f (↑u : O) := by
+  have hkK : (k : K) = f (p : O) ^ multiplicity p k * f (↑u : O) := by
     rw [← map_natCast f k, hu, map_mul, map_pow]
   have hbne : f (↑u : O) ≠ 0 := (u.isUnit.map f).ne_zero
   have hfu : (f (↑u : O))⁻¹ = f (↑u⁻¹ : O) :=
@@ -234,12 +234,11 @@ So substituting `X_j ↦ π·U_j` lands the logarithm in `O⟦U⟧`, and the exp
 `deg d - e·v_p(deg d) → ∞` drives convergence on `𝔪^n`. -/
 theorem coeff_log_map_scale (hram : IsUniformizer π p e) (hpe : e + 1 < p)
     (f : O →+* K) (hfp : f (p : O) ≠ 0) (i : ι) (d : ι →₀ ℕ) :
-    ∃ c ∈ maximalIdeal O ^ (d.degree - e * padicValNat p d.degree),
+    ∃ c ∈ maximalIdeal O ^ (d.degree - e * multiplicity p d.degree),
       f π ^ d.degree * MvPowerSeries.coeff d ((Φ.map f).log i) = f c := by
   obtain ⟨b, hb⟩ := Φ.coeff_log_map_padic hram.prime hram.natCast_mem f hfp i d
-  obtain ⟨c, hcmem, hcv⟩ := hram.exists_pow_eq (v := padicValNat p d.degree)
-    (k := d.degree)
-    (by have := Nat.mul_padicValNat_le hpe d.degree; lia)
+  obtain ⟨c, hcmem, hcv⟩ := hram.exists_pow_eq (v := multiplicity p d.degree) (k := d.degree)
+    (by lia [Nat.mul_multiplicity_le_of_lt hpe d.degree])
   refine ⟨c * b, Ideal.mul_mem_right _ _ hcmem, ?_⟩
   rw [map_mul, ← hb, ← map_pow, hcv, map_mul, map_pow]
   ring
@@ -268,7 +267,7 @@ theorem exists_integral_scaled_log (hram : IsUniformizer π p e) (hpe : e + 1 < 
       Tendsto (fun d ↦ coeff d H) cofinite (𝓝 0) := by
   choose b hb1 hb2 using Φ.coeff_log_map_scale hram hpe f hfp i
   exact ⟨b, fun d ↦ (hb2 d).symm, MvPSeries.tendsto_coeff_zero_of_mem_pow hb1
-    ((Nat.tendsto_sub_mul_padicValNat_atTop hpe).comp Finsupp.tendsto_degree_cofinite)⟩
+    ((Nat.tendsto_sub_mul_multiplicity_atTop hpe).comp Finsupp.tendsto_degree_cofinite)⟩
 
 end logConvergence
 
