@@ -10,8 +10,8 @@ public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.SelmerGroup
 public import HyperellipticCurves.Mathlib.RingTheory.Polynomial.ChineseRemainder
 public import HyperellipticCurves.Mathlib.RingTheory.Valuation.Integral
 
-import HyperellipticCurves.Mathlib.NumberTheory.RamificationInertia.Valuation
 import HyperellipticCurves.Mathlib.RingTheory.AdjoinRoot
+import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation.Ramification
 import HyperellipticCurves.Mathlib.RingTheory.Norm.AdjoinRoot
 
 /-!

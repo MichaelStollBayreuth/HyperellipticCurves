@@ -8,7 +8,7 @@ module
 public import HyperellipticCurves.Curve.JacobianStructure
 public import HyperellipticCurves.Descent.Map
 public import HyperellipticCurves.Descent.Selmer
-public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation
+public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation.Completion
 
 import HyperellipticCurves.Descent.Image
 import HyperellipticCurves.Descent.Kernel

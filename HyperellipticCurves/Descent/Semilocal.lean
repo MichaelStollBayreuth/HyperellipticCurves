@@ -7,8 +7,8 @@ module
 
 public import HyperellipticCurves.Descent.Selmer
 public import HyperellipticCurves.Mathlib.FieldTheory.Perfect
-public import HyperellipticCurves.Mathlib.NumberTheory.RamificationInertia.Valuation
-public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation
+public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation.Completion
+public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation.Ramification
 
 import HyperellipticCurves.Mathlib.RingTheory.AdjoinRoot
 

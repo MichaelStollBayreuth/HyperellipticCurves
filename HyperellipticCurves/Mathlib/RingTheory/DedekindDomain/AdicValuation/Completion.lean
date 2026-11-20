@@ -5,11 +5,10 @@ Authors: Michael Stoll
 -/
 module
 
--- Beyond the sibling, for the statements: the completions `adicCompletion`, `valuationOfNeZero`
--- and discrete valuation rings.
+-- Beyond the sibling `Mathlib.RingTheory.DedekindDomain.AdicValuation.Completion`, for the
+-- statements: `valuationOfNeZero` and discrete valuation rings.
 public import Mathlib.NumberTheory.NumberField.Completion.FinitePlace
 public import Mathlib.RingTheory.DedekindDomain.AdicValuation.Completion
-public import Mathlib.RingTheory.DedekindDomain.AdicValuation.Valuation
 public import Mathlib.RingTheory.DedekindDomain.SelmerGroup
 public import Mathlib.RingTheory.Valuation.Discrete.IsDiscreteValuationRing
 
@@ -17,12 +16,10 @@ public import Mathlib.RingTheory.Valuation.Discrete.IsDiscreteValuationRing
 import HyperellipticCurves.Mathlib.RingTheory.Valuation.Discrete.IsDiscreteValuationRing
 
 /-!
-# Adic valuations of units, and adic completions of the fraction field
+# Adic completions of the fraction field
 
 ## Main statements
 
-* `IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_of_isUnit`: the `v`-adic valuation of a
-  unit is `1`.
 * `IsDedekindDomain.HeightOneSpectrum.instCharZeroAdicCompletion`: the completion of a field of
   characteristic `0` has characteristic `0`.
 * `IsDedekindDomain.HeightOneSpectrum.valuation_maximalIdeal_adicCompletionIntegers`,
@@ -36,16 +33,6 @@ hyperelliptic curves; upstreaming candidates for Mathlib.
 -/
 
 @[expose] public section
-
-namespace IsDedekindDomain.HeightOneSpectrum
-
-variable {R : Type*} [CommRing R] [IsDedekindDomain R] (v : HeightOneSpectrum R)
-
-/-- The `v`-adic valuation of a unit is `1`. -/
-theorem intValuation_eq_one_of_isUnit {a : R} (ha : IsUnit a) : v.intValuation a = 1 :=
-  intValuation_eq_one_iff.mpr fun hmem ↦ v.isPrime.ne_top (Ideal.eq_top_of_isUnit_mem _ hmem ha)
-
-end IsDedekindDomain.HeightOneSpectrum
 
 open WithZero
 

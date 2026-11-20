@@ -17,7 +17,7 @@ public import Mathlib.RingTheory.RamificationInertia.Inertia
 
 import HyperellipticCurves.Mathlib.GroupTheory.FiniteAbelian.Basic
 import HyperellipticCurves.Mathlib.GroupTheory.Finiteness
-import HyperellipticCurves.Mathlib.NumberTheory.RamificationInertia.Valuation
+import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation.Ramification
 import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.Instances
 import HyperellipticCurves.Mathlib.RingTheory.Ideal.Norm.RelNorm
 

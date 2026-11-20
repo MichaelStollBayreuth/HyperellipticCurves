@@ -244,7 +244,6 @@ public import HyperellipticCurves.Mathlib.NumberTheory.Padics.PadicIntegers
 public import HyperellipticCurves.Mathlib.NumberTheory.Padics.PadicNumbers
 public import HyperellipticCurves.Mathlib.NumberTheory.Padics.PadicVal.Defs
 public import HyperellipticCurves.Mathlib.NumberTheory.Padics.RingHoms
-public import HyperellipticCurves.Mathlib.NumberTheory.RamificationInertia.Valuation
 public import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.AsTensorProduct
 public import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.Basic
 public import HyperellipticCurves.Mathlib.RingTheory.AdicCompletion.Completeness
@@ -253,7 +252,9 @@ public import HyperellipticCurves.Mathlib.RingTheory.AdjoinRoot
 public import HyperellipticCurves.Mathlib.RingTheory.Artinian.Module
 public import HyperellipticCurves.Mathlib.RingTheory.Bezout
 public import HyperellipticCurves.Mathlib.RingTheory.Coprime.Basic
-public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation
+public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation.Completion
+public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation.Ramification
+public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.AdicValuation.Valuation
 public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.Factorization
 public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.FiniteAdeleRing
 public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.Ideal.Basic
