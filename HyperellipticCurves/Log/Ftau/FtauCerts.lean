@@ -59,10 +59,10 @@ theorem isUnit_of_mvSeriesResidue_ne_zero {x : MvPowerSeries σ O}
   MvPowerSeries.isUnit_iff_constantCoeff.mpr ((residue_ne_zero_iff_isUnit _).mp hx)
 
 theorem ker_mvSeriesResidue_le_jacobson :
-    RingHom.ker (mvSeriesResidue σ O) ≤ Ideal.jacobson ⊥ := by
+    RingHom.ker (mvSeriesResidue σ O) ≤ Ring.jacobson (MvPowerSeries σ O) := by
   intro x hx
   rw [RingHom.mem_ker] at hx
-  rw [IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top, mem_maximalIdeal x, mem_nonunits_iff]
+  rw [IsLocalRing.ringJacobson_eq_maximalIdeal, mem_maximalIdeal x, mem_nonunits_iff]
   exact fun hunit ↦ zero_ne_one (isUnit_zero_iff.mp (hx ▸ hunit.map (mvSeriesResidue σ O)))
 
 end MvSeriesResidue

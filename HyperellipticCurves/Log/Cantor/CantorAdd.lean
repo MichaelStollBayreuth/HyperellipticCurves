@@ -412,7 +412,7 @@ essential — `u = 1 - πX` over a DVR has unit reduction but generates a proper
 Prescribing the residues is what makes residue-level pipeline computations transportable
 along the lifted certificates. -/
 theorem exists_bezout_lift_map {R A : Type*} [CommRing R] [CommRing A] {φ : R →+* A}
-    (hsurj : Function.Surjective φ) (hker : RingHom.ker φ ≤ Ideal.jacobson ⊥)
+    (hsurj : Function.Surjective φ) (hker : RingHom.ker φ ≤ Ring.jacobson R)
     {u g h : R[X]} (hu : u.Monic)
     {a b c : A[X]} (habc : a * u.map φ + b * g.map φ + c * h.map φ = 1) :
     ∃ s₁ s₂ s₃ : R[X], s₁ * u + s₂ * g + s₃ * h = 1
@@ -446,7 +446,7 @@ theorem exists_bezout_lift_map {R A : Type*} [CommRing R] [CommRing A] {φ : R �
 /-- **Coprimality with a monic polynomial is detected by the residue**: the Bézout
 certificate for the images lifts by `ChabautyColeman.exists_bezout_lift_map`. -/
 theorem isCoprime_of_map {R A : Type*} [CommRing R] [CommRing A] {φ : R →+* A}
-    (hsurj : Function.Surjective φ) (hker : RingHom.ker φ ≤ Ideal.jacobson ⊥) {u g : R[X]}
+    (hsurj : Function.Surjective φ) (hker : RingHom.ker φ ≤ Ring.jacobson R) {u g : R[X]}
     (hu : u.Monic) (hco : IsCoprime (u.map φ) (g.map φ)) : IsCoprime u g := by
   obtain ⟨a, b, hab⟩ := hco
   have habc : a * u.map φ + b * g.map φ + (0 : A[X]) * (0 : R[X]).map φ = 1 := by
@@ -467,7 +467,7 @@ theorem exists_bezout_lift (hu : u.Monic)
     ∃ s₁ s₂ s₃ : O[X], s₁ * u + s₂ * g + s₃ * h = 1 := by
   obtain ⟨a, b, c, habc⟩ := hbez
   obtain ⟨s₁, s₂, s₃, hs, -, -, -⟩ := exists_bezout_lift_map residue_surjective
-    (ker_residue.trans_le (maximalIdeal_le_jacobson ⊥)) hu habc
+    (RingHom.ker_le_jacobson_of_isLocalHom (residue O)) hu habc
   exact ⟨s₁, s₂, s₃, hs⟩
 
 /-- **Separability is detected by the residue**: the Bézout certificate for `(ū, ū')` lifts

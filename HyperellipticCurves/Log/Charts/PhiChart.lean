@@ -297,8 +297,8 @@ theorem isUnit_of_seriesResidue_ne_zero {x : O⟦X⟧} (hx : seriesResidue O x �
     IsUnit x :=
   PowerSeries.isUnit_iff_constantCoeff.mpr ((residue_ne_zero_iff_isUnit _).mp hx)
 
-theorem ker_seriesResidue_le_jacobson : RingHom.ker (seriesResidue O) ≤ Ideal.jacobson ⊥ := by
-  rw [IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top]
+theorem ker_seriesResidue_le_jacobson : RingHom.ker (seriesResidue O) ≤ Ring.jacobson O⟦X⟧ := by
+  rw [IsLocalRing.ringJacobson_eq_maximalIdeal]
   exact fun x hx ↦ (mem_maximalIdeal x).mpr
     (mem_nonunits_iff.mpr fun hu ↦ (hu.map (seriesResidue O)).ne_zero (RingHom.mem_ker.mp hx))
 

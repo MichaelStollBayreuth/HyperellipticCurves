@@ -251,7 +251,7 @@ def ReflectsCoprime (φ : R →+* A) : Prop :=
   ∀ p q : R[X], p.Monic → IsCoprime (p.map φ) (q.map φ) → IsCoprime p q
 
 theorem reflectsCoprime_of_ker_le_jacobson (hsurj : Function.Surjective φ)
-    (hker : RingHom.ker φ ≤ Ideal.jacobson ⊥) : ReflectsCoprime φ :=
+    (hker : RingHom.ker φ ≤ Ring.jacobson R) : ReflectsCoprime φ :=
   fun _ _ hp hpq ↦ isCoprime_of_map hsurj hker hp hpq
 
 theorem reflectsCoprime_of_field {K L : Type*} [Field K] [Field L] (φ : K →+* L) :

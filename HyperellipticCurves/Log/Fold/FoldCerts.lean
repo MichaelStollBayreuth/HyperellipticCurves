@@ -152,7 +152,7 @@ variable {R A : Type*} [CommRing R] [Nontrivial R] [CommRing A] {φ : R →+* A}
 /-- One step of the pack lifting: extend a partially lifted pack by the Nakayama lift of
 the next Bézout identity. -/
 private theorem exists_lift_step (hsurj : Function.Surjective φ)
-    (hker : RingHom.ker φ ≤ Ideal.jacobson ⊥) (hf : f.Monic)
+    (hker : RingHom.ker φ ≤ Ring.jacobson R) (hf : f.Monic)
     (hfdeg : f.natDegree = 2 * n + 1) (h₀ : IsFoldState n f U₀ V₀)
     (hcv : ∀ j < 2 * n, ys j ^ 2 = f.eval (xs j)) {d' : FoldCertData A n}
     (hd' : IsFoldCerts (f.map φ) (fun j ↦ φ (xs j)) (fun j ↦ φ (ys j)) (U₀.map φ)
@@ -212,7 +212,7 @@ configuration lifts, one Bézout triple per step by Nakayama
 (`ChabautyColeman.exists_bezout_lift_map`), to a valid pack with prescribed residues. No chain or
 degree data needs lifting — the fold is chain-free. -/
 theorem exists_isFoldCerts_lift (hsurj : Function.Surjective φ)
-    (hker : RingHom.ker φ ≤ Ideal.jacobson ⊥) (hf : f.Monic)
+    (hker : RingHom.ker φ ≤ Ring.jacobson R) (hf : f.Monic)
     (hfdeg : f.natDegree = 2 * n + 1) (h₀ : IsFoldState n f U₀ V₀)
     (hcv : ∀ j < 2 * n, ys j ^ 2 = f.eval (xs j)) (d' : FoldCertData A n)
     (hd' : IsFoldCerts (f.map φ) (fun j ↦ φ (xs j)) (fun j ↦ φ (ys j)) (U₀.map φ)

@@ -301,7 +301,7 @@ reduction certificates lift by the degree squeeze
 lifted pack reduces to the given one — which is what carries residue-field conditions on the
 pack (Weierstrass avoidance) up to the lift. -/
 theorem exists_isPipelineCerts_of_center (hsurj : Function.Surjective ψ)
-    (hdet : ∀ x : R, ψ x ≠ 0 → IsUnit x) (hker : RingHom.ker ψ ≤ Ideal.jacobson ⊥)
+    (hdet : ∀ x : R, ψ x ≠ 0 → IsUnit x) (hker : RingHom.ker ψ ≤ Ring.jacobson R)
     {f : R[X]} {D : PipelineData R} (hf : f.Monic) (hu₁ : D.u₁.Monic) (hu₂ : D.u₂.Monic)
     (hu₃ : D.u₃.Monic) (hd₁ : D.u₁ ∣ D.v₁ ^ 2 - f) (hd₂ : D.u₂ ∣ D.v₂ ^ 2 - f)
     (hd₃ : D.u₃ ∣ D.v₃ ^ 2 - f) {n : ℕ} (d' : CantorCertData κ)

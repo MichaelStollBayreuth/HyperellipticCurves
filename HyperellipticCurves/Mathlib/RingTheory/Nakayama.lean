@@ -21,12 +21,12 @@ import Mathlib.RingTheory.AdjoinRoot
 ## Main statements
 
 * `Ideal.eq_top_of_sup_map_eq_top`: an ideal of a *finite* `R`-algebra that becomes the unit
-  ideal modulo the extension of an ideal `I ≤ jacobson ⊥` of `R` is the unit ideal.
+  ideal modulo the extension of an ideal `I ≤ Ring.jacobson R` is the unit ideal.
 * `Polynomial.span_eq_top_of_sup_map_C_eq_top`: the same conclusion for the span of a set of
   polynomials over `R` **containing a monic polynomial**. `R[X]` itself is not finite over `R`,
   but the quotient by the monic member is, which is what makes the statement true; it fails
-  without the monicity hypothesis: `1 - r * X` with `r ∈ jacobson ⊥` generates the unit ideal
-  modulo `I.map C` but not over `R`.
+  without the monicity hypothesis: `1 - r * X` with `r ∈ Ring.jacobson R` generates the unit
+  ideal modulo `I.map C` but not over `R`.
 * `Polynomial.span_eq_top_of_span_image_map_eq_top`: the form for a surjective ring homomorphism
   with kernel in the Jacobson radical.
 
@@ -42,7 +42,7 @@ namespace Ideal
 that becomes the unit ideal modulo (the extension of) an ideal `I` contained in the Jacobson
 radical of `R` is the unit ideal. -/
 theorem eq_top_of_sup_map_eq_top {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
-    [Module.Finite R S] {I : Ideal R} (hI : I ≤ Ideal.jacobson ⊥) {J : Ideal S}
+    [Module.Finite R S] {I : Ideal R} (hI : I ≤ Ring.jacobson R) {J : Ideal S}
     (h : J ⊔ I.map (algebraMap R S) = ⊤) : J = ⊤ := by
   have hle : (⊤ : Submodule R S) ≤ J.restrictScalars R ⊔ I • ⊤ := by
     intro x _
@@ -50,8 +50,7 @@ theorem eq_top_of_sup_map_eq_top {R S : Type*} [CommRing R] [CommRing S] [Algebr
     obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp hx
     refine Submodule.add_mem_sup ha ?_
     rwa [Ideal.smul_top_eq_map]
-  have := Submodule.le_of_le_smul_of_le_jacobson Module.Finite.fg_top
-    (hI.trans_eq Ideal.jacobson_bot) hle
+  have := Submodule.le_of_le_smul_of_le_jacobson Module.Finite.fg_top hI hle
   exact eq_top_iff.mpr fun x _ ↦ this Submodule.mem_top
 
 end Ideal
@@ -62,10 +61,10 @@ open Ideal
 
 /-- A set of polynomials over `R` that contains a monic polynomial and generates the unit
 ideal modulo (constants from) an ideal `I` contained in the Jacobson radical of `R`
-generates the unit ideal. Monicity is essential: `{1 - rX}` with `r ∈ jacobson ⊥` satisfies
+generates the unit ideal. Monicity is essential: `{1 - rX}` with `r ∈ Ring.jacobson R` satisfies
 the other hypotheses but does not generate the unit ideal. -/
 theorem span_eq_top_of_sup_map_C_eq_top {R : Type*} [CommRing R] {I : Ideal R}
-    (hI : I ≤ Ideal.jacobson ⊥) {s : Set R[X]} (hs : ∃ p ∈ s, p.Monic)
+    (hI : I ≤ Ring.jacobson R) {s : Set R[X]} (hs : ∃ p ∈ s, p.Monic)
     (h : Ideal.span s ⊔ I.map (C : R →+* R[X]) = ⊤) : Ideal.span s = ⊤ := by
   obtain ⟨u, hus, hu⟩ := hs
   have : Module.Finite R (R[X] ⧸ Ideal.span {u}) := hu.finite_quotient
@@ -91,7 +90,7 @@ theorem span_eq_top_of_sup_map_C_eq_top {R : Type*} [CommRing R] {I : Ideal R}
 surjective ring homomorphism with kernel contained in the Jacobson radical generates the
 unit ideal generates the unit ideal itself. -/
 theorem span_eq_top_of_span_image_map_eq_top {R S : Type*} [CommRing R] [CommRing S]
-    {φ : R →+* S} (hφ : Function.Surjective φ) (hker : RingHom.ker φ ≤ Ideal.jacobson ⊥)
+    {φ : R →+* S} (hφ : Function.Surjective φ) (hker : RingHom.ker φ ≤ Ring.jacobson R)
     {s : Set R[X]} (hs : ∃ p ∈ s, p.Monic) (h : Ideal.span (map φ '' s) = ⊤) :
     Ideal.span s = ⊤ := by
   refine span_eq_top_of_sup_map_C_eq_top hker hs ?_
