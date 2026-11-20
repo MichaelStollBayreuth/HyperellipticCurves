@@ -2079,8 +2079,8 @@ of~(2) one at a time adds their generators.
 \emph{Formalization.} $O_F$ is the integral closure of~$\ZZ$ in the field factor \texttt{AdjoinRoot
 g} of~$L$. (1) uses general lemmas on number fields that are missing from Mathlib: for the class
 number, the Minkowski bound for cubic fields
-(\texttt{RingOfIntegers.isPrincipalIdealRing\_of\_finrank\_eq\_three\_of\_abs\_discr\_le}) with
-\texttt{NumberField.isPrincipalIdealRing\_integralClosure\_iff}, and for the unit rank
+(\texttt{NumberField.RingOfIntegers.isPrincipalIdealRing\_of\_finrank\_eq\_three\_of\_abs\_discr\_le})
+with \texttt{NumberField.isPrincipalIdealRing\_integralClosure\_iff}, and for the unit rank
 \texttt{NumberField.Units.finrank\_eq\_one\_of\_finrank\_eq\_three\_of\_discr\_neg} with
 \texttt{NumberField.finrank\_additive\_units\_integralClosure}; the order~$4$ is
 \texttt{Units.card\_modPow\_two}. The classes of~$-1$, $t$, $-t$ are nonsquares by

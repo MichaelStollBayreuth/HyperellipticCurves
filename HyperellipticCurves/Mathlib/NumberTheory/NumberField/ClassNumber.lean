@@ -16,9 +16,8 @@ public import Mathlib.NumberTheory.NumberField.ClassNumber
   in `K` is finite, for any `ℤ`-algebra structure on `K`.
 * `NumberField.isPrincipalIdealRing_integralClosure_iff`: the integral closure of `ℤ` in `K` is a
   principal ideal ring iff `𝓞 K` is.
-* `RingOfIntegers.isPrincipalIdealRing_of_finrank_eq_three_of_abs_discr_le`: a cubic number field
-  with `|discr K| ≤ 49` has a principal ring of integers (in the root namespace `RingOfIntegers`,
-  as Mathlib's `NumberField.RingOfIntegers.isPrincipalIdealRing_of_abs_discr_lt`).
+* `NumberField.RingOfIntegers.isPrincipalIdealRing_of_finrank_eq_three_of_abs_discr_le`: a cubic
+  number field with `|discr K| ≤ 49` has a principal ring of integers.
 
 Auxiliary material for the formalization of `2`-descent on hyperelliptic Jacobians; an
 upstreaming candidate for Mathlib.
@@ -48,7 +47,7 @@ theorem isPrincipalIdealRing_integralClosure_iff {K : Type*} [Field K] [Algebra 
 
 end NumberField
 
-namespace RingOfIntegers
+namespace NumberField.RingOfIntegers
 
 variable {K : Type*} [Field K] [NumberField K]
 
@@ -58,7 +57,7 @@ theorem isPrincipalIdealRing_of_finrank_eq_three_of_abs_discr_le (h3 : finrank �
     (hd : |discr K| ≤ 49) : IsPrincipalIdealRing (𝓞 K) := by
   have hs : nrComplexPlaces K ≤ 1 := by lia [card_add_two_mul_card_eq_rank K]
   have hd' : ((|discr K| : ℤ) : ℝ) ≤ 49 := mod_cast hd
-  refine NumberField.RingOfIntegers.isPrincipalIdealRing_of_abs_discr_lt (hd'.trans_lt ?_)
+  refine isPrincipalIdealRing_of_abs_discr_lt (hd'.trans_lt ?_)
   rw [h3]
   interval_cases nrComplexPlaces K
   · norm_num
@@ -66,4 +65,4 @@ theorem isPrincipalIdealRing_of_finrank_eq_three_of_abs_discr_le (h3 : finrank �
     calc (49 : ℝ) < (2 * (3.14 / 4) * (9 / 2)) ^ 2 := by norm_num
       _ < _ := by gcongr; exact Real.pi_gt_d2
 
-end RingOfIntegers
+end NumberField.RingOfIntegers
