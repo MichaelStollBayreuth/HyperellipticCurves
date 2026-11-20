@@ -45,7 +45,7 @@ section Semiring
 variable [Semiring R]
 
 theorem C_mul_X_add_C_eq_zero {a b : R} : C a * X + C b = 0 ↔ a = 0 ∧ b = 0 :=
-  ⟨fun h ↦ ⟨by simpa using congr(coeff $h 1), by simpa using congr(coeff $h 0)⟩,
+  ⟨fun h ↦ ⟨by simpa using congr($(h).coeff 1), by simpa using congr($(h).coeff 0)⟩,
     fun ⟨ha, hb⟩ ↦ by simp [ha, hb]⟩
 
 end Semiring

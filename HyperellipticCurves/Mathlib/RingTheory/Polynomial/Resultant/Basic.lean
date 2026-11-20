@@ -550,7 +550,7 @@ theorem toMatrix_sylvesterBlock (hg : g.Monic) (p : R[X]) (hp : p.natDegree ≤ 
     simp
   · rw [toMatrix_apply, hinl, Basis.prod_repr_inr, fromBlocks_apply₂₁, of_apply]
   · rw [toMatrix_apply, hinr, sylvesterBlock_apply_zero_left, Basis.prod_repr_inr,
-      fromBlocks_apply₂₂, Basis.repr_self, one_apply, Finsupp.single_apply]
+      fromBlocks_apply₂₂, Basis.repr_self, Matrix.one_apply, Finsupp.single_apply]
     exact if_congr eq_comm rfl rfl
 
 open Matrix in

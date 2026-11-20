@@ -6,7 +6,8 @@ Authors: Michael Stoll
 module
 
 public import HyperellipticCurves.Mathlib.Topology.Algebra.Nonarchimedean.AdicTopology
-public import Mathlib.RingTheory.DedekindDomain.AdicValuation
+public import Mathlib.RingTheory.DedekindDomain.AdicValuation.Completion
+public import Mathlib.RingTheory.DedekindDomain.AdicValuation.Valuation
 public import Mathlib.RingTheory.Valuation.Discrete.IsDiscreteValuationRing
 public import Mathlib.Topology.Algebra.Nonarchimedean.Basic
 

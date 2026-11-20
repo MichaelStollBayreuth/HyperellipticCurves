@@ -242,15 +242,15 @@ theorem curveVanishing_of_forall_redCoeff {F : MvPolynomial (Fin (g + 1) × Fin 
   rw [show Q = Fin.snoc (Fin.init Q) (Q (Fin.last g)) from (Fin.snoc_init_self Q).symm,
     eval_snoc_eq f (Fin.init Q) hql F]
   have hc0 : ((((lastSplit (κ := κ) g) F) %ₘ ySq f g).coeff 0).map
-      (MvPolynomial.eval (tupleCoords (Fin.init Q))) = 0 :=
-    Polynomial.ext fun k ↦ by
-      rw [Polynomial.coeff_map, Polynomial.coeff_zero]
-      exact hall 0 k (Fin.init Q) hQi
+      (MvPolynomial.eval (tupleCoords (Fin.init Q))) = 0 := by
+    ext k : 2
+    rw [Polynomial.coeff_map, Polynomial.coeff_zero]
+    exact hall 0 k (Fin.init Q) hQi
   have hc1 : ((((lastSplit (κ := κ) g) F) %ₘ ySq f g).coeff 1).map
-      (MvPolynomial.eval (tupleCoords (Fin.init Q))) = 0 :=
-    Polynomial.ext fun k ↦ by
-      rw [Polynomial.coeff_map, Polynomial.coeff_zero]
-      exact hall 1 k (Fin.init Q) hQi
+      (MvPolynomial.eval (tupleCoords (Fin.init Q))) = 0 := by
+    ext k : 2
+    rw [Polynomial.coeff_map, Polynomial.coeff_zero]
+    exact hall 1 k (Fin.init Q) hQi
   rw [hc0, hc1]
   simp
 

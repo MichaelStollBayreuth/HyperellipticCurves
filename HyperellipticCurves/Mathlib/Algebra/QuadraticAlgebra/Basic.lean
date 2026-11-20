@@ -16,8 +16,6 @@ import HyperellipticCurves.Mathlib.Algebra.QuadraticAlgebra.Defs
 
 ## Main definitions
 
-* `QuadraticAlgebra.starAlgEquiv`: `star` as an `S`-algebra automorphism, for any base `S` of the
-  coefficient ring.
 * `QuadraticAlgebra.mapRingHomTo`: functoriality in the coefficient ring with prescribed target
   coefficients. Unlike `QuadraticAlgebra.mapRingHom`, whose target is
   `QuadraticAlgebra R' (φ a) (φ b)`, the identities `φ a = a'`, `φ b = b'` are hypotheses, so the
@@ -26,6 +24,7 @@ import HyperellipticCurves.Mathlib.Algebra.QuadraticAlgebra.Defs
 ## Main statements
 
 * `QuadraticAlgebra.star_algebraMap`: conjugation fixes the image of the base.
+* `QuadraticAlgebra.starAlgEquiv_symm`: Mathlib's `QuadraticAlgebra.starAlgEquiv` is an involution.
 * `QuadraticAlgebra.omega_sq`, `QuadraticAlgebra.star_omega`: `ω ^ 2 = a + b • ω`, and
   conjugation sends `ω` to `b - ω`.
 * `QuadraticAlgebra.mapRingHomTo_injective`: the induced map is injective when the coefficient
@@ -46,18 +45,8 @@ theorem star_algebraMap (s : S) :
     star (algebraMap S (QuadraticAlgebra R a b) s) = algebraMap S _ s := by
   ext <;> simp [re_star, im_star]
 
-/-- `star` as an `S`-algebra automorphism of `QuadraticAlgebra R a b`,
-for any base `S` of the coefficient ring `R`. -/
-def starAlgEquiv : QuadraticAlgebra R a b ≃ₐ[S] QuadraticAlgebra R a b :=
-  AlgEquiv.ofRingEquiv (f := starRingAut) star_algebraMap
-
 @[simp]
-theorem starAlgEquiv_apply (z : QuadraticAlgebra R a b) :
-    (starAlgEquiv (S := S)) z = star z := rfl
-
-@[simp]
-theorem starAlgEquiv_symm :
-    (starAlgEquiv (S := S) (R := R) (a := a) (b := b)).symm = starAlgEquiv := rfl
+theorem starAlgEquiv_symm : (starAlgEquiv (R := R) (a := a) (b := b)).symm = starAlgEquiv := rfl
 
 /-- The defining equation of the generator: `ω² = a + b·ω`. -/
 theorem omega_sq : (ω : QuadraticAlgebra R a b) ^ 2 = algebraMap R _ a + b • ω := by

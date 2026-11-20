@@ -6,7 +6,7 @@ Authors: Michael Stoll
 module
 
 public import Mathlib.Algebra.Order.GroupWithZero.Finset
-public import Mathlib.RingTheory.DedekindDomain.AdicValuation
+public import Mathlib.RingTheory.DedekindDomain.AdicValuation.Valuation
 
 import HyperellipticCurves.Mathlib.Algebra.Order.GroupWithZero.Finset
 

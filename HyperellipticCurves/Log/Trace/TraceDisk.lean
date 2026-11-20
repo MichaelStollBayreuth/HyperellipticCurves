@@ -97,7 +97,7 @@ theorem residue_eq_of_constantCoeff_sub_mem {x y : O⟦X⟧}
 theorem map_residue_eq {P : Polynomial O⟦X⟧} {q : O[X]}
     (h : P.map (PowerSeries.constantCoeff : O⟦X⟧ →+* O) = q) :
     P.map (residue O⟦X⟧) = (q.map (PowerSeries.C : O →+* O⟦X⟧)).map (residue O⟦X⟧) := by
-  refine Polynomial.ext fun k ↦ ?_
+  ext k : 2
   simp only [Polynomial.coeff_map]
   refine residue_eq_of_constantCoeff_sub_mem ?_
   rw [PowerSeries.constantCoeff_C, ← h, Polynomial.coeff_map, sub_self]
@@ -134,10 +134,12 @@ theorem map_chartV_eq_of_chartCoords {w c₁ c₂ : O[X]} {U V : Polynomial O⟦
     simp only [Polynomial.map_map]
     exact h
   refine eq_of_dvd_sq_sub_of_residue_bezout (f := f.map PowerSeries.C)
-    (v := vτ.map (PowerSeries.C : O →+* O⟦X⟧)) hUm ?_ hVdvd ?_ hVdeg hbezres hWres
+    (v := vτ.map (PowerSeries.C : O →+* O⟦X⟧)) hUm ?_ ?_ ?_ hVdeg hbezres hWres
     (map_residue_eq hVres)
   · rw [← map_chartU_eq_of_chartCoords hne θ hθC hθX hu hUm hUdeg]
     exact chartU_map_dvd_chartV_map_sq_sub hu hne.ge hv hw hbez hθC
+  · -- as an argument of the `refine`, `hVdvd` meets the lemma's unassigned instances: timeout
+    exact hVdvd
   · have hdegU : U.degree = uτ.degree := by
       rw [degree_eq_natDegree hUm.ne_zero, hUdeg, degree_eq_natDegree hu.ne_zero]
     rw [hdegU]

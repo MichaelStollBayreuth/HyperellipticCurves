@@ -7,7 +7,7 @@ module
 
 public import HyperellipticCurves.Curve.Basic
 public import Mathlib.Data.Set.Card
-public import Mathlib.RingTheory.DedekindDomain.AdicValuation
+public import Mathlib.RingTheory.DedekindDomain.AdicValuation.Valuation
 public import Mathlib.RingTheory.Valuation.Discrete.IsDiscreteValuationRing
 
 import Mathlib.Algebra.Polynomial.Eval.Degree

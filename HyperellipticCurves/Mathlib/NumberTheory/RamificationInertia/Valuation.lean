@@ -6,7 +6,7 @@ Authors: Michael Stoll
 module
 
 public import HyperellipticCurves.Mathlib.RingTheory.DedekindDomain.Ideal.Lemmas
-public import Mathlib.NumberTheory.RamificationInertia.Valuation
+public import Mathlib.RingTheory.DedekindDomain.AdicValuation.Ramification
 
 /-!
 # Valuations in an extension of Dedekind domains

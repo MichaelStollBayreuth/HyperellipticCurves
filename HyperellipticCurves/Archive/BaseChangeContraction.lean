@@ -43,7 +43,7 @@ variable (p : K' →ₗ[K] K)
 
 -- apply `p` to all coefficients
 private noncomputable def pMap (r : K'[X]) : K[X] :=
-  ⟨⟨Finsupp.mapRange p (map_zero p) r.toFinsupp.coeff⟩⟩
+  .ofCoeff (Finsupp.mapRange p (map_zero p) r.coeff)
 
 private lemma coeff_pMap (r : K'[X]) (n : ℕ) : (pMap p r).coeff n = p (r.coeff n) := rfl
 

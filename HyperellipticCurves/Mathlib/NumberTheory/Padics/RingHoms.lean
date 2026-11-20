@@ -69,7 +69,7 @@ theorem eq_zero_of_forall_mem_range_nsmul_pow {M : Type*} [AddCommGroup M] [Modu
     [Module.Finite ℤ_[p] M] {a : M}
     (ha : ∀ n : ℕ, a ∈ (nsmulAddMonoidHom (α := M) (p ^ n)).range) : a = 0 := by
   have hI := Ideal.iInf_pow_smul_eq_bot_of_le_jacobson (M := M) (IsLocalRing.maximalIdeal ℤ_[p])
-    (IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge
+    (IsLocalRing.ringJacobson_eq_maximalIdeal ℤ_[p]).ge
   rw [← Submodule.mem_bot ℤ_[p], ← hI]
   refine (Submodule.mem_iInf _).mpr fun n ↦ ?_
   obtain ⟨b, rfl⟩ := ha n

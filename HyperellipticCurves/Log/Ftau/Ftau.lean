@@ -57,7 +57,7 @@ theorem rename_comp_C {σ σ' : Type*} (e : σ → σ') [Filter.TendstoCofinite 
 any multiple of one gives a unit. -/
 theorem ker_constantCoeff_le_jacobson {σ : Type*} :
     RingHom.ker (MvPowerSeries.constantCoeff : MvPowerSeries σ O →+* O) ≤ Ideal.jacobson ⊥ :=
-  fun g hg ↦ Ideal.mem_jacobson_bot.mpr fun y ↦
+  fun g hg ↦ Ideal.jacobson_bot (R := MvPowerSeries σ O) ▸ Ring.mem_jacobson_iff.mpr fun y ↦
     MvPowerSeries.isUnit_iff_constantCoeff.mpr (by simp [RingHom.mem_ker.mp hg])
 
 variable [Nontrivial O]

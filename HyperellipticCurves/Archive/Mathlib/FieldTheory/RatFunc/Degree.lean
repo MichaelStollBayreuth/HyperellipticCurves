@@ -70,7 +70,7 @@ theorem IntDegreeLE.add {x y : RatFunc K} {c : ℤ} (hx : x.IntDegreeLE c)
   · simpa using hy
   rcases eq_or_ne y 0 with rfl | hy0
   · simpa using hx
-  exact .inr ((intDegree_add_le hy0 h0).trans
+  exact .inr ((intDegree_add_le h0).trans
     (max_le (hx.resolve_left hx0) (hy.resolve_left hy0)))
 
 theorem IntDegreeLE.neg {x : RatFunc K} {c : ℤ} (hx : x.IntDegreeLE c) :
@@ -109,18 +109,18 @@ theorem intDegree_sub_eq_max {x y : RatFunc K} (hx : x ≠ 0) (hy : y ≠ 0)
   have hxy : x - y ≠ 0 := sub_ne_zero.mpr fun h ↦ hne (by rw [h])
   have hle : (x - y).intDegree ≤ max x.intDegree y.intDegree := by
     rw [sub_eq_add_neg]
-    exact (intDegree_add_le (neg_ne_zero.mpr hy) (by rwa [← sub_eq_add_neg])).trans
+    exact (intDegree_add_le (by rwa [← sub_eq_add_neg])).trans
       (by rw [intDegree_neg])
   rcases lt_or_gt_of_ne hne with h | h
   · have hmax : max x.intDegree y.intDegree = y.intDegree := max_eq_right h.le
-    have h2 := intDegree_add_le (y := -(x - y)) (neg_ne_zero.mpr hxy)
+    have h2 := intDegree_add_le (y := -(x - y))
       (show x + -(x - y) ≠ 0 by intro h0; exact hy (by linear_combination h0))
     rw [show x + -(x - y) = y by ring, intDegree_neg] at h2
     rw [hmax] at hle ⊢
     rcases max_cases x.intDegree (x - y).intDegree with ⟨he, _⟩ | ⟨he, _⟩ <;>
       rw [he] at h2 <;> lia
   · have hmax : max x.intDegree y.intDegree = x.intDegree := max_eq_left h.le
-    have h2 := intDegree_add_le (y := x - y) hxy
+    have h2 := intDegree_add_le (y := x - y)
       (show y + (x - y) ≠ 0 by intro h0; exact hx (by linear_combination h0))
     rw [show y + (x - y) = x by ring] at h2
     rw [hmax] at hle ⊢

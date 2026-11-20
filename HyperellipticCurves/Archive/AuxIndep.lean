@@ -190,22 +190,22 @@ theorem phiPipeline_eq_of_aux (hf : f.Monic)
   have hpair' := mk0_pair_mul_mk0_pair_chain (f := F.map ρ) (hnePz xQ' hsep')
     (hneQa xQ' hsep') hmPQ' hmQR' hPz (hCeval xQ' yQ' hyQ') (hCeval a b hb)
   -- rewrite everything to the concrete pair data over `Kz`
-  have hidD : (phiConfig f a b xQ yQ m m₀ uτ vτ).map ρ
-      = ⟨(X - C (ρ (PowerSeries.C a + PowerSeries.X))) * (X - C (ρ (PowerSeries.C xQ))),
-        pairV (ρ (PowerSeries.C a + PowerSeries.X))
-          (ρ (PowerSeries.C b * diskSeriesGeneric f a)) (ρ m),
-        (uτ.map PowerSeries.C).map ρ, (vτ.map PowerSeries.C).map ρ,
-        (X - C (ρ (PowerSeries.C xQ))) * (X - C (ρ (PowerSeries.C a))),
-        pairV (ρ (PowerSeries.C xQ)) (ρ (PowerSeries.C yQ)) (ρ (PowerSeries.C m₀))⟩ := by
-    simp only [PipelineData.map, phiConfig, diskConfig, hidu₁, hidv₁, hidu₃, hidv₃]
-  have hidD' : (phiConfig f a b xQ' yQ' m' m₀' uτ vτ).map ρ
-      = ⟨(X - C (ρ (PowerSeries.C a + PowerSeries.X))) * (X - C (ρ (PowerSeries.C xQ'))),
-        pairV (ρ (PowerSeries.C a + PowerSeries.X))
-          (ρ (PowerSeries.C b * diskSeriesGeneric f a)) (ρ m'),
-        (uτ.map PowerSeries.C).map ρ, (vτ.map PowerSeries.C).map ρ,
-        (X - C (ρ (PowerSeries.C xQ'))) * (X - C (ρ (PowerSeries.C a))),
-        pairV (ρ (PowerSeries.C xQ')) (ρ (PowerSeries.C yQ')) (ρ (PowerSeries.C m₀'))⟩ := by
-    simp only [PipelineData.map, phiConfig, diskConfig, hidu₁', hidv₁', hidu₃', hidv₃']
+  set DK : PipelineData Kz :=
+    ⟨(X - C (ρ (PowerSeries.C a + PowerSeries.X))) * (X - C (ρ (PowerSeries.C xQ))),
+      pairV (ρ (PowerSeries.C a + PowerSeries.X)) (ρ (PowerSeries.C b * diskSeriesGeneric f a))
+        (ρ m), (uτ.map PowerSeries.C).map ρ, (vτ.map PowerSeries.C).map ρ,
+      (X - C (ρ (PowerSeries.C xQ))) * (X - C (ρ (PowerSeries.C a))),
+      pairV (ρ (PowerSeries.C xQ)) (ρ (PowerSeries.C yQ)) (ρ (PowerSeries.C m₀))⟩ with hDKdef
+  set DK' : PipelineData Kz :=
+    ⟨(X - C (ρ (PowerSeries.C a + PowerSeries.X))) * (X - C (ρ (PowerSeries.C xQ'))),
+      pairV (ρ (PowerSeries.C a + PowerSeries.X)) (ρ (PowerSeries.C b * diskSeriesGeneric f a))
+        (ρ m'), (uτ.map PowerSeries.C).map ρ, (vτ.map PowerSeries.C).map ρ,
+      (X - C (ρ (PowerSeries.C xQ'))) * (X - C (ρ (PowerSeries.C a))),
+      pairV (ρ (PowerSeries.C xQ')) (ρ (PowerSeries.C yQ')) (ρ (PowerSeries.C m₀'))⟩ with hDK'def
+  have hidD : (phiConfig f a b xQ yQ m m₀ uτ vτ).map ρ = DK := by
+    simp only [hDKdef, PipelineData.map, phiConfig, diskConfig, hidu₁, hidv₁, hidu₃, hidv₃]
+  have hidD' : (phiConfig f a b xQ' yQ' m' m₀' uτ vτ).map ρ = DK' := by
+    simp only [hDK'def, PipelineData.map, phiConfig, diskConfig, hidu₁', hidv₁', hidu₃', hidv₃']
   rw [hidD] at hcertsKz hmap
   rw [hidD'] at hcertsKz' hmap'
   have hu₁K : ((X - C (ρ (PowerSeries.C a + PowerSeries.X)))
@@ -230,7 +230,8 @@ theorem phiPipeline_eq_of_aux (hf : f.Monic)
     rw [hFρ, hf.natDegree_map]
     exact hgτ
   -- both pipelines over `Kz` have the same input class product, hence the same output
-  have heq := cantorPipeline_eq_cantorPipeline_of_mk0_eq hu₁K hd₁K hu₂K hd₂K hu₃K hd₃K
+  have heq := cantorPipeline_eq_cantorPipeline_of_mk0_eq (D := DK) (D' := DK') hu₁K hd₁K hu₂K
+    hd₂K hu₃K hd₃K
     hu₁K' hd₁K' hu₂K hd₂K hu₃K' hd₃K' hcertsKz hcertsKz' hgK
     (by rw [mul_right_comm, hpair, ← hpair', mul_right_comm])
   -- combine and descend along the injective `ρ`

@@ -41,11 +41,11 @@ open Filter
 namespace Nat
 
 /-- **The `p`-adic valuation is a small fraction of its argument** when `p > e + 1`: the
-`(e + 2)`-form of Mathlib's `mul_padicValNat_le` (`p * v_p n ≤ n`), in the shape the
+`(e + 2)`-form of Mathlib's `mul_multiplicity_le` (`p * v_p n ≤ n`), in the shape the
 ramification estimates consume. -/
 theorem mul_padicValNat_le {p e : ℕ} (hpe : e + 1 < p) (n : ℕ) :
     (e + 2) * padicValNat p n ≤ n :=
-  (Nat.mul_le_mul_right _ (show e + 2 ≤ p by lia)).trans _root_.mul_padicValNat_le
+  (Nat.mul_le_mul_right _ (show e + 2 ≤ p by lia)).trans (Nat.padicValNat_def ▸ mul_multiplicity_le)
 
 /-- The gap `n - e·v_p(n)` is at least `B` as soon as `n ≥ (e + 2)·B`. -/
 theorem add_mul_padicValNat_le {p e : ℕ} (hpe : e + 1 < p) {B n : ℕ} (hn : (e + 2) * B ≤ n) :

@@ -40,7 +40,7 @@ extended from `R` (`IsDedekindDomain.SInteger.map_comap_eq`), by the denominator
 ## Implementation notes
 
 `Ideal.map_eq_top_of_inv_subset` belongs in `Mathlib.RingTheory.DedekindDomain.Ideal.Basic`,
-next to `FractionalIdeal.coe_ideal_mul_inv`; it is kept here with its only user.
+next to `FractionalIdeal.coeIdeal_mul_inv`; it is kept here with its only user.
 
 Vendored from EllipticCurves (`EllipticCurves/Mathlib/SIntegers.lean` and
 `EllipticCurves/Mathlib/Basic.lean`), for the finiteness of Selmer groups; upstreaming candidates
@@ -89,8 +89,8 @@ theorem Ideal.map_eq_top_of_inv_subset {R : Type*} [CommRing R] [IsDedekindDomai
     Ideal.map (algebraMap R A) I = ⊤ := by
   set M := Ideal.map (algebraMap R A) I
   have key : (1 : Submodule R K) ≤ (M.restrictScalars R).map A.val.toLinearMap := by
-    rw [← FractionalIdeal.coe_one, ← FractionalIdeal.coe_ideal_mul_inv I hI,
-      FractionalIdeal.coe_mul]
+    rw [← FractionalIdeal.coeToSubmodule_one, ← FractionalIdeal.coeIdeal_mul_inv I hI,
+      FractionalIdeal.coeToSubmodule_mul]
     refine Submodule.mul_le.mpr fun x hx y hy ↦ ?_
     obtain ⟨a, ha, rfl⟩ := (FractionalIdeal.mem_coeIdeal R⁰).mp hx
     exact ⟨algebraMap R A a * ⟨y, h hy⟩, Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem _ ha), rfl⟩

@@ -117,9 +117,9 @@ theorem integralClosure_map_maximalIdeal_ne_top :
     (maximalIdeal O).map (algebraMap O (integralClosure O L)) ≠ ⊤ := by
   have := integralClosure_isAdicComplete_map O K L
   intro h
-  have hle := IsAdicComplete.le_jacobson_bot
+  have hle := IsAdicComplete.le_jacobson
     ((maximalIdeal O).map (algebraMap O (integralClosure O L)))
-  exact bot_ne_top (Ideal.jacobson_eq_top_iff.mp (top_le_iff.mp (h ▸ hle)))
+  exact (Ring.jacobson_lt_top _).ne (top_le_iff.mp (h ▸ hle))
 
 include K in
 /-- **The integral closure of a complete DVR in a finite separable extension is a DVR.** -/

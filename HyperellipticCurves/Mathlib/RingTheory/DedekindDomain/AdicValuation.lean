@@ -8,7 +8,8 @@ module
 -- Beyond the sibling, for the statements: the completions `adicCompletion`, `valuationOfNeZero`
 -- and discrete valuation rings.
 public import Mathlib.NumberTheory.NumberField.Completion.FinitePlace
-public import Mathlib.RingTheory.DedekindDomain.AdicValuation
+public import Mathlib.RingTheory.DedekindDomain.AdicValuation.Completion
+public import Mathlib.RingTheory.DedekindDomain.AdicValuation.Valuation
 public import Mathlib.RingTheory.DedekindDomain.SelmerGroup
 public import Mathlib.RingTheory.Valuation.Discrete.IsDiscreteValuationRing
 

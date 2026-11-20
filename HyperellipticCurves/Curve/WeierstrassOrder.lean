@@ -32,7 +32,7 @@ variable {K : Type*} [Field K] {f : K[X]}
 /-- The `star` involution fixes the Weierstrass point ideal (the two point ideals above `x₀`
 coincide there). -/
 theorem map_star_pointIdeal_zero {x₀ : K} :
-    Ideal.map (starAlgEquiv (S := K) (R := K[X]) (a := f) (b := 0)).toRingEquiv
+    Ideal.map (starAlgEquiv (R := K[X]) (a := f) (b := 0)).toRingEquiv
         (pointIdeal f x₀ 0) = pointIdeal f x₀ 0 := by
   simp only [pointIdeal, map_zero, sub_zero, Ideal.map_span, Set.image_pair,
     AlgEquiv.coe_toRingEquiv, starAlgEquiv_apply, star_algebraMap, HypRing.star_y]
@@ -48,7 +48,7 @@ theorem emultiplicity_pointIdeal_element_weierstrass_eq {x₀ : K} (hb : (0 : K)
     emultiplicity (pointIdeal f x₀ 0) (Ideal.span {z})
       = rootMultiplicity x₀ (z.re ^ 2 - f * z.im ^ 2) := by
   have hspan : Ideal.span {star z} = Ideal.map
-      (starAlgEquiv (S := K) (R := K[X]) (a := f) (b := 0)).toRingEquiv (Ideal.span {z}) := by
+      (starAlgEquiv (R := K[X]) (a := f) (b := 0)).toRingEquiv (Ideal.span {z}) := by
     rw [Ideal.map_span, Set.image_singleton, AlgEquiv.coe_toRingEquiv, starAlgEquiv_apply]
   have hsym : emultiplicity (pointIdeal f x₀ 0) (Ideal.span {star z})
       = emultiplicity (pointIdeal f x₀ 0) (Ideal.span {z}) := by

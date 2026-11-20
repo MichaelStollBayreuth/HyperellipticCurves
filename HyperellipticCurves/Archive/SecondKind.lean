@@ -11,7 +11,7 @@ public import HyperellipticCurves.Disks.CurvePoint
 public import HyperellipticCurves.RedJ.RedIdealPrincipal
 public import Mathlib.LinearAlgebra.Matrix.Adjugate
 public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
-public import Mathlib.RingTheory.DedekindDomain.AdicValuation
+public import Mathlib.RingTheory.DedekindDomain.AdicValuation.Valuation
 
 /-!
 # Differentials of the second kind: the holomorphic-differential classification

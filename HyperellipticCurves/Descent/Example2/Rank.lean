@@ -518,7 +518,7 @@ theorem card_relaxedSelmerGroup_le
 `#J(ℚ)[2] = 4` and `ChabautyColeman.DescentExample2.card_relaxedSelmerGroup_le`, `2 ^ r * 4 ≤ 8`;
 and `r ≥ 1` as `P` has infinite order (`ChabautyColeman.DescentExample2.not_isOfFinOrder_P`),
 whereas a finitely generated commutative group of rank `0` is a torsion group. -/
-theorem finrank_hypJac [IsMulFG (HypJac ℚ f)]
+theorem finrank_hypJac (hMW : IsMulFG (HypJac ℚ f))
     (L₂₃ : HypJac.LocalStructure 23 ℚ_[23] (f.map (algebraMap ℚ ℚ_[23])) 2)
     (L₅₉ : HypJac.LocalStructure 59 ℚ_[59] (f.map (algebraMap ℚ ℚ_[59])) 2) :
     Module.finrank ℤ (Additive (HypJac ℚ f)) = 1 := by

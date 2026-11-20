@@ -407,7 +407,8 @@ theorem globExpand_globZeta
   rw [globZeta, map_chartCoords, phiZeta, map_chartCoords, map_chartCoords, chartCoords,
     chartCoords, h1]
   simp only [Polynomial.map_map]
-  refine congrArg (fun φ ↦ Polynomial.coeff (_ - Polynomial.map φ uτ) _) (RingHom.ext fun c ↦ ?_)
+  refine congrArg (fun φ ↦ AddMonoidAlgebra.coeff (_ - Polynomial.map φ uτ) _)
+    (RingHom.ext fun c ↦ ?_)
   simp [globExpand_algebraMap_base, PowerSeries.map_C]
 
 end Transport

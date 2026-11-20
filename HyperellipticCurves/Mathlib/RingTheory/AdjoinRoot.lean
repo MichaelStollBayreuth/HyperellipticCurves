@@ -172,7 +172,7 @@ theorem of_add_of_mul_root_eq_zero_iff (hf : f.Monic) (hdeg : 1 < f.natDegree) {
   have h0 : C b * X + C a = 0 := by
     by_contra hne
     exact hf.not_dvd_of_degree_lt hne (degree_lt_degree (natDegree_linear_le.trans_lt hdeg)) h
-  exact ⟨by simpa using congr(coeff $h0 0), by simpa using congr(coeff $h0 1)⟩
+  exact ⟨by simpa using congr($(h0).coeff 0), by simpa using congr($(h0).coeff 1)⟩
 
 /-- If `u + w θ` is a square in `R[X] ⧸ (X ^ 2 + b X + c)`, `θ` the root, then
 `4 u - 2 b w = α ^ 2 + (b ^ 2 - 4 c) β ^ 2` and `w = α β` for some `α` and `β`: for

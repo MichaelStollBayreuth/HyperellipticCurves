@@ -142,7 +142,7 @@ theorem valuation_eq_exp_neg_count (v : HeightOneSpectrum R) {x : K} (hx : x ≠
   have key (r : R) (hr : r ≠ 0) : v.valuation K (algebraMap R K r) =
       WithZero.exp (-count K v (spanSingleton R⁰ (algebraMap R K r))) := by
     rw [valuation_of_algebraMap, intValuation_if_neg _ hr, ← coeIdeal_span_singleton,
-      count_coe K v (by simpa using hr)]
+      count_coeIdeal K v (by simpa using hr)]
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := R) x
   have hb0 : (b : R) ≠ 0 := nonZeroDivisors.ne_zero hb
   have ha0 : a ≠ 0 := by rintro rfl; simp at hx

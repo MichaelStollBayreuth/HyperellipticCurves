@@ -37,9 +37,8 @@ variable {M : Type*} [CommMonoid M] [DecidableEq ι] {s t : Finset ι} {f : ι �
 is the product of the products over `s` and over `t`: the factors over `s ∩ t` occur twice. -/
 theorem prod_symmDiff_of_sq_eq_one (hf : ∀ i ∈ s ∩ t, f i ^ 2 = 1) :
     ∏ i ∈ s ∆ t, f i = (∏ i ∈ s, f i) * ∏ i ∈ t, f i := by
-  rw [← prod_union_inter, ← sup_eq_union, ← symmDiff_sup_inf, sup_eq_union,
-    prod_union (disjoint_symmDiff_inf s t), inf_eq_inter, mul_assoc, ← sq, ← prod_pow,
-    prod_eq_one hf, mul_one]
+  rw [← prod_union_inter, ← symmDiff_sup_inf, prod_union (disjoint_symmDiff_inf s t), mul_assoc,
+    ← sq, ← prod_pow, prod_eq_one hf, mul_one]
 
 end CommMonoid
 

@@ -158,7 +158,7 @@ status:
     sorry_count: 0
     axioms: ["propext", "Classical.choice", "Quot.sound"]
     comparator_config: ""
-    literature_dependencies: ["finite generation of J(ℚ) (the Mordell-Weil theorem), as the instance IsMulFG (HypJac ℚ f)", "Mattuck's structure theorem for J over ℚ_23 and ℚ_59 (ChabautyColeman.HypJac.LocalStructure)"]
+    literature_dependencies: ["finite generation of J(ℚ) (the Mordell-Weil theorem), as the hypothesis hMW : IsMulFG (HypJac ℚ f)", "Mattuck's structure theorem for J over ℚ_23 and ℚ_59 (ChabautyColeman.HypJac.LocalStructure)"]
 
 # how it was produced.
 automation:

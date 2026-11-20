@@ -37,7 +37,7 @@ theorem Polynomial.finite_setOf_not_hasSeparableReduction {R : Type*} [CommRing 
   refine ((f.support.finite_toSet.biUnion fun i _ ↦ Support.finite R (f.coeff i)).union
     ((Support.finite R f.leadingCoeff⁻¹).union ((Support.finite R f.discr).union
       (Support.finite R f.discr⁻¹)))).subset fun v hv ↦ ?_
-  contrapose! hv
+  contrapose hv
   simp only [Set.mem_union, Set.mem_iUnion, HeightOneSpectrum.Support, Set.mem_ofPred_eq,
     not_or, not_exists, not_lt] at hv
   have hle (i : ℕ) : v.valuation K (f.coeff i) ≤ 1 :=

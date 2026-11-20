@@ -359,7 +359,7 @@ variable {K : Type*} [Field K] {f : K[X]}
 
 /-- The `star` involution carries the point ideal of `(x₀, y₀)` to that of `(x₀, -y₀)`. -/
 theorem map_star_pointIdeal (x₀ y₀ : K) :
-    Ideal.map (QuadraticAlgebra.starAlgEquiv (S := K) (R := K[X]) (a := f) (b := 0)).toRingEquiv
+    Ideal.map (QuadraticAlgebra.starAlgEquiv (R := K[X]) (a := f) (b := 0)).toRingEquiv
         (pointIdeal f x₀ y₀) = pointIdeal f x₀ (-y₀) := by
   simp only [pointIdeal, Ideal.map_span, Set.image_pair, AlgEquiv.coe_toRingEquiv,
     QuadraticAlgebra.starAlgEquiv_apply, star_sub, HypRing.star_y, HypRing.algebraMap_eq_C,
@@ -375,7 +375,7 @@ theorem emultiplicity_pointIdeal_neg (x₀ y₀ : K) (z : HypRing K f) :
     emultiplicity (pointIdeal f x₀ (-y₀)) (Ideal.span {z})
       = emultiplicity (pointIdeal f x₀ y₀) (Ideal.span {star z}) := by
   have hspan : Ideal.map
-      (QuadraticAlgebra.starAlgEquiv (S := K) (R := K[X]) (a := f) (b := 0)).toRingEquiv
+      (QuadraticAlgebra.starAlgEquiv (R := K[X]) (a := f) (b := 0)).toRingEquiv
         (Ideal.span {star z}) = Ideal.span {z} := by
     rw [Ideal.map_span, Set.image_singleton, AlgEquiv.coe_toRingEquiv,
       QuadraticAlgebra.starAlgEquiv_apply, star_star]

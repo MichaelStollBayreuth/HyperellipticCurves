@@ -731,7 +731,7 @@ instance fact_prime_five : Fact (Nat.Prime 5) := ⟨Nat.prime_five⟩
 instance neZero_two_zmod_five : NeZero (2 : ZMod 5) := ⟨by decide⟩
 
 private theorem natDegree_X_pow_five_sub_X : (X ^ 5 - X : (ZMod 5)[X]).natDegree = 5 :=
-  FiniteField.X_pow_card_sub_X_natDegree_eq _ Nat.one_lt_ofNat
+  natDegree_X_pow_sub_X Nat.one_lt_ofNat
 
 instance fact_odd_natDegree_X_pow_five_sub_X : Fact (Odd (X ^ 5 - X : (ZMod 5)[X]).natDegree) :=
   ⟨⟨2, natDegree_X_pow_five_sub_X⟩⟩

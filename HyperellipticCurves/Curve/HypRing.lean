@@ -71,7 +71,7 @@ variable {K : Type*} [Field K] (f : K[X])
 
 theorem not_isSquare_algebraMap_ratFunc (hf : Odd f.natDegree) :
     ¬IsSquare (algebraMap K[X] (RatFunc K) f) :=
-  RatFunc.not_isSquare_of_odd_intDegree (by rwa [RatFunc.intDegree_polynomial, Int.odd_coe_nat])
+  RatFunc.not_isSquare_of_odd_intDegree (by rwa [RatFunc.intDegree_polynomial, Int.odd_natCast])
 
 /-- A polynomial of odd degree is not a square, so every declaration assuming
 `Fact (¬IsSquare f)` applies to `f` of odd degree. -/
@@ -81,7 +81,7 @@ instance instFactNotIsSquareOfOdd [hf : Fact (Odd f.natDegree)] : Fact (¬IsSqua
 /-- For `f : K[X]` not a square, the polynomial `Y² - f` is irreducible over `K(x)`. -/
 theorem irreducible_Ysq_sub_f (hf : ¬IsSquare f) :
     Irreducible (X ^ 2 - C (algebraMap K[X] (RatFunc K) f) : (RatFunc K)[X]) :=
-  X_pow_sub_C_irreducible_of_prime Nat.prime_two fun r hr ↦
+  irreducible_X_pow_sub_C_of_prime Nat.prime_two fun r hr ↦
     hf (IsIntegrallyClosed.isSquare_algebraMap_iff.mp ⟨r, by rw [← hr, sq]⟩)
 
 /-- For `f` not a square, the defining quadratic of `HypField K f` has no root in `K(x)`;
