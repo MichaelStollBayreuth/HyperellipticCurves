@@ -22,8 +22,8 @@ series `funcExpansionGeneric = P(a+z) + Q(a+z)·b·η(z)` over `O`.
 
 Reduction commutes with this expansion (`map_funcExpansionGeneric`), so the reduced series is the
 residue-curve local expansion of the reduced function — the analytic side of the specialization of
-a principal divisor. The reduction relies on `map_sqrtSeries` (a ring hom commutes with the
-square-root recursion) and `map_diskSeriesGeneric`.
+a principal divisor. The reduction relies on `ChabautyColeman.map_sqrtSeries` (a ring hom
+commutes with the square-root recursion) and `ChabautyColeman.map_diskSeriesGeneric`.
 -/
 
 @[expose] public section
@@ -35,26 +35,6 @@ namespace ChabautyColeman
 variable {O κ : Type*} [CommRing O] [CommRing κ]
 
 /-! ### Reduction commutes with the square-root series -/
-
-/-- A ring hom commutes with the square-root recursion `sqrtAux`. -/
-theorem map_sqrtAux (ρ : O →+* κ) (c : O⟦X⟧) (a₀ v : O) (n : ℕ) :
-    ρ (sqrtAux c a₀ v n) = sqrtAux ((PowerSeries.map ρ) c) (ρ a₀) (ρ v) n := by
-  induction n using Nat.strong_induction_on with
-  | _ n IH =>
-    obtain _ | m := n
-    · rw [sqrtAux_zero, sqrtAux_zero]
-    · rw [sqrtAux_succ, sqrtAux_succ, map_mul, map_sub, ← PowerSeries.coeff_map]
-      congr 2
-      rw [map_sum]
-      refine Finset.sum_congr rfl fun x _ ↦ ?_
-      by_cases hlt : x.1 < m + 1 ∧ x.2 < m + 1
-      · rw [dite_eq_left hlt, dite_eq_left hlt, map_mul, IH x.1 hlt.1, IH x.2 hlt.2]
-      · rw [dite_eq_right hlt, dite_eq_right hlt, map_zero]
-
-theorem map_sqrtSeries (ρ : O →+* κ) (c : O⟦X⟧) (a₀ v : O) :
-    (PowerSeries.map ρ) (sqrtSeries c a₀ v) = sqrtSeries ((PowerSeries.map ρ) c) (ρ a₀) (ρ v) := by
-  ext n
-  rw [PowerSeries.coeff_map, coeff_sqrtSeries, coeff_sqrtSeries, map_sqrtAux]
 
 theorem map_diskSeriesGeneric (ρ : O →+* κ) (f : O[X]) (a : O) (hfa : IsUnit (f.eval a))
     (h2 : IsUnit (2 : O)) :

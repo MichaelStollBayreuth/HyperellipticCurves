@@ -27,6 +27,7 @@ residue characteristic `≠ 2` (`lem:sqrt-series`).
 
 * `ChabautyColeman.sqrtSeries_sq`: `(sqrtSeries c a₀ v)² = c` when `a₀² = c(0)` and `2a₀·v = 1`.
 * `ChabautyColeman.exists_sqrtSeries`: existence of a square root when `2a₀` is a unit.
+* `ChabautyColeman.map_sqrtSeries`: a ring hom commutes with the construction.
 
 Blueprint node: `lem:sqrt-series`.
 -/
@@ -109,6 +110,24 @@ theorem exists_sqrtSeries {c : O⟦X⟧} {a₀ : O} (ha : a₀ ^ 2 = constantCoe
   ⟨sqrtSeries c a₀ (Ring.inverse (2 * a₀)),
     sqrtSeries_sq c ha (Ring.mul_inverse_cancel _ hu),
     constantCoeff_sqrtSeries c a₀ _⟩
+
+/-! ### Ring homomorphisms -/
+
+variable {κ : Type*} [CommRing κ]
+
+/-- A ring hom commutes with the square-root recursion `ChabautyColeman.sqrtAux`. -/
+theorem map_sqrtAux (ρ : O →+* κ) (c : O⟦X⟧) (a₀ v : O) (n : ℕ) :
+    ρ (sqrtAux c a₀ v n) = sqrtAux (PowerSeries.map ρ c) (ρ a₀) (ρ v) n := by
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    rcases n with _ | n
+    · simp [sqrtAux_zero]
+    · simp +contextual [sqrtAux_succ, ih, apply_ite ρ]
+
+theorem map_sqrtSeries (ρ : O →+* κ) (c : O⟦X⟧) (a₀ v : O) :
+    PowerSeries.map ρ (sqrtSeries c a₀ v) = sqrtSeries (PowerSeries.map ρ c) (ρ a₀) (ρ v) := by
+  ext n
+  simp [map_sqrtAux]
 
 end ChabautyColeman
 
