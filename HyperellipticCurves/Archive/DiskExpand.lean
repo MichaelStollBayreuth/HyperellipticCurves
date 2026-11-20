@@ -455,8 +455,8 @@ theorem globExpand_algebraMap_derivative (r : RatFunc K) :
   rw [RatFunc.derivative_div p hq, globExpand_algebraMap, globExpand_algebraMap, map_div₀,
     map_div₀, hlift, hlift, hlift, hlift,
     kzDeriv_div _ (htne hq),
-    hnum, hden, PowerSeries.derivative_coe, PowerSeries.derivative_coe, derivative_taylor,
-    derivative_taylor, map_sub, map_mul, map_mul, map_pow]
+    hnum, hden, PowerSeries.derivative_coe, PowerSeries.derivative_coe, ← taylor_derivative,
+    ← taylor_derivative, map_sub, map_mul, map_mul, map_pow]
 
 /-- Chain rule for the disk expansion at `y`: expanding `dy/dx = f′/(2f)·y` is the
 `z`-derivative `b·η′` of the expansion `b·η` of `y`. -/

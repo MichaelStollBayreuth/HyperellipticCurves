@@ -210,7 +210,6 @@ public import HyperellipticCurves.Mathlib.Algebra.Polynomial.SpecificDegree
 public import HyperellipticCurves.Mathlib.Algebra.Polynomial.Taylor
 public import HyperellipticCurves.Mathlib.Algebra.QuadraticAlgebra.Basic
 public import HyperellipticCurves.Mathlib.Algebra.QuadraticAlgebra.Defs
-public import HyperellipticCurves.Mathlib.Algebra.QuadraticAlgebra.NormDeterminant
 public import HyperellipticCurves.Mathlib.Algebra.Ring.Units
 public import HyperellipticCurves.Mathlib.Algebra.Squarefree.Basic
 public import HyperellipticCurves.Mathlib.Data.ENat.Basic

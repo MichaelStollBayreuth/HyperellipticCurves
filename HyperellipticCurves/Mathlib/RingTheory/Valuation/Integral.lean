@@ -94,9 +94,8 @@ theorem le_one_of_eval_eq_zero {p : R[X]} (hlc : v p.leadingCoeff = 1)
   exact (zero_lt_one.trans hlt).ne' (pow_eq_zero_iff hdeg |>.mp h.symm)
 
 theorem coeffs_subset_integer {g : R[X]} (hg : ∀ i, v (g.coeff i) ≤ 1) :
-    (g.coeffs : Set R) ⊆ v.integer := fun c hc ↦ by
-  obtain ⟨n, -, rfl⟩ := mem_coeffs_iff.mp hc
-  exact hg n
+    (g.coeffs : Set R) ⊆ v.integer :=
+  coe_coeffs_subset_iff.mpr fun n _ ↦ hg n
 
 /-- If `g` has `v`-integral coefficients, `θ` is a `v`-integral root of `g` at which `g'` is a
 `v`-unit and `x` is `v`-integral, then either `x - θ` is a `v`-unit, or it has the valuation of

@@ -15,11 +15,10 @@ public import Mathlib.Algebra.Polynomial.Taylor
 import Mathlib.Algebra.Polynomial.RingDivision
 
 /-!
-# Derivatives and root multiplicities under the Taylor shift
+# Root multiplicities under the Taylor shift
 
 ## Main statements
 
-* `Polynomial.derivative_taylor`: the formal derivative commutes with the Taylor shift.
 * `Polynomial.rootMultiplicity_taylor`: `rootMultiplicity z (taylor r p) =
   rootMultiplicity (z + r) p`.
 
@@ -30,12 +29,6 @@ curves; upstreaming candidates for Mathlib.
 @[expose] public section
 
 namespace Polynomial
-
-/-- The formal derivative commutes with the Taylor shift. -/
-theorem derivative_taylor {R : Type*} [CommRing R] (p : R[X]) (r : R) :
-    Polynomial.derivative (Polynomial.taylor r p) = Polynomial.taylor r p.derivative := by
-  rw [Polynomial.taylor_apply, Polynomial.derivative_comp, Polynomial.taylor_apply]
-  simp
 
 /-- Root multiplicities shift under `taylor`. -/
 theorem rootMultiplicity_taylor {R : Type*} [CommRing R] (p : R[X]) (r z : R) :

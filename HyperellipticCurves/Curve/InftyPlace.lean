@@ -55,7 +55,7 @@ theorem inftyOrd_toHypField (P Q : K[X]) :
       = -((P ^ 2 - f * Q ^ 2).natDegree : ℤ) := by
   have hnorm : Algebra.norm (RatFunc K) (HypRing.toHypField f (⟨P, Q⟩ : HypRing K f))
       = algebraMap K[X] (RatFunc K) (P ^ 2 - f * Q ^ 2) := by
-    rw [QuadraticAlgebra.algebraNorm_eq_norm, QuadraticAlgebra.norm_def,
+    rw [Algebra.norm_quadraticAlgebra_apply, QuadraticAlgebra.norm_def,
       HypRing.re_toHypField, HypRing.im_toHypField, map_sub, map_mul, map_pow, map_pow]
     ring
   rw [inftyOrd, hnorm, RatFunc.intDegree_polynomial]

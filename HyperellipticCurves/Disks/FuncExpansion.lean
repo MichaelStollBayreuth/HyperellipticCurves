@@ -114,7 +114,7 @@ theorem two_mul_diskSeriesGeneric_mul_derivative {f : O[X]} {a : O}
       = (taylor a f.derivative : O⟦X⟧) := by
   have h := congrArg (PowerSeries.derivative) (diskSeriesGeneric_sq hfa h2)
   rw [Derivation.leibniz_pow, Derivation.leibniz, PowerSeries.derivative_C, smul_zero,
-    zero_add, PowerSeries.derivative_coe, derivative_taylor] at h
+    zero_add, PowerSeries.derivative_coe, ← taylor_derivative] at h
   have hcancel : (PowerSeries.C (Ring.inverse (f.eval a)) : O⟦X⟧)
       * PowerSeries.C (f.eval a) = 1 := by
     rw [← map_mul, Ring.inverse_mul_cancel _ hfa, map_one]

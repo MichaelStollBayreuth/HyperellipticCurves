@@ -80,10 +80,6 @@ noncomputable instance (priority := 50) instAlgebraIntermediateField
     (L : IntermediateField K (AlgebraicClosure K)) : Algebra O L :=
   ((algebraMap K L).comp (algebraMap O K)).toAlgebra
 
-instance instIsScalarTowerIntermediateField (L : IntermediateField K (AlgebraicClosure K)) :
-    IsScalarTower O K L :=
-  .of_algebraMap_eq fun _ ↦ rfl
-
 end TowerAlgebra
 
 section TowerClosure

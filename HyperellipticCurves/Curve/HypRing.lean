@@ -7,9 +7,9 @@ module
 
 public import HyperellipticCurves.Mathlib.Algebra.QuadraticAlgebra.Basic
 public import HyperellipticCurves.Mathlib.Algebra.QuadraticAlgebra.Defs
-public import HyperellipticCurves.Mathlib.Algebra.QuadraticAlgebra.NormDeterminant
 public import HyperellipticCurves.Mathlib.FieldTheory.RatFunc.Basic
 public import Mathlib.FieldTheory.RatFunc.Degree
+public import Mathlib.RingTheory.QuadraticAlgebra
 
 import HyperellipticCurves.Mathlib.FieldTheory.RatFunc.Degree
 import HyperellipticCurves.Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
@@ -160,16 +160,16 @@ for `α = a + b·y` one has `Nm(α) = α·ι(α) = a² - b²·f` and `Tr(α) = 2
 
 theorem norm_eq (z : HypRing R f) :
     Algebra.norm R[X] z = z.re ^ 2 - f * z.im ^ 2 := by
-  rw [algebraNorm_eq_norm, norm_def]
+  rw [Algebra.norm_quadraticAlgebra_apply, norm_def]
   ring
 
 theorem trace_eq (z : HypRing R f) : Algebra.trace R[X] (HypRing R f) z = 2 * z.re := by
-  rw [algebraTrace_eq]
+  rw [Algebra.trace_quadraticAlgebra_apply, trace_def]
   ring
 
 theorem mul_star_eq_norm (z : HypRing R f) :
     z * star z = algebraMap R[X] _ (Algebra.norm R[X] z) := by
-  rw [algebraNorm_eq_norm, algebraMap_norm_eq_mul_star]
+  rw [Algebra.norm_quadraticAlgebra_apply, algebraMap_norm_eq_mul_star]
 
 end HypRing
 
@@ -204,17 +204,17 @@ for `α = a + b·y ∈ F_K` one has `Nm(α) = α·ι(α) = a² - b²·f` and `Tr
 
 theorem norm_eq (z : HypField K f) :
     Algebra.norm (RatFunc K) z = z.re ^ 2 - algebraMap K[X] (RatFunc K) f * z.im ^ 2 := by
-  rw [algebraNorm_eq_norm, norm_def]
+  rw [Algebra.norm_quadraticAlgebra_apply, norm_def]
   ring
 
 theorem trace_eq (z : HypField K f) :
     Algebra.trace (RatFunc K) (HypField K f) z = 2 * z.re := by
-  rw [algebraTrace_eq]
+  rw [Algebra.trace_quadraticAlgebra_apply, trace_def]
   ring
 
 theorem mul_star_eq_norm (z : HypField K f) :
     z * star z = algebraMap (RatFunc K) _ (Algebra.norm (RatFunc K) z) := by
-  rw [algebraNorm_eq_norm, algebraMap_norm_eq_mul_star]
+  rw [Algebra.norm_quadraticAlgebra_apply, algebraMap_norm_eq_mul_star]
 
 end HypField
 
@@ -260,7 +260,7 @@ theorem isUnit_iff (hf : Odd f.natDegree) {z : HypRing K f} :
   refine ⟨fun hz ↦ ?_, fun ⟨c, hc⟩ ↦ hc ▸ c.isUnit.map (algebraMap K (HypRing K f))⟩
   have hn : IsUnit (z.re ^ 2 - f * z.im ^ 2) := by
     have h := isUnit_iff_norm_isUnit.mp hz
-    rwa [← algebraNorm_eq_norm, norm_eq] at h
+    rwa [← Algebra.norm_quadraticAlgebra_apply, norm_eq] at h
   obtain ⟨c, hc, hcp⟩ := Polynomial.isUnit_iff.mp hn
   have h1 : z.re ^ 2 = C c + f * z.im ^ 2 := by linear_combination -hcp
   have him : z.im = 0 := eq_zero_of_sq_eq_C_add_mul_sq hf h1
